@@ -9,9 +9,10 @@ import SwiftUI
 
 @main
 struct CnPhetApp_iOSApp: App {
+    @StateObject private var store = ContentStore()
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AuthGateView()
         }
     }
 }
