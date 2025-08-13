@@ -14,6 +14,11 @@ struct SimHostView: View {
         switch topic.sim {
         case .projectile:
             ProjectileSimView(title: topic.title)
+        case .freefall:
+            FreefallSimView(title: topic.title)
+        case .lens:
+            LensSimView(title: topic.title)
+
         default:
             VStack(spacing: 12) {
                 Text(topic.title).font(.title3.bold())

@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum Subject: String, Codable, CaseIterable, Identifiable {
+enum Subject: String, Codable, CaseIterable, Identifiable, Hashable {
     case physics, math, chemistry, biology
     var id: String { rawValue }
     var title: String {
@@ -20,17 +20,14 @@ enum Subject: String, Codable, CaseIterable, Identifiable {
     }
 }
 
-enum SimType: String, Codable {
-    case projectile    // 抛体（已实现）
-    case freefall, lens, ohm
-    case linear, quadratic, sine
-    case idealGas, titration, enzyme
+enum SimType: String, Codable, Hashable {
+    case projectile, freefall, lens, ohm, linear, quadratic, sine, idealGas, titration, enzyme
 }
 
-struct Topic: Identifiable, Codable {
+struct Topic: Identifiable, Codable, Hashable {
     let id: String
     let title: String
     let subject: Subject
     let sim: SimType
-    let thumb: String?   // 例如 "thumb_physics_projectile"
+    let thumb: String?
 }
