@@ -171,13 +171,15 @@ struct ProfileSheetView: View {
     }
 }
 
-// 修改密码（最小实现）
+// 修改密码（完善版）
 struct ChangePasswordSheetView: View {
     @EnvironmentObject var auth: AuthViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var oldPwd = ""
     @State private var newPwd = ""
     @State private var newPwd2 = ""
+    @State private var showErrorAlert = false
+    @State private var errorMessage = ""
 
     var body: some View {
         NavigationStack {
@@ -191,21 +193,80 @@ struct ChangePasswordSheetView: View {
                     SecureField("新密码（≥6位）", text: $newPwd)
                         .textContentType(.password)
                         .privacySensitive()
+                    
                     SecureField("重复新密码", text: $newPwd2)
                         .textContentType(.password)
                         .privacySensitive()
+                    
+                    // 密码确认提示 - 只在第二次输入完成后才显示
+                    if !newPwd2.isEmpty {
+                        if newPwd == newPwd2 {
+                            HStack {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.green)
+                                Text("密码匹配")
+                                    .foregroundColor(.green)
+                                    .font(.caption)
+                            }
+                        } else {
+                            HStack {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.red)
+                                Text("两次输入的新密码不一致")
+                                    .foregroundColor(.red)
+                                .font(.caption)
+                            }
+                        }
+                    }
                 }
+                
                 Button("确认修改") {
                     Task {
-                        guard newPwd.count >= 6, newPwd == newPwd2 else { return }
-                        await auth.changePassword(current: oldPwd, to: newPwd)
-                        dismiss()
+                        await validateAndChangePassword()
                     }
                 }
                 .disabled(oldPwd.isEmpty || newPwd.count < 6 || newPwd != newPwd2)
             }
             .navigationTitle("修改密码")
+            .alert("修改密码", isPresented: $showErrorAlert) {
+                Button("确定") { }
+            } message: {
+                Text(errorMessage)
+            }
         }
         .presentationDetents([.medium, .large])
     }
+    
+    // 验证并修改密码
+    private func validateAndChangePassword() async {
+        // 验证新密码一致性
+        guard newPwd == newPwd2 else {
+            errorMessage = "新密码与重复新密码不一致，请检查后重试。"
+            showErrorAlert = true
+            return
+        }
+        
+        // 验证新密码长度
+        guard newPwd.count >= 6 else {
+            errorMessage = "新密码长度至少6位，请检查后重试。"
+            showErrorAlert = true
+            return
+        }
+        
+        // 调用修改密码方法
+        await auth.changePassword(current: oldPwd, to: newPwd)
+        
+        // 检查是否有错误
+        if let error = auth.errorMessage, !error.isEmpty {
+            errorMessage = error
+            showErrorAlert = true
+        } else {
+            // 成功修改，关闭界面
+            dismiss()
+        }
+    }
+    
+
+    
+
 }
