@@ -33,7 +33,7 @@ struct SignUpView: View {
                     Button("返回修改邮箱") { auth.cancelPendingSignup() }
                     Spacer()
                     Button("重发验证码") {
-                        Task { await auth.resendEmailOTP() }
+                        Task { await auth.resendForgotPasswordOTP() }
                     }
                     Button("验证并完成注册") {
                         Task { await auth.verifyEmailOTP(code.trimmingCharacters(in: .whitespaces)) }

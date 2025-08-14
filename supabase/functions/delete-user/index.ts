@@ -1,39 +1,115 @@
 // supabase/functions/delete-user/index.ts
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-// 这些环境变量名要和 “secrets set” 保持一致
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
-const ANON_KEY      = Deno.env.get('SUPABASE_ANON_KEY')!   // 平常用的公钥
-const SERVICE_ROLE  = Deno.env.get('SERVICE_ROLE_KEY')!     // ✅ 只能存在服务端/函数中使用
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
-Deno.serve(async (req) => {
-  if (req.method !== 'POST') {
-    return new Response('Method Not Allowed', { status: 405 })
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
   }
 
-  const authHeader = req.headers.get('Authorization') ?? ''
-  if (!authHeader.startsWith('Bearer ')) {
-    return new Response('Missing token', { status: 401 })
-  }
+  try {
+    // 获取 JWT token（仅用于验证用户身份）
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      throw new Error('No authorization header')
+    }
+    
+    const token = authHeader.replace('Bearer ', '')
+    
+    // 创建两个不同的 Supabase 客户端
+    // 1. 用用户 JWT 验证身份
+    const userClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      }
+    )
 
-  // ① 用“用户 JWT”绑定的 client 拿当前 user
-  const userClient = createClient(SUPABASE_URL, ANON_KEY, {
-    global: { headers: { Authorization: authHeader } },
-    auth:   { persistSession: false },
-  })
-  const { data: { user }, error } = await userClient.auth.getUser()
-  if (error || !user) {
-    return new Response('Unauthorized', { status: 401 })
-  }
+    // 2. 用 service_role 执行删除操作（关键修复）
+    const adminClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        global: {
+          // 注意：这里不需要用户的 JWT，使用 service_role 的权限
+          headers: { 
+            'apikey': Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''}`
+          },
+        },
+      }
+    )
 
-  // ② 用 “service role” 的 admin client 来删除
-  const admin = createClient(SUPABASE_URL, SERVICE_ROLE, {
-    auth: { persistSession: false },
-  })
-  const { error: delErr } = await admin.auth.admin.deleteUser(user.id)
-  if (delErr) {
-    return new Response(`Delete failed: ${delErr.message}`, { status: 500 })
-  }
+    // 验证用户身份（使用用户 JWT）
+    const { data: { user }, error: authError } = await userClient.auth.getUser(token)
+    if (authError || !user) {
+      throw new Error('Invalid token')
+    }
 
-  return new Response('ok', { status: 200 })
+    console.log(`Starting deletion for user: ${user.id} (${user.email})`)
+
+    // 先删除用户资料（使用 service_role 权限）
+    try {
+      const { error: profileError } = await adminClient
+        .from('profiles')
+        .delete()
+        .eq('id', user.id)
+      
+      if (profileError) {
+        console.error('Profile deletion error:', profileError)
+        throw new Error(`Profile deletion failed: ${profileError.message}`)
+      }
+      console.log('Profile deleted successfully')
+    } catch (profileError) {
+      console.error('Profile deletion failed:', profileError)
+      throw new Error(`Profile deletion failed: ${profileError.message}`)
+    }
+
+    // 再删除用户账号（使用 service_role 权限）
+    try {
+      const { error: userError } = await adminClient.auth.admin.deleteUser(user.id)
+      if (userError) {
+        console.error('User deletion error:', userError)
+        throw new Error(`User deletion failed: ${userError.message}`)
+      }
+      console.log('User account deleted successfully')
+    } catch (userError) {
+      console.error('User deletion failed:', userError)
+      throw new Error(`Failed to delete user: ${userError.message}`)
+    }
+
+    return new Response(
+      JSON.stringify({ 
+        message: 'User deleted successfully',
+        userId: user.id,
+        email: user.email,
+        timestamp: new Date().toISOString()
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200 
+      }
+    )
+
+  } catch (error) {
+    console.error('Error in delete-user function:', error)
+    return new Response(
+      JSON.stringify({ 
+        error: error.message,
+        timestamp: new Date().toISOString()
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400 
+      }
+    )
+  }
 })
