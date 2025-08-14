@@ -10,9 +10,14 @@ import SwiftUI
 @main
 struct CnPhetApp_iOSApp: App {
     @StateObject private var store = ContentStore()
+    @StateObject private var auth  = AuthViewModel()
+
     var body: some Scene {
         WindowGroup {
             AuthGateView()
+                .environmentObject(store)
+                .environmentObject(auth)
         }
     }
 }
+

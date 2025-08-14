@@ -36,6 +36,8 @@ struct SignInView: View {
             .buttonStyle(.borderedProminent)
             .disabled(email.isEmpty || password.count < 6)
         }
+        
         .navigationTitle("登录")
+        
     }
 }

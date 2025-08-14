@@ -8,6 +8,7 @@
 // Services/AuthViewModel.swift
 import Foundation
 import Supabase
+import SwiftUI   // ← 需要这行，withAnimation 才在作用域内
 
 // 与 public.profiles 对齐的输入体
 private struct NewProfile: Encodable {
@@ -26,7 +27,8 @@ final class AuthViewModel: ObservableObject {
     @Published var profile: UserProfile?
     @Published var isBusy = false
     @Published var errorMessage: String?
-
+    
+    @Published var banner: String?
     // ⬇️ 为两步注册新增的状态
     @Published var awaitingEmailOTP = false
     @Published var pendingEmail: String?
@@ -55,6 +57,7 @@ final class AuthViewModel: ObservableObject {
 
     deinit { authWatcher?.cancel() }
 
+    
     // MARK: - 步骤 1：注册并发送验证码（不自动登录）
     func startSignUp(email: String, password: String, displayName: String?) async {
         await run {
@@ -159,6 +162,163 @@ final class AuthViewModel: ObservableObject {
             self.profile = nil
         }
     }
+    
+    // 从按钮里调用这些同步方法即可，避免在 View 里直接用 Task
+    @MainActor
+    func signOutFromUI() {
+        Task { await self.signOut() }
+    }
+
+    @MainActor
+    func deleteAccountFromUI(confirmPassword: String) {
+        Task { await self.deleteAccount(confirmPassword: confirmPassword) }
+    }
+
+    
+    
+    // MARK: - 用户信息（便于 UI 直接拿）
+    var accountEmail: String { user?.email ?? "" }
+    var accountDisplayName: String { profile?.display_name ?? "" }
+    // 在 AuthViewModel 顶部属性区新增
+
+    func showBanner(_ text: String, seconds: Double = 1.0) {
+        banner = text
+        Task {
+            try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+            await MainActor.run { self.banner = nil }
+        }
+    }
+
+    /// 统一显示顶部提示，避免与任何同名属性冲突
+    @MainActor
+    func showToast(_ text: String, seconds: Double = 1.0) {
+        withAnimation { banner = text }
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+            withAnimation { banner = nil }
+        }
+    }
+
+    /// 简单错误构造器（替代 AuthError.message(...)）
+    private func makeError(_ msg: String) -> Error {
+        NSError(domain: "app.auth", code: -1, userInfo: [NSLocalizedDescriptionKey: msg])
+    }
+
+    
+    // MARK: - 修改密码（校验原密码）
+    func changePassword(current oldPassword: String, to newPassword: String) async {
+        await run {
+            guard let email = self.user?.email else {
+                self.errorMessage = "未登录"; return
+            }
+            // 1) 先用原密码“再登录”校验（若开启 Secure password change，等价于 re-auth）
+            _ = try await self.client.auth.signIn(email: email, password: oldPassword)
+            // 2) 更新密码
+            try await self.client.auth.update(user: .init(password: newPassword))
+            // 3) 可选：用新密码再登录一次，确保会话最新
+            _ = try? await self.client.auth.signIn(email: email, password: newPassword)
+            // 原来：self.errorMessage = "密码已更新"
+            await MainActor.run { self.showToast("密码已更新", seconds: 1) }
+
+
+        }
+    }
+
+    // MARK: - 注销账号（推荐：走 Edge Function 真删）
+    /// 真正执行"注销账户"的逻辑
+    func deleteAccount(confirmPassword: String) async {
+        do {
+            print("🔍 开始注销账号流程...")
+            
+            // 1) 重新校验密码（避免越权/过期会话）
+            guard let email = self.user?.email ?? self.profile?.email else {
+                throw makeError("当前用户邮箱不存在")
+            }
+            print("📧 验证邮箱: \(email)")
+            
+            _ = try await self.client.auth.signIn(email: email, password: confirmPassword)
+            print("✅ 密码验证成功")
+
+            // 2) 调用 Edge Function 删除 supabase auth 用户
+            let session = try await self.client.auth.session
+            let jwt = session.accessToken
+            guard !jwt.isEmpty else { throw makeError("会话失效，请重新登录") }
+            print("🔑 获取到有效JWT")
+
+            // 尝试调用Edge Function
+            do {
+                try await SupabaseService.shared.deleteCurrentUserViaEdge(jwt: jwt)
+                print("✅ Edge Function 调用成功")
+            } catch {
+                print("⚠️ Edge Function 调用失败: \(error.localizedDescription)")
+                // 如果Edge Function失败，尝试软删除
+                print("🔄 尝试软删除...")
+                try await self.softDeleteAccount(note: "Edge Function失败，使用软删除")
+            }
+
+            // 3) 先给出提示，再退出登录
+            await MainActor.run { self.showToast("注销成功", seconds: 1.0) }
+            try await Task.sleep(nanoseconds: 1_000_000_000) // 1s
+
+            try await self.client.auth.signOut()
+            await MainActor.run {
+                self.user = nil
+                self.profile = nil
+            }
+            print("✅ 账号注销完成，已退出登录")
+            
+        } catch {
+            print("❌ 注销账号失败: \(error.localizedDescription)")
+            // 统一错误提示
+            await MainActor.run { self.showToast(error.localizedDescription, seconds: 2) }
+        }
+    }
+    
+    
+
+    // MARK: - 仅用于"开发期软删除"的便捷方法（不想立刻做 Edge Function 时可先用）
+    func softDeleteAccount(note: String? = nil) async {
+        await run {
+            guard let uid = self.user?.id else {
+                print("❌ 软删除失败：用户ID不存在")
+                return
+            }
+            print("🔄 开始软删除用户: \(uid)")
+            
+            // 尝试更新profiles表
+            do {
+                // 使用结构体来确保类型安全
+                struct SoftDeleteProfile: Encodable {
+                    let display_name: String
+                    let updated_at: String
+                    let deleted_at: String
+                }
+                
+                let updateData = SoftDeleteProfile(
+                    display_name: "已注销",
+                    updated_at: ISO8601DateFormatter().string(from: .init()),
+                    deleted_at: ISO8601DateFormatter().string(from: .init())
+                )
+                
+                _ = try await self.client.database
+                    .from("profiles")
+                    .update(updateData)
+                    .eq("id", value: uid)
+                    .execute()
+                print("✅ profiles表更新成功")
+            } catch {
+                print("⚠️ profiles表更新失败: \(error.localizedDescription)")
+                // 即使更新失败也继续执行
+            }
+            
+            // 退出登录
+            try? await self.client.auth.signOut()
+            self.user = nil
+            self.profile = nil
+            print("✅ 软删除完成，已退出登录")
+        }
+    }
+
 
     func updateDisplayName(_ name: String) async {
         await run {
