@@ -609,18 +609,7 @@ final class AuthViewModel: ObservableObject {
         self.errorMessage = nil
     }
 
-    // 手动触发密码重置（备用方案）
-    func manualTriggerPasswordReset(email: String, token: String) {
-        print("🔄 手动触发密码重置")
-        print("📝 邮箱: \(email)")
-        print("📝 Token: \(token.prefix(10))...")
-        
-        self.resetEmail = email
-        self.resetToken = token
-        self.isResettingPassword = true
-        
-        print("✅ 手动重置状态设置完成")
-    }
+
     
     // 更新重置令牌（用于新验证码）
     func updateResetToken(newToken: String) {

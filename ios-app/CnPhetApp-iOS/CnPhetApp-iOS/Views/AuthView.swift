@@ -76,11 +76,6 @@ struct SignInForm: View {
     @State private var password = ""
     @State private var showForgotPasswordAlert = false
     @State private var forgotPasswordEmail = ""
-    @State private var showManualResetAlert = false
-    @State private var manualResetEmail = ""
-    @State private var manualResetToken = ""
-    @State private var showLinkInputAlert = false
-    @State private var linkInputText = ""
     
     var body: some View {
         VStack(spacing: 20) {
@@ -103,18 +98,6 @@ struct SignInForm: View {
                         }
                         .font(.caption)
                         .foregroundColor(.blue)
-                        
-                        Button("手动重置密码") {
-                            showManualResetAlert = true
-                        }
-                        .font(.caption2)
-                        .foregroundColor(.orange)
-                        
-                        Button("从邮件复制链接") {
-                            showLinkInputAlert = true
-                        }
-                        .font(.caption2)
-                        .foregroundColor(.green)
                         
 
                     }
@@ -167,7 +150,7 @@ struct SignInForm: View {
                 forgotPasswordEmail = ""
             }
             
-            Button(auth.isBusy ? "发送中..." : "发送重置链接") {
+            Button(auth.isBusy ? "发送中..." : "发送重置验证码") {
                 Task {
                     await auth.resetPassword(email: forgotPasswordEmail)
                     forgotPasswordEmail = ""
@@ -176,84 +159,13 @@ struct SignInForm: View {
             }
             .disabled(forgotPasswordEmail.isEmpty || auth.isBusy)
         } message: {
-            Text("请输入您的邮箱地址，我们将发送密码重置链接到您的邮箱。")
+            Text("请输入您的邮箱地址，我们将发送密码重置验证码到您的邮箱。")
         }
-        .alert("手动重置密码", isPresented: $showManualResetAlert) {
-            TextField("邮箱地址", text: $manualResetEmail)
-                .textInputAutocapitalization(.never)
-                .keyboardType(.emailAddress)
-            
-            TextField("重置令牌", text: $manualResetToken)
-                .textInputAutocapitalization(.never)
-                .textInputAutocapitalization(.never)
-            
-            Button("取消", role: .cancel) {
-                manualResetEmail = ""
-                manualResetToken = ""
-            }
-            
-            Button("开始重置") {
-                auth.manualTriggerPasswordReset(email: manualResetEmail, token: manualResetToken)
-                manualResetEmail = ""
-                manualResetToken = ""
-                showManualResetAlert = false
-            }
-            .disabled(manualResetEmail.isEmpty || manualResetToken.isEmpty)
-        } message: {
-            Text("如果您收到了密码重置邮件，请从邮件中复制重置令牌，然后在这里手动输入邮箱和令牌来重置密码。")
-        }
-        .alert("从邮件复制链接", isPresented: $showLinkInputAlert) {
-            TextField("粘贴完整链接", text: $linkInputText)
-                .textInputAutocapitalization(.never)
-            
-            Button("取消", role: .cancel) {
-                linkInputText = ""
-            }
-            
-            Button("解析链接") {
-                parsePasswordResetLink(linkInputText)
-                linkInputText = ""
-                showLinkInputAlert = false
-            }
-            .disabled(linkInputText.isEmpty)
-        } message: {
-            Text("请从邮件中复制完整的重置链接（包括 cnphetapp:// 开头的部分），粘贴到这里，我们将自动解析邮箱和令牌。")
-        }
+
+
     }
     
-    // 解析密码重置链接
-    private func parsePasswordResetLink(_ link: String) {
-        print("🔗 开始解析链接: \(link)")
-        
-        guard let url = URL(string: link) else {
-            print("❌ 无效的链接格式")
-            return
-        }
-        
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
-              let queryItems = components.queryItems else {
-            print("❌ 无法解析链接参数")
-            return
-        }
-        
-        var token: String?
-        var email: String?
-        
-        for item in queryItems {
-            if item.name == "token" {
-                token = item.value
-            } else if item.name == "email" {
-                email = item.value
-            }
-        }
-        
-        if let token = token, let email = email {
-            print("✅ 解析成功 - Token: \(token.prefix(10))..., Email: \(email)")
-            auth.manualTriggerPasswordReset(email: email, token: token)
-        } else {
-            print("❌ 缺少必要的参数")
-        }
-    }
+
 }
 
 // 注册表单
@@ -369,9 +281,38 @@ struct PasswordResetForm: View {
             VStack(spacing: 16) {
                 SecureField("新密码（≥6 位）", text: $newPassword)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(newPassword.count >= 6 ? Color.green : Color.gray, lineWidth: 1)
+                    )
                 
                 SecureField("确认新密码", text: $confirmPassword)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(getConfirmPasswordBorderColor(), lineWidth: 1)
+                    )
+                
+                // 密码确认提示
+                if !confirmPassword.isEmpty {
+                    if newPassword == confirmPassword {
+                        HStack {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                            Text("密码匹配")
+                                .foregroundColor(.green)
+                                .font(.caption)
+                        }
+                    } else {
+                        HStack {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.red)
+                            Text("密码不匹配")
+                                .foregroundColor(.red)
+                                .font(.caption)
+                        }
+                    }
+                }
             }
             
             // 按钮
@@ -383,6 +324,15 @@ struct PasswordResetForm: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(newPassword.isEmpty || confirmPassword.isEmpty || newPassword != confirmPassword || newPassword.count < 6 || auth.isBusy)
+                
+                // 按钮禁用原因提示
+                if newPassword.isEmpty || confirmPassword.isEmpty || newPassword != confirmPassword || newPassword.count < 6 {
+                    let reason = getDisabledReason()
+                    Text(reason)
+                        .foregroundColor(.orange)
+                        .font(.caption)
+                        .multilineTextAlignment(.center)
+                }
                 
                 Button("取消") {
                     auth.cancelPasswordReset()
@@ -410,6 +360,32 @@ struct PasswordResetForm: View {
             if !newValue {
                 print("🔄 检测到密码重置状态变为 false，应该返回登录界面")
             }
+        }
+    }
+    
+    // 获取按钮禁用原因
+    private func getDisabledReason() -> String {
+        if newPassword.isEmpty {
+            return "请输入新密码"
+        } else if confirmPassword.isEmpty {
+            return "请确认新密码"
+        } else if newPassword.count < 6 {
+            return "密码长度至少6位"
+        } else if newPassword != confirmPassword {
+            return "两次输入的密码不一致"
+        } else {
+            return ""
+        }
+    }
+    
+    // 获取确认密码输入框的边框颜色
+    private func getConfirmPasswordBorderColor() -> Color {
+        if confirmPassword.isEmpty {
+            return Color.gray
+        } else if newPassword == confirmPassword {
+            return Color.green
+        } else {
+            return Color.red
         }
     }
 }
