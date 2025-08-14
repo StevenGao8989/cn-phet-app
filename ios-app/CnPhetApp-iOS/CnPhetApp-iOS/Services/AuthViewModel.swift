@@ -151,7 +151,7 @@ final class AuthViewModel: ObservableObject {
                 } else if errorMsg.contains("over email rate limit") || errorMsg.contains("rate limit") {
                     self.errorMessage = "请求太频繁，请稍后再试。"
                 } else {
-                    self.errorMessage = error.localizedDescription
+                    self.errorMessage = "验证码发送失败，请稍后重试。"
                 }
             }
         }
@@ -235,7 +235,7 @@ final class AuthViewModel: ObservableObject {
                 } else if errorMsg.contains("already registered") {
                     self.errorMessage = "该邮箱已注册，请直接登录。"
                 } else {
-                    self.errorMessage = "发送失败: \(error.localizedDescription)"
+                    self.errorMessage = "发送失败，请稍后重试。"
                 }
                 
                 // 显示错误提示
@@ -475,7 +475,7 @@ final class AuthViewModel: ObservableObject {
                             } else if errorMsg.contains("already used") {
                                 self.errorMessage = "验证码已被使用，请重新申请。"
                             } else {
-                                self.errorMessage = "验证码验证失败: \(error.localizedDescription)"
+                                self.errorMessage = "验证码验证失败，请检查后重试。"
                             }
                             
                             await MainActor.run { self.showToast("验证失败，请重试", seconds: 2) }
@@ -587,7 +587,7 @@ final class AuthViewModel: ObservableObject {
                     } else if errorMsg.contains("rate limit") || errorMsg.contains("too many") {
                         self.errorMessage = "请求过于频繁，请稍后再试。"
                     } else {
-                        self.errorMessage = "密码更新失败: \(updateError.localizedDescription)"
+                        self.errorMessage = "密码更新失败，请检查后重试。"
                     }
                     
                     await MainActor.run { self.showToast("密码更新失败，请重试", seconds: 2) }
@@ -595,7 +595,7 @@ final class AuthViewModel: ObservableObject {
                 
             } catch let error as NSError {
                 print("❌ 密码重置流程失败: \(error.localizedDescription)")
-                self.errorMessage = "密码重置失败: \(error.localizedDescription)"
+                self.errorMessage = "密码重置失败，请稍后重试。"
                 await MainActor.run { self.showToast("重置失败，请重试", seconds: 2) }
             }
         }
@@ -760,17 +760,27 @@ final class AuthViewModel: ObservableObject {
                 // 重新加载用户信息
                 try await self.loadCurrentUserAndProfile()
                 
-                self.errorMessage = "密码修改成功！"
+                // 清除错误信息，设置成功消息
+                self.errorMessage = nil
                 self.showToast("密码修改成功！", seconds: 2)
                 
             } catch let error as NSError {
                 print("❌ 密码修改失败: \(error.localizedDescription)")
                 
                 let errorMsg = error.localizedDescription.lowercased()
-                if errorMsg.contains("invalid") {
-                    self.errorMessage = "原密码错误，请重试。"
+                if errorMsg.contains("invalid") || errorMsg.contains("credentials") {
+                    self.errorMessage = "当前密码错误，请检查后重试。"
+                } else if errorMsg.contains("session") || errorMsg.contains("unauthorized") {
+                    self.errorMessage = "认证会话已过期，请重新登录。"
+                } else if errorMsg.contains("password") && errorMsg.contains("weak") {
+                    self.errorMessage = "新密码强度不够，请使用更复杂的密码。"
+                } else if errorMsg.contains("different") && errorMsg.contains("old") {
+                    self.errorMessage = "新密码不能与当前密码相同，请设置不同的密码。"
+                } else if errorMsg.contains("rate limit") || errorMsg.contains("too many") {
+                    self.errorMessage = "请求过于频繁，请稍后再试。"
                 } else {
-                    self.errorMessage = "密码修改失败: \(error.localizedDescription)"
+                    // 对于其他英文错误，提供通用的中文提示
+                    self.errorMessage = "密码修改失败，请检查输入信息后重试。"
                 }
             }
         }
@@ -817,7 +827,7 @@ final class AuthViewModel: ObservableObject {
                 if errorMsg.contains("invalid") {
                     self.errorMessage = "密码错误，请重试。"
                 } else {
-                    self.errorMessage = "删除账号失败: \(error.localizedDescription)"
+                    self.errorMessage = "删除账号失败，请稍后重试。"
                 }
             }
         }
@@ -910,7 +920,7 @@ final class AuthViewModel: ObservableObject {
             } else if msg.contains("over email rate limit") || msg.contains("rate limit") {
                 self.errorMessage = "请求太频繁，请稍后再试。"
             } else {
-                self.errorMessage = error.localizedDescription
+                self.errorMessage = "操作失败，请稍后重试。"
             }
             print("Auth error:", error)
         }
