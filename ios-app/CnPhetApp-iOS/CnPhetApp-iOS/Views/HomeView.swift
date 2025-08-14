@@ -44,6 +44,8 @@ struct HomeView: View {
                         Button("查看个人信息") { showProfileSheet = true }
                         Button("修改密码")   { showChangePwdSheet = true }
                         Divider()
+
+                        Divider()
                         Button("退出登录", role: .destructive) {
                             auth.signOutFromUI()
                         }

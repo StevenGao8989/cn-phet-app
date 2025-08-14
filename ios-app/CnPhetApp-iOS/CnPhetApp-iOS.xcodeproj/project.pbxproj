@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		828767062E4C7759003D6767 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 828767052E4C7759003D6767 /* Secrets.xcconfig */; };
 		8287671E2E4C7DEF003D6767 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 8287671D2E4C7DEF003D6767 /* Supabase */; };
-		828767202E4C8416003D6767 /* Secrets 2.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 8287671F2E4C8416003D6767 /* Secrets 2.xcconfig */; };
-		828767222E4C8421003D6767 /* Secrets 3.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 828767212E4C8421003D6767 /* Secrets 3.xcconfig */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,8 +33,6 @@
 		828766CC2E4B9469003D6767 /* CnPhetApp-iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "CnPhetApp-iOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		828766D62E4B9469003D6767 /* CnPhetApp-iOSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "CnPhetApp-iOSUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		828767052E4C7759003D6767 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
-		8287671F2E4C8416003D6767 /* Secrets 2.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Secrets 2.xcconfig"; sourceTree = "<group>"; };
-		828767212E4C8421003D6767 /* Secrets 3.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Secrets 3.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -105,8 +101,6 @@
 				828766C02E4B9467003D6767 /* Products */,
 				828767052E4C7759003D6767 /* Secrets.xcconfig */,
 				8287671C2E4C7DE4003D6767 /* Frameworks */,
-				8287671F2E4C8416003D6767 /* Secrets 2.xcconfig */,
-				828767212E4C8421003D6767 /* Secrets 3.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -251,8 +245,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				828767222E4C8421003D6767 /* Secrets 3.xcconfig in Resources */,
-				828767202E4C8416003D6767 /* Secrets 2.xcconfig in Resources */,
 				828767062E4C7759003D6767 /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -453,7 +445,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.stevengao.CnPhetApp-iOS";
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourcompany.cnphetapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPABASE_URL = "https://yveexbmtnlnsfwrpumgy.supabase.co";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -483,7 +475,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.stevengao.CnPhetApp-iOS";
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourcompany.cnphetapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPABASE_URL = "https://yveexbmtnlnsfwrpumgy.supabase.co";
 				SWIFT_EMIT_LOC_STRINGS = YES;

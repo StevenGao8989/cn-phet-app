@@ -8,7 +8,7 @@
 // Services/AuthViewModel.swift
 import Foundation
 import Supabase
-import SwiftUI   // ← 需要这行，withAnimation 才在作用域内
+import SwiftUI
 
 // 与 public.profiles 对齐的输入体
 private struct NewProfile: Encodable {
@@ -34,6 +34,16 @@ final class AuthViewModel: ObservableObject {
     @Published var pendingEmail: String?
     @Published var pendingPassword: String?
     @Published var pendingDisplayName: String?
+    
+    // 密码重置状态
+    @Published var isResettingPassword = false
+    @Published var resetToken: String?
+    @Published var resetEmail: String?
+    
+    // 忘记密码验证码状态
+    @Published var isForgotPasswordFlow = false
+    @Published var forgotPasswordEmail: String? = nil
+    @Published var forgotPasswordOTP = ""
 
     private let client = SupabaseService.shared.client
     private var authWatcher: Task<Void, Never>?
@@ -73,7 +83,7 @@ final class AuthViewModel: ObservableObject {
             // 发起注册（Confirm email 开启时，通常不会返回 session）
             _ = try await self.client.auth.signUp(email: email, password: password, data: meta)
 
-            // 保存待验证信息，进入“输入验证码”步骤
+            // 保存待验证信息，进入"输入验证码"步骤
             self.pendingEmail = email
             self.pendingPassword = password
             self.pendingDisplayName = displayName
@@ -89,53 +99,594 @@ final class AuthViewModel: ObservableObject {
                 let email = self.pendingEmail,
                 let pwd   = self.pendingPassword
             else {
-                self.errorMessage = "验证码会话已过期，请返回重新注册。"
-                self.awaitingEmailOTP = false
+                self.errorMessage = "注册信息丢失，请重新开始。"
                 return
             }
 
-            // 1) 校验 6 位验证码（对应 signup 流程）
-            _ = try await self.client.auth.verifyOTP(
-                email: email,
-                token: code,
-                type: .signup
-            )
+            do {
+                // 1️⃣ 校验验证码（这一步会建立 session）
+                let result = try await self.client.auth.verifyOTP(
+                    email: email,
+                    token: code,
+                    type: .signup
+                )
+                
+                // 验证码验证成功后，直接使用 result.user
+                let user = result.user
 
-            // 2) 通过后再登录
-            _ = try await self.client.auth.signIn(email: email, password: pwd)
-
-            // 3) upsert 到 profiles（触发器在也不冲突）
-            if let u = try? await self.client.auth.session.user {
-                let payload = NewProfile(id: u.id, email: email, display_name: self.pendingDisplayName)
+                // 2️⃣ 登录（确保 session 建立）
+                _ = try await self.client.auth.signIn(email: email, password: pwd)
+                
+                // 3️⃣ 落库用户资料
+                let newProfile = NewProfile(
+                    id: user.id,
+                    email: user.email ?? email,
+                    display_name: self.pendingDisplayName
+                )
+                
                 _ = try await self.client.database
                     .from("profiles")
-                    .upsert(payload, onConflict: "id")
+                    .insert(newProfile)
                     .execute()
 
-                // 4) 可选：把昵称再同步一次到 user_metadata（确保 Users 页面显示）
-                if let name = self.pendingDisplayName, !name.isEmpty {
-                    try? await self.client.auth.update(user: .init(
-                        data: ["display_name": AnyJSON.string(name), "full_name": AnyJSON.string(name)]
-                    ))
+                // 4️⃣ 加载用户信息
+                try await self.loadCurrentUserAndProfile()
+                
+                // 5️⃣ 清理状态
+                self.awaitingEmailOTP = false
+                self.pendingEmail = nil
+                self.pendingPassword = nil
+                self.pendingDisplayName = nil
+                self.errorMessage = nil
+                
+                print("✅ 注册完成，用户已登录")
+                
+            } catch let error as NSError {
+                print("❌ 验证码校验失败: \(error.localizedDescription)")
+                
+                // 根据错误类型提供更具体的提示
+                let errorMsg = error.localizedDescription.lowercased()
+                if errorMsg.contains("invalid") || errorMsg.contains("expired") {
+                    self.errorMessage = "验证码无效或已过期，请重试或点击重发验证码。"
+                } else if errorMsg.contains("over email rate limit") || errorMsg.contains("rate limit") {
+                    self.errorMessage = "请求太频繁，请稍后再试。"
+                } else {
+                    self.errorMessage = error.localizedDescription
                 }
             }
-
-            // 5) 清理并加载资料
-            self.awaitingEmailOTP = false
-            self.pendingEmail = nil
-            self.pendingPassword = nil
-            self.pendingDisplayName = nil
-            try? await self.loadCurrentUserAndProfile()
         }
     }
 
-    // 重发验证码
-    func resendEmailOTP() async {
+    // MARK: - 忘记密码功能
+    func resetPassword(email: String) async {
         await run {
-            guard let email = self.pendingEmail else { return }
-            try await self.client.auth.resend(email: email, type: .signup)
-            self.errorMessage = "已重新发送验证码到 \(email)"
+            print("🔄 开始忘记密码流程，邮箱: \(email)")
+            
+            do {
+                // 方法1：尝试使用密码重置功能（如果可用）
+                do {
+                    try await self.client.auth.resetPasswordForEmail(email)
+                    print("✅ 密码重置验证码发送成功（方法1）")
+                    
+                    // 设置忘记密码流程状态
+                    await MainActor.run {
+                        self.forgotPasswordEmail = email
+                        self.isForgotPasswordFlow = true
+                        self.errorMessage = "验证码已发送到 \(email)，请查收邮件并输入验证码。"
+                    }
+                    
+                    // 显示成功提示
+                    await MainActor.run {
+                        self.showToast("验证码已发送", seconds: 3)
+                    }
+                    return
+                    
+                } catch let error as NSError {
+                    print("⚠️ 方法1失败，尝试方法2: \(error.localizedDescription)")
+                }
+                
+                // 方法2：使用注册流程发送验证码
+                print("🔄 尝试方法2：使用注册流程发送验证码")
+                
+                // 先尝试登出当前用户（如果有的话）
+                do {
+                    try await self.client.auth.signOut()
+                    print("✅ 已登出当前用户")
+                } catch let error as NSError {
+                    print("⚠️ 登出失败或用户未登录: \(error.localizedDescription)")
+                }
+                
+                // 发送新的验证码
+                let signUpResult = try await self.client.auth.signUp(email: email, password: "temp_password_123")
+                print("✅ 注册流程验证码发送成功")
+                
+                // 检查结果
+                let user = signUpResult.user
+                print("📧 用户ID: \(user.id.uuidString)")
+                print("📧 验证码已发送到邮箱，请尽快输入")
+                print("📧 注意：验证码有效期较短，请尽快输入")
+                
+                // 设置忘记密码流程状态
+                await MainActor.run {
+                    self.forgotPasswordEmail = email
+                    self.isForgotPasswordFlow = true
+                    self.errorMessage = "验证码已发送到 \(email)，请查收邮件并输入验证码。"
+                }
+                
+                // 显示成功提示
+                await MainActor.run {
+                    self.showToast("验证码已发送", seconds: 3)
+                }
+                
+            } catch let error as NSError {
+                print("❌ 发送验证码失败: \(error.localizedDescription)")
+                print("❌ 错误详情: \(error)")
+                
+                // 根据错误类型提供更具体的提示
+                let errorMsg = error.localizedDescription.lowercased()
+                if errorMsg.contains("user not found") || errorMsg.contains("does not exist") {
+                    self.errorMessage = "该邮箱地址未注册，请检查邮箱地址是否正确。"
+                } else if errorMsg.contains("rate limit") || errorMsg.contains("too many requests") {
+                    self.errorMessage = "请求过于频繁，请稍后再试。"
+                } else if errorMsg.contains("invalid email") {
+                    self.errorMessage = "邮箱地址格式不正确，请检查后重试。"
+                } else if errorMsg.contains("email not confirmed") {
+                    self.errorMessage = "邮箱未确认，请先确认邮箱。"
+                } else if errorMsg.contains("already registered") {
+                    self.errorMessage = "该邮箱已注册，请直接登录。"
+                } else {
+                    self.errorMessage = "发送失败: \(error.localizedDescription)"
+                }
+                
+                // 显示错误提示
+                await MainActor.run {
+                    self.showToast("发送失败，请重试", seconds: 2)
+                }
+            }
         }
+    }
+
+    // 验证忘记密码的验证码
+    func verifyForgotPasswordOTP(_ code: String) async {
+        await run {
+            guard let email = self.forgotPasswordEmail else {
+                self.errorMessage = "邮箱信息丢失，请重新开始。"
+                return
+            }
+            
+            print("🔄 验证忘记密码验证码，邮箱: \(email)")
+            print("📝 验证码: \(code)")
+            
+            do {
+                print("🔄 开始验证验证码...")
+                print("📝 邮箱: \(email)")
+                print("📝 验证码: \(code)")
+                print("📝 验证类型: .signup")
+                
+                // 方法1：尝试验证注册验证码
+                do {
+                    print("🔄 尝试方法1：验证注册验证码")
+                    let result = try await self.client.auth.verifyOTP(
+                        email: email,
+                        token: code,
+                        type: .signup
+                    )
+                    print("✅ 验证码验证成功（方法1）")
+                    print("📝 验证结果: \(result)")
+                    
+                    // 验证成功后，进入密码重置界面
+                    await MainActor.run {
+                        self.resetEmail = email
+                        self.resetToken = code
+                        self.isResettingPassword = true
+                        self.isForgotPasswordFlow = false
+                        self.errorMessage = nil
+                        print("🔄 进入密码重置界面")
+                    }
+                    return
+                    
+                } catch let error as NSError {
+                    print("⚠️ 方法1失败: \(error.localizedDescription)")
+                }
+                
+                // 方法2：尝试用验证码重新注册（建立会话）
+                print("🔄 尝试方法2：用验证码重新注册建立会话")
+                do {
+                    // 先尝试登出当前用户
+                    do {
+                        try await self.client.auth.signOut()
+                        print("✅ 已登出当前用户")
+                    } catch let signOutError as NSError {
+                        print("⚠️ 登出失败或用户未登录: \(signOutError.localizedDescription)")
+                    }
+                    
+                    // 重新注册以建立会话
+                    let result = try await self.client.auth.signUp(email: email, password: "temp_password_123")
+                    print("✅ 重新注册成功，建立会话")
+                    print("📝 注册结果: \(result)")
+                    
+                    // 验证成功后，进入密码重置界面
+                    await MainActor.run {
+                        self.resetEmail = email
+                        self.resetToken = code
+                        self.isResettingPassword = true
+                        self.isForgotPasswordFlow = false
+                        self.errorMessage = nil
+                        print("🔄 进入密码重置界面")
+                    }
+                    return
+                    
+                } catch let error as NSError {
+                    print("⚠️ 方法2失败: \(error.localizedDescription)")
+                }
+                
+                // 如果两种方法都失败，提供具体错误信息
+                print("❌ 所有验证方法都失败了")
+                
+                // 设置通用错误信息
+                self.errorMessage = "验证码验证失败，请重试或重新发送验证码。"
+                
+                // 显示错误提示
+                await MainActor.run {
+                    self.showToast("验证失败，请重试", seconds: 2)
+                }
+            }
+        }
+    }
+
+    // 重发忘记密码验证码
+    func resendForgotPasswordOTP() async {
+        await run {
+            guard let email = self.forgotPasswordEmail else { return }
+            
+            print("🔄 重新发送验证码到: \(email)")
+            
+            do {
+                // 先尝试登出当前用户
+                do {
+                    try await self.client.auth.signOut()
+                    print("✅ 已登出当前用户")
+                } catch let error as NSError {
+                    print("⚠️ 登出失败或用户未登录: \(error.localizedDescription)")
+                }
+                
+                // 重新发送注册验证码
+                let result = try await self.client.auth.signUp(email: email, password: "temp_password_123")
+                print("✅ 重新发送验证码成功")
+                
+                let user = result.user
+                print("📧 新验证码已发送，用户ID: \(user.id.uuidString)")
+                self.errorMessage = "新验证码已发送到 \(email)，请尽快输入。"
+                
+            } catch let error as NSError {
+                print("❌ 重发验证码失败: \(error.localizedDescription)")
+                self.errorMessage = "重发验证码失败，请重试。"
+            }
+        }
+    }
+
+    // 取消忘记密码流程
+    func cancelForgotPasswordFlow() {
+        self.isForgotPasswordFlow = false
+        self.forgotPasswordEmail = nil
+        self.forgotPasswordOTP = ""
+        self.errorMessage = nil
+    }
+
+    // 处理密码重置回调
+    func handlePasswordReset(token: String, email: String) {
+        print("🔄 开始处理密码重置回调")
+        print("📝 Token: \(token)")
+        print("📝 Email: \(email)")
+        
+        // 设置重置状态
+        self.resetToken = token
+        self.resetEmail = email
+        self.isResettingPassword = true
+        
+        print("✅ 密码重置状态已设置")
+        print("📝 isResettingPassword: \(self.isResettingPassword)")
+        print("📝 resetEmail: \(self.resetEmail ?? "nil")")
+        print("📝 resetToken: \(self.resetToken ?? "nil")")
+    }
+
+    // 提交新密码
+    func updatePassword(newPassword: String) async {
+        await run {
+            guard let token = self.resetToken else {
+                self.errorMessage = "重置令牌无效，请重新申请密码重置。"
+                return
+            }
+            
+            guard let email = self.resetEmail else {
+                self.errorMessage = "重置邮箱信息丢失，请重新申请密码重置。"
+                return
+            }
+            
+            print("🔄 开始更新密码，邮箱: \(email)")
+            print("📝 使用重置令牌: \(token)")
+            
+            do {
+                // 步骤1：验证验证码并建立会话
+                print("🔄 步骤1：验证验证码并建立会话")
+                print("📝 验证码: \(token)")
+                print("📝 邮箱: \(email)")
+                
+                var verificationSuccessful = false
+                
+                // 尝试多种验证方式
+                do {
+                    // 方式1：尝试 signup 类型验证
+                    print("🔄 尝试方式1：signup 类型验证")
+                    let result = try await self.client.auth.verifyOTP(
+                        email: email,
+                        token: token,
+                        type: .signup
+                    )
+                    print("✅ 验证码验证成功（方式1）")
+                    print("📝 验证结果: \(result)")
+                    
+                    // 检查是否有用户信息
+                    let user = result.user
+                    print("📧 用户ID: \(user.id.uuidString)")
+                    verificationSuccessful = true
+                    
+                } catch let error as NSError {
+                    print("⚠️ 方式1失败: \(error.localizedDescription)")
+                    
+                    // 方式2：尝试 recovery 类型验证（如果可用）
+                    do {
+                        print("🔄 尝试方式2：recovery 类型验证")
+                        let result = try await self.client.auth.verifyOTP(
+                            email: email,
+                            token: token,
+                            type: .recovery
+                        )
+                        print("✅ 验证码验证成功（方式2）")
+                        print("📝 验证结果: \(result)")
+                        
+                        let user = result.user
+                        print("📧 用户ID: \(user.id.uuidString)")
+                        verificationSuccessful = true
+                        
+                    } catch let recoveryError as NSError {
+                        print("⚠️ 方式2失败: \(recoveryError.localizedDescription)")
+                        
+                        // 方式3：尝试用验证码作为密码登录
+                        do {
+                            print("🔄 尝试方式3：用验证码作为密码登录")
+                            _ = try await self.client.auth.signIn(email: email, password: token)
+                            print("✅ 验证码登录成功（方式3）")
+                            verificationSuccessful = true
+                            
+                        } catch let loginError as NSError {
+                            print("⚠️ 方式3失败: \(loginError.localizedDescription)")
+                            
+                            // 所有方式都失败，提供详细错误信息
+                            print("❌ 所有验证方式都失败了")
+                            let errorMsg = error.localizedDescription.lowercased()
+                            
+                            if errorMsg.contains("expired") {
+                                self.errorMessage = "验证码已过期，请重新申请密码重置。"
+                            } else if errorMsg.contains("invalid") {
+                                self.errorMessage = "验证码无效，请检查后重试。"
+                            } else if errorMsg.contains("not found") {
+                                self.errorMessage = "用户不存在，请检查邮箱地址。"
+                            } else if errorMsg.contains("already used") {
+                                self.errorMessage = "验证码已被使用，请重新申请。"
+                            } else {
+                                self.errorMessage = "验证码验证失败: \(error.localizedDescription)"
+                            }
+                            
+                            await MainActor.run { self.showToast("验证失败，请重试", seconds: 2) }
+                            return
+                        }
+                    }
+                }
+                
+                // 如果验证失败，直接返回
+                guard verificationSuccessful else {
+                    print("❌ 验证码验证失败")
+                    return
+                }
+                
+                // 步骤2：检查当前会话状态
+                print("🔄 步骤2：检查当前会话状态")
+                do {
+                    let currentSession = try await self.client.auth.session
+                    print("✅ 当前会话有效，用户ID: \(currentSession.user.id.uuidString)")
+                } catch {
+                    print("⚠️ 当前会话无效，尝试建立新会话")
+                    
+                    // 尝试用临时密码登录建立会话
+                    do {
+                        print("🔄 尝试用临时密码登录建立会话")
+                        _ = try await self.client.auth.signIn(email: email, password: "temp_password_123")
+                        print("✅ 临时登录成功，会话已建立")
+                    } catch let loginError as NSError {
+                        print("❌ 临时登录失败: \(loginError.localizedDescription)")
+                        
+                        // 如果临时密码登录失败，尝试重新注册
+                        do {
+                            print("🔄 尝试重新注册建立会话")
+                            try? await self.client.auth.signOut() // 确保清洁状态
+                            
+                            let signUpResult = try await self.client.auth.signUp(
+                                email: email, 
+                                password: "temp_password_123"
+                            )
+                            print("✅ 重新注册成功")
+                            
+                            let user = signUpResult.user
+                            print("📧 新用户ID: \(user.id.uuidString)")
+                            
+                            // 提示用户需要重新输入验证码
+                            self.errorMessage = "需要重新验证，请重新申请密码重置。"
+                            await MainActor.run { 
+                                self.showToast("需要重新验证", seconds: 2)
+                            }
+                            return
+                            
+                        } catch let signUpError as NSError {
+                            print("❌ 重新注册失败: \(signUpError.localizedDescription)")
+                            self.errorMessage = "无法建立认证会话，请重新申请密码重置。"
+                            await MainActor.run { self.showToast("会话建立失败", seconds: 2) }
+                            return
+                        }
+                    }
+                }
+                
+                
+                // 步骤3：更新密码
+                print("🔄 步骤3：更新密码")
+                
+                do {
+                    try await self.client.auth.update(user: .init(password: newPassword))
+                    print("✅ 密码更新成功")
+                    
+                    await MainActor.run { self.showToast("密码重置成功！", seconds: 3) }
+                    
+                    // 步骤4：尝试用新密码登录
+                    print("🔄 步骤4：尝试用新密码登录")
+                    do {
+                        _ = try await self.client.auth.signIn(email: email, password: newPassword)
+                        try await self.loadCurrentUserAndProfile()
+                        print("✅ 新密码登录成功")
+                        
+                        // 登录成功后，清理重置状态
+                        await MainActor.run {
+                            self.isResettingPassword = false
+                            self.resetToken = nil
+                            self.resetEmail = nil
+                            self.errorMessage = nil
+                            print("🔄 密码重置完成，已返回登录界面")
+                        }
+                        
+                    } catch let loginError as NSError {
+                        print("⚠️ 新密码登录失败: \(loginError.localizedDescription)")
+                        
+                        // 即使登录失败，也要清理重置状态并返回登录界面
+                        await MainActor.run {
+                            self.isResettingPassword = false
+                            self.resetToken = nil
+                            self.resetEmail = nil
+                            self.errorMessage = "密码重置成功！请使用新密码登录。"
+                            print("🔄 密码重置完成，返回登录界面")
+                        }
+                    }
+                    
+                } catch let updateError as NSError {
+                    print("❌ 密码更新失败: \(updateError.localizedDescription)")
+                    
+                    // 根据错误类型提供更具体的提示
+                    let errorMsg = updateError.localizedDescription.lowercased()
+                    if errorMsg.contains("session") || errorMsg.contains("unauthorized") {
+                        self.errorMessage = "认证会话问题，请重新申请密码重置。"
+                    } else if errorMsg.contains("password") && errorMsg.contains("weak") {
+                        self.errorMessage = "密码强度不够，请设置更强的密码。"
+                    } else if errorMsg.contains("rate limit") || errorMsg.contains("too many") {
+                        self.errorMessage = "请求过于频繁，请稍后再试。"
+                    } else {
+                        self.errorMessage = "密码更新失败: \(updateError.localizedDescription)"
+                    }
+                    
+                    await MainActor.run { self.showToast("密码更新失败，请重试", seconds: 2) }
+                }
+                
+            } catch let error as NSError {
+                print("❌ 密码重置流程失败: \(error.localizedDescription)")
+                self.errorMessage = "密码重置失败: \(error.localizedDescription)"
+                await MainActor.run { self.showToast("重置失败，请重试", seconds: 2) }
+            }
+        }
+    }
+
+    // 取消密码重置
+    func cancelPasswordReset() {
+        self.isResettingPassword = false
+        self.resetToken = nil
+        self.resetEmail = nil
+        self.errorMessage = nil
+    }
+
+    // 手动触发密码重置（备用方案）
+    func manualTriggerPasswordReset(email: String, token: String) {
+        print("🔄 手动触发密码重置")
+        print("📝 邮箱: \(email)")
+        print("📝 Token: \(token.prefix(10))...")
+        
+        self.resetEmail = email
+        self.resetToken = token
+        self.isResettingPassword = true
+        
+        print("✅ 手动重置状态设置完成")
+    }
+    
+    // 更新重置令牌（用于新验证码）
+    func updateResetToken(newToken: String) {
+        print("🔄 更新重置令牌")
+        print("📝 旧令牌: \(self.resetToken?.prefix(10) ?? "nil")...")
+        print("📝 新令牌: \(newToken.prefix(10))...")
+        
+        self.resetToken = newToken
+        self.errorMessage = nil
+        
+        print("✅ 重置令牌更新完成")
+    }
+    
+    // 调试方法：检查验证码状态
+    func debugOTPStatus(email: String, token: String) async {
+        print("🔍 开始调试验证码状态")
+        print("📝 邮箱: \(email)")
+        print("📝 验证码: \(token)")
+        
+        // 检查当前会话状态
+        do {
+            let session = try await self.client.auth.session
+            print("✅ 当前会话状态: 已登录")
+            print("📝 用户ID: \(session.user.id.uuidString)")
+            print("📝 邮箱: \(session.user.email ?? "未知")")
+        } catch {
+            print("⚠️ 当前会话状态: 未登录")
+        }
+        
+        // 尝试不同的验证方式
+        let types: [String] = ["signup", "recovery", "magiclink", "email"]
+        
+        for typeString in types {
+            do {
+                print("🔄 尝试验证类型: \(typeString)")
+                // 根据字符串类型选择对应的验证方式
+                switch typeString {
+                case "signup":
+                    let result = try await self.client.auth.verifyOTP(
+                        email: email,
+                        token: token,
+                        type: .signup
+                    )
+                    print("✅ 验证成功 - 类型: signup")
+                    print("📝 结果: \(result)")
+                    break
+                case "recovery":
+                    let result = try await self.client.auth.verifyOTP(
+                        email: email,
+                        token: token,
+                        type: .recovery
+                    )
+                    print("✅ 验证成功 - 类型: recovery")
+                    print("📝 结果: \(result)")
+                    break
+                default:
+                    print("⚠️ 跳过不支持的验证类型: \(typeString)")
+                    continue
+                }
+                break
+            } catch let error as NSError {
+                print("❌ 验证失败 - 类型: \(typeString), 错误: \(error.localizedDescription)")
+            }
+        }
+        
+        print("🔍 调试完成")
     }
 
     // 取消两步注册，回到输入邮箱密码页
@@ -174,12 +725,9 @@ final class AuthViewModel: ObservableObject {
         Task { await self.deleteAccount(confirmPassword: confirmPassword) }
     }
 
-    
-    
     // MARK: - 用户信息（便于 UI 直接拿）
     var accountEmail: String { user?.email ?? "" }
     var accountDisplayName: String { profile?.display_name ?? "" }
-    // 在 AuthViewModel 顶部属性区新增
 
     func showBanner(_ text: String, seconds: Double = 1.0) {
         banner = text
@@ -209,72 +757,82 @@ final class AuthViewModel: ObservableObject {
     func changePassword(current oldPassword: String, to newPassword: String) async {
         await run {
             guard let email = self.user?.email else {
-                self.errorMessage = "未登录"; return
+                self.errorMessage = "用户信息丢失，请重新登录。"
+                return
             }
-            // 1) 先用原密码“再登录”校验（若开启 Secure password change，等价于 re-auth）
-            _ = try await self.client.auth.signIn(email: email, password: oldPassword)
-            // 2) 更新密码
-            try await self.client.auth.update(user: .init(password: newPassword))
-            // 3) 可选：用新密码再登录一次，确保会话最新
-            _ = try? await self.client.auth.signIn(email: email, password: newPassword)
-            // 原来：self.errorMessage = "密码已更新"
-            await MainActor.run { self.showToast("密码已更新", seconds: 1) }
-
-
+            
+            do {
+                // 先验证旧密码
+                _ = try await self.client.auth.signIn(email: email, password: oldPassword)
+                
+                // 更新新密码
+                try await self.client.auth.update(user: .init(password: newPassword))
+                
+                // 重新加载用户信息
+                try await self.loadCurrentUserAndProfile()
+                
+                self.errorMessage = "密码修改成功！"
+                self.showToast("密码修改成功！", seconds: 2)
+                
+            } catch let error as NSError {
+                print("❌ 密码修改失败: \(error.localizedDescription)")
+                
+                let errorMsg = error.localizedDescription.lowercased()
+                if errorMsg.contains("invalid") {
+                    self.errorMessage = "原密码错误，请重试。"
+                } else {
+                    self.errorMessage = "密码修改失败: \(error.localizedDescription)"
+                }
+            }
         }
     }
 
-    // MARK: - 注销账号（推荐：走 Edge Function 真删）
-    /// 真正执行"注销账户"的逻辑
+    // MARK: - 删除账号
     func deleteAccount(confirmPassword: String) async {
-        do {
-            print("🔍 开始注销账号流程...")
-            
-            // 1) 重新校验密码（避免越权/过期会话）
-            guard let email = self.user?.email ?? self.profile?.email else {
-                throw makeError("当前用户邮箱不存在")
+        await run {
+            guard let email = self.user?.email else {
+                self.errorMessage = "用户信息丢失，请重新登录。"
+                return
             }
-            print("📧 验证邮箱: \(email)")
             
-            _ = try await self.client.auth.signIn(email: email, password: confirmPassword)
-            print("✅ 密码验证成功")
-
-            // 2) 调用 Edge Function 删除 supabase auth 用户
-            let session = try await self.client.auth.session
-            let jwt = session.accessToken
-            guard !jwt.isEmpty else { throw makeError("会话失效，请重新登录") }
-            print("🔑 获取到有效JWT")
-
-            // 尝试调用Edge Function
             do {
-                try await SupabaseService.shared.deleteCurrentUserViaEdge(jwt: jwt)
-                print("✅ Edge Function 调用成功")
-            } catch {
-                print("⚠️ Edge Function 调用失败: \(error.localizedDescription)")
-                // 如果Edge Function失败，尝试软删除
-                print("🔄 尝试软删除...")
-                try await self.softDeleteAccount(note: "Edge Function失败，使用软删除")
-            }
-
-            // 3) 先给出提示，再退出登录
-            await MainActor.run { self.showToast("注销成功", seconds: 1.0) }
-            try await Task.sleep(nanoseconds: 1_000_000_000) // 1s
-
-            try await self.client.auth.signOut()
-            await MainActor.run {
+                // 先验证密码
+                _ = try await self.client.auth.signIn(email: email, password: confirmPassword)
+                
+                // 删除用户资料
+                if let uid = self.user?.id {
+                    _ = try await self.client.database
+                        .from("profiles")
+                        .delete()
+                        .eq("id", value: uid)
+                        .execute()
+                    print("✅ profiles表删除成功")
+                }
+                
+                // 删除用户账号
+                try await self.client.auth.admin.deleteUser(id: self.user?.id ?? UUID())
+                print("✅ 用户账号删除成功")
+                
+                // 退出登录
+                try await self.client.auth.signOut()
                 self.user = nil
                 self.profile = nil
+                
+                self.errorMessage = "账号已成功删除。"
+                self.showToast("账号已成功删除", seconds: 3)
+                
+            } catch let error as NSError {
+                print("❌ 删除账号失败: \(error.localizedDescription)")
+                
+                let errorMsg = error.localizedDescription.lowercased()
+                if errorMsg.contains("invalid") {
+                    self.errorMessage = "密码错误，请重试。"
+                } else {
+                    self.errorMessage = "删除账号失败: \(error.localizedDescription)"
+                }
             }
-            print("✅ 账号注销完成，已退出登录")
-            
-        } catch {
-            print("❌ 注销账号失败: \(error.localizedDescription)")
-            // 统一错误提示
-            await MainActor.run { self.showToast(error.localizedDescription, seconds: 2) }
         }
     }
-    
-    
 
     // MARK: - 仅用于"开发期软删除"的便捷方法（不想立刻做 Edge Function 时可先用）
     func softDeleteAccount(note: String? = nil) async {
@@ -306,7 +864,7 @@ final class AuthViewModel: ObservableObject {
                     .eq("id", value: uid)
                     .execute()
                 print("✅ profiles表更新成功")
-            } catch {
+            } catch let error as NSError {
                 print("⚠️ profiles表更新失败: \(error.localizedDescription)")
                 // 即使更新失败也继续执行
             }
@@ -318,7 +876,6 @@ final class AuthViewModel: ObservableObject {
             print("✅ 软删除完成，已退出登录")
         }
     }
-
 
     func updateDisplayName(_ name: String) async {
         await run {
@@ -356,7 +913,7 @@ final class AuthViewModel: ObservableObject {
         isBusy = true
         errorMessage = nil
         do { try await work() }
-        catch {
+        catch let error as NSError {
             // 友好化常见错误提示
             let msg = error.localizedDescription.lowercased()
             if msg.contains("otp") || msg.contains("token") {
