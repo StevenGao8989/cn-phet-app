@@ -281,19 +281,11 @@ struct PasswordResetForm: View {
             VStack(spacing: 16) {
                 SecureField("新密码（≥6 位）", text: $newPassword)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(newPassword.count >= 6 ? Color.green : Color.gray, lineWidth: 1)
-                    )
                 
                 SecureField("确认新密码", text: $confirmPassword)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(getConfirmPasswordBorderColor(), lineWidth: 1)
-                    )
                 
-                // 密码确认提示
+                // 密码确认提示 - 只在第二次输入完成后才显示
                 if !confirmPassword.isEmpty {
                     if newPassword == confirmPassword {
                         HStack {
@@ -378,16 +370,7 @@ struct PasswordResetForm: View {
         }
     }
     
-    // 获取确认密码输入框的边框颜色
-    private func getConfirmPasswordBorderColor() -> Color {
-        if confirmPassword.isEmpty {
-            return Color.gray
-        } else if newPassword == confirmPassword {
-            return Color.green
-        } else {
-            return Color.red
-        }
-    }
+
 }
 
 // 忘记密码验证码表单
