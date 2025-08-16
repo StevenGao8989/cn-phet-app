@@ -19,8 +19,10 @@ struct HomeView: View {
     @State private var showChangePwdSheet = false
     @State private var showDeleteAlert = false
     @State private var confirmPwdForDelete = ""
+    @State private var selectedSubject: Subject?
+    @State private var showGradeSelection = false
 
-    // 先用昵称，其次邮箱，再兜底“我”
+    // 先用昵称，其次邮箱，再兜底"我"
     private var displayText: String {
         if let n = auth.profile?.display_name, !n.isEmpty { return n }
         if let e = auth.user?.email, !e.isEmpty { return e }
@@ -30,21 +32,16 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack {
-            VStack {
-                SubjectsBar(filter: $store.filter)
-                TopicsList(topics: store.visibleTopics)
-            }
-            .navigationDestination(for: Topic.self) { topic in
-                SimHostView(topic: topic)
-            }
-            .navigationTitle("交互公式实验室")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+            VStack(spacing: 0) {
+                // 顶部标题
+                HStack {
+                    Text("理科实验室")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                    Spacer()
                     Menu {
                         Button("查看个人信息") { showProfileSheet = true }
                         Button("修改密码")   { showChangePwdSheet = true }
-                        Divider()
-
                         Divider()
                         Button("退出登录", role: .destructive) {
                             auth.signOutFromUI()
@@ -53,7 +50,51 @@ struct HomeView: View {
                             showDeleteAlert = true
                         }
                     } label: {
-                        AvatarView(initials: avatarInitials)
+                        Button("S") {
+                            // 设置按钮
+                        }
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .frame(width: 40, height: 40)
+                        .background(Color.blue)
+                        .clipShape(Circle())
+                    }
+                }
+                .padding()
+                
+                // 学科选择按钮
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: 2), spacing: 16) {
+                    SubjectCard(subject: .physics) {
+                        selectedSubject = .physics
+                        showGradeSelection = true
+                    }
+                    
+                    SubjectCard(subject: .chemistry) {
+                        selectedSubject = .chemistry
+                        showGradeSelection = true
+                    }
+                    
+                    SubjectCard(subject: .math) {
+                        selectedSubject = .math
+                        showGradeSelection = true
+                    }
+                    
+                    SubjectCard(subject: .biology) {
+                        selectedSubject = .biology
+                        showGradeSelection = true
+                    }
+                }
+                .padding(.horizontal)
+                
+                Spacer()
+            }
+            .navigationTitle("学科选择")
+            .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $showGradeSelection) {
+                if let subject = selectedSubject {
+                    NavigationStack {
+                        GradeSelectionView(subject: subject)
                     }
                 }
             }
@@ -83,35 +124,66 @@ struct HomeView: View {
     }
 }
 
-// MARK: - 顶部学科筛选条（拆分成独立视图，降低复杂度）
-private struct SubjectsBar: View {
-    @Binding var filter: Subject?
+// MARK: - 学科选择卡片
+struct SubjectCard: View {
+    let subject: Subject
+    let action: () -> Void
+    
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
-                Button("全部") { filter = nil }
-                    .buttonStyle(.borderedProminent)
-                // 如果 Subject 遵循 Hashable（一般枚举都可以），显式 id 可减轻推断
-                ForEach(Subject.allCases, id: \.self) { s in
-                    Button(s.title) { filter = s }
-                        .buttonStyle(.bordered)
-                        .tint(filter == s ? .accentColor : .secondary)
+        Button(action: action) {
+            VStack(spacing: 16) {
+                // 顶部图标
+                ZStack {
+                    Circle()
+                        .fill(subject.color.opacity(0.2))
+                        .frame(width: 60, height: 60)
+                    
+                    Text(subject.icon)
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(subject.color)
+                }
+                
+                // 学科名称
+                VStack(spacing: 4) {
+                    Text(subject.title)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                    
+                    Text(subject.englishTitle)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
             }
-            .padding(.horizontal)
-            .padding(.top, 8)
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color(.systemBackground))
+            .cornerRadius(16)
+            .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
         }
+        .buttonStyle(PlainButtonStyle())
     }
 }
 
-// MARK: - 主题列表（独立视图）
-private struct TopicsList: View {
-    let topics: [Topic]
-    var body: some View {
-        List(topics) { topic in
-            NavigationLink(value: topic) { TopicRow(topic: topic) }
+// 扩展Subject枚举，添加颜色和图标属性
+extension Subject {
+    var color: Color {
+        switch self {
+        case .physics: return .blue
+        case .chemistry: return .green
+        case .math: return .orange
+        case .biology: return .purple
         }
-        .listStyle(.plain)
+    }
+    
+    var icon: String {
+        switch self {
+        case .physics: return "物"
+        case .chemistry: return "化"
+        case .math: return "数"
+        case .biology: return "生"
+        }
     }
 }
 
