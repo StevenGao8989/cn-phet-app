@@ -19,6 +19,7 @@ struct ProjectileSimView: View {
     @State private var v0: Double = 20     // 初速度 m/s
     @State private var theta: Double = 45  // 角度 °
     @State private var g: Double = 9.8     // 重力 m/s²
+    @State private var h0: Double = 0      // 初始高度 m
 
     @State private var playing = false
     @State private var t: Double = 0       // 已播放时间 s
@@ -26,9 +27,14 @@ struct ProjectileSimView: View {
 
     private var vx: Double { v0 * cos(deg2rad(theta)) }
     private var vy: Double { v0 * sin(deg2rad(theta)) }
-    private var tFlight: Double { max(0.0001, 2 * vy / g) }
+    private var tFlight: Double { 
+        // 考虑初始高度的飞行时间计算
+        let discriminant = vy * vy + 2 * g * h0
+        if discriminant < 0 { return 0.0001 }
+        return max(0.0001, (vy + sqrt(discriminant)) / g)
+    }
     private var range: Double { vx * tFlight }
-    private var hMax: Double { vy * vy / (2 * g) }
+    private var hMax: Double { h0 + vy * vy / (2 * g) }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -57,7 +63,7 @@ struct ProjectileSimView: View {
                     for i in 0...steps {
                         let tt = currentT * Double(i) / Double(steps)
                         let x = vx * tt
-                        let y = max(0, vy * tt - 0.5 * g * tt * tt)
+                        let y = max(0, h0 + vy * tt - 0.5 * g * tt * tt)
                         let p = toPoint(x: x, y: y)
                         if first { path.move(to: p); first = false } else { path.addLine(to: p) }
                     }
@@ -73,9 +79,9 @@ struct ProjectileSimView: View {
                     }, with: .color(.gray.opacity(0.6)), style: StrokeStyle(dash: [4,4]))
 
                     // 文本信息（简）
-                    let info = "t飞行≈\(String(format: "%.2f", tFlight))s  射程≈\(String(format: "%.2f", range))m  最高点≈\(String(format: "%.2f", hMax))m"
+                    let info = "时间≈\(String(format: "%.2f", tFlight))s 水平距离≈\(String(format: "%.2f", range))m  最高点≈\(String(format: "%.2f", hMax))m"
                     let attr = AttributedString(info)
-                    context.draw(Text(attr).font(.footnote), at: CGPoint(x: margin + 6, y: margin + 10), anchor: .topLeading)
+                    context.draw(Text(attr).font(.footnote), at: CGPoint(x: margin + 6, y: margin + 30), anchor: .topLeading)
                 }
                 .background(Color(UIColor.systemBackground))
             }
@@ -92,6 +98,9 @@ struct ProjectileSimView: View {
 
                 HStack { Text("g 重力加速度"); Spacer(); Text(String(format: "%.1f m/s²", g)) }
                 Slider(value: $g, in: 3.0...19.6, step: 0.1) { _ in restartIfNeeded() }
+
+                HStack { Text("h₀ 初始高度"); Spacer(); Text(String(format: "%.1f m", h0)) }
+                Slider(value: $h0, in: 0...20, step: 0.1) { _ in restartIfNeeded() }
 
                 HStack(spacing: 12) {
                     Button(playing ? "暂停" : "播放") {
@@ -187,19 +196,19 @@ struct ProjectileSimView: View {
         
         // 添加坐标轴标签
         let xAxisLabel = "距离 (m)"
-        let yAxisLabel = "高度 (m)"
+        let yAxisLabel = "高度 h (m)"
         
-        // x 轴标签
+        // x 轴标签 - 移到最右端，确保完全可见
         let xLabelAttr = AttributedString(xAxisLabel)
         context.draw(Text(xLabelAttr).font(.caption).foregroundColor(.secondary), 
-                   at: CGPoint(x: size.width / 2, y: size.height - 8), 
-                   anchor: .top)
+                   at: CGPoint(x: size.width - 12, y: size.height - 8), 
+                   anchor: .topTrailing)
         
-        // y 轴标签
+        // y 轴标签 - 移到最上端
         let yLabelAttr = AttributedString(yAxisLabel)
         context.draw(Text(yLabelAttr).font(.caption).foregroundColor(.secondary), 
-                   at: CGPoint(x: 8, y: size.height / 2), 
-                   anchor: .trailing)
+                   at: CGPoint(x: margin + 8, y: margin + 8), 
+                   anchor: .topLeading)
     }
     
     // 计算合适的刻度间隔
@@ -238,5 +247,10 @@ struct ProjectileSimView: View {
         if playing {
             t = 0
         }
+    }
+    
+    // 角度转弧度
+    private func deg2rad(_ degrees: Double) -> Double {
+        return degrees * .pi / 180.0
     }
 }
