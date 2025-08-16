@@ -104,186 +104,218 @@ struct GradeTopicsView: View {
         case .grade7: // 初一
             return [
                 GradeTopic(
-                    id: "basic_physics_concept",
-                    title: "物理基础概念",
+                    id: "scientific_method",
+                    title: "科学探究方法",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "物理学的定义、研究方法、基本单位",
+                    icon: "🔬",
+                    description: "理想化、控制变量、对照实验、数据记录与处理",
                     difficulty: "基础"
                 ),
                 GradeTopic(
-                    id: "measurement",
-                    title: "测量与单位",
+                    id: "physical_quantities",
+                    title: "物理量与单位",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "长度、质量、时间的测量，国际单位制",
+                    icon: "📏",
+                    description: "SI基本单位与常用换算、量纲意识",
                     difficulty: "基础"
                 ),
                 GradeTopic(
-                    id: "simple_motion",
-                    title: "简单运动",
+                    id: "measurement_error",
+                    title: "测量与误差",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "匀速直线运动、路程与时间的关系",
+                    icon: "📊",
+                    description: "读数规则、有效数字、绝对/相对误差、重复测量与平均值",
                     difficulty: "基础"
                 )
             ]
         case .grade8: // 初二
             return [
                 GradeTopic(
-                    id: "motion_and_force",
+                    id: "motion_force",
                     title: "运动与力",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "位移与路程、速度与加速度、受力与合力、摩擦力",
+                    icon: "⚡",
+                    description: "质点与参考系、位移与路程、标量/矢量、速度与加速度、匀变速直线运动三公式",
                     difficulty: "基础"
                 ),
                 GradeTopic(
                     id: "pressure_buoyancy",
                     title: "压强与浮力",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "压强与面积关系、液体压强与深度、阿基米德原理",
+                    icon: "💧",
+                    description: "压强与面积关系、液体压强p=ρgh、气压与连通器、阿基米德原理与浮沉条件",
                     difficulty: "基础"
                 ),
                 GradeTopic(
-                    id: "sound_light_basic",
-                    title: "声与光(基础)",
+                    id: "acoustics",
+                    title: "声学",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "声音的产生与传播、光的直线传播、反射与折射",
+                    icon: "🔊",
+                    description: "声音的产生与传播介质、音调/响度/音色、回声、噪声与降噪、多普勒现象",
+                    difficulty: "基础"
+                ),
+                GradeTopic(
+                    id: "geometric_optics_basic",
+                    title: "几何光学基础",
+                    subtitle: "物理",
+                    icon: "💡",
+                    description: "光的直线传播、阴影与小孔成像、反射定律与平面镜成像规律、折射现象与全反射",
                     difficulty: "基础"
                 ),
                 GradeTopic(
                     id: "simple_circuit",
                     title: "简单电路入门",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "电路元件与电路图、串并联规律、安全用电",
+                    icon: "⚡",
+                    description: "电路元件与电路图、串并联基本规律、电流/电压/电阻的认识与测量、安全用电常识",
                     difficulty: "基础"
                 )
             ]
         case .grade9: // 初三
             return [
                 GradeTopic(
-                    id: "energy_conservation",
-                    title: "能量守恒",
+                    id: "electricity_deep",
+                    title: "电学深化",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "机械能守恒、能量转化与转移、效率",
+                    icon: "🔌",
+                    description: "欧姆定律、串并联电路定量计算、电功与电功率、焦耳定律、家庭电路与安全",
                     difficulty: "中等"
                 ),
                 GradeTopic(
-                    id: "wave_properties",
-                    title: "波动性质",
+                    id: "work_mechanical_energy",
+                    title: "功与机械能",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "波的传播、反射、折射、干涉、衍射",
+                    icon: "⚙️",
+                    description: "功与功率、杠杆与滑轮、机械效率、动能/重力势能/弹性势能、机械能守恒与动能定理",
                     difficulty: "中等"
                 ),
                 GradeTopic(
-                    id: "electric_field_basic",
-                    title: "电场基础",
+                    id: "thermodynamics_phase",
+                    title: "热学与物态变化",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "电荷、电场、电势、电流、电阻",
+                    icon: "🌡️",
+                    description: "温度与热量、比热容与热量计算、物态变化与潜热、热传导/对流/辐射与生活应用",
                     difficulty: "中等"
                 )
             ]
-        case .grade10: // 高一 - 完全按照截图配置
+        case .grade10: // 高一
             return [
                 GradeTopic(
                     id: "kinematics",
                     title: "运动学",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "x–t、v–t图像、匀变速直线运动、抛体与曲线运动",
+                    icon: "📈",
+                    description: "x-t、v-t、a-t图像的物理含义与相互转化、匀变速直线运动系统求解、自由落体、圆周运动",
                     difficulty: "中等"
                 ),
                 GradeTopic(
-                    id: "force_motion",
-                    title: "力与运动",
+                    id: "force_motion_newton",
+                    title: "力与运动（牛顿定律）",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "受力分析与平衡、牛顿第三定律、摩擦力与约束力",
+                    icon: "⚖️",
+                    description: "受力分析与等效简化、牛顿三定律、超重/失重、摩擦与约束、多物体系统/连接体/斜面模型",
                     difficulty: "中等"
                 ),
                 GradeTopic(
-                    id: "work_energy",
+                    id: "work_energy_advanced",
                     title: "功与能",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "功功率与效率、动能定理、保守力与机械能守恒",
+                    icon: "🔋",
+                    description: "变力做功与F-x曲线面积、功率（平均/瞬时）、保守力/非保守力、机械能守恒的适用与破坏",
                     difficulty: "中等"
                 ),
                 GradeTopic(
-                    id: "momentum_impulse",
+                    id: "momentum_impulse_advanced",
                     title: "动量与冲量",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "冲量定理、动量守恒、碰撞与爆炸",
+                    icon: "🚀",
+                    description: "冲量-动量定理、动量守恒（一维/二维）、碰撞（弹性/非弹性）与反冲/爆炸模型",
                     difficulty: "中等"
                 ),
                 GradeTopic(
-                    id: "electrostatics_basic",
-                    title: "静电场基础",
+                    id: "electrostatics",
+                    title: "静电场",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "点电荷相互作用、电场强度与电势差、电容概念",
+                    icon: "⚡",
+                    description: "点电荷作用（库仑定律）、电场强度与叠加、电势能与电势、等势面、带电粒子在匀强电场中的类抛体",
+                    difficulty: "中等"
+                ),
+                GradeTopic(
+                    id: "experiment_methods",
+                    title: "实验与方法",
+                    subtitle: "物理",
+                    icon: "🧪",
+                    description: "打点计时器/光电门测v,a、摩擦系数测定、动量守恒/能量守恒验证、不确定度评估、线性拟合与误差来源分析",
                     difficulty: "中等"
                 )
             ]
         case .grade11: // 高二
             return [
                 GradeTopic(
-                    id: "electromagnetic_induction",
-                    title: "电磁感应",
+                    id: "magnetic_field_particles",
+                    title: "磁场与带电粒子",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "法拉第电磁感应定律、楞次定律、自感与互感",
+                    icon: "🧲",
+                    description: "磁感线与右手定则、通电导线/线圈的磁场、洛伦兹力与带电粒子在匀强磁场中的圆周/螺旋运动",
                     difficulty: "高级"
                 ),
                 GradeTopic(
-                    id: "alternating_current",
-                    title: "交流电",
+                    id: "electromagnetic_induction_ac",
+                    title: "电磁感应与交流电",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "正弦交流电、有效值、相位、阻抗",
+                    icon: "⚡",
+                    description: "磁通量、法拉第电磁感应定律、楞次定律、感应电动势产生的多情境分析、正弦交流、有效值、相位、阻抗RLC",
                     difficulty: "高级"
                 ),
                 GradeTopic(
-                    id: "quantum_physics_basic",
-                    title: "量子物理基础",
+                    id: "vibration_waves",
+                    title: "振动与波",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "光电效应、波粒二象性、原子结构",
+                    icon: "🌊",
+                    description: "简谐振动、单摆/弹簧振子周期、简谐合成与拍频、机械波、波速、波的能量传递、反射/干涉/衍射/共振",
                     difficulty: "高级"
                 )
             ]
         case .grade12: // 高三
             return [
                 GradeTopic(
-                    id: "nuclear_physics",
-                    title: "核物理",
+                    id: "optics_advanced",
+                    title: "光学深化",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "原子核结构、放射性衰变、核反应、质能方程",
+                    icon: "🔬",
+                    description: "薄透镜成像规律与作图、放大率、光学仪器、杨氏双缝干涉、薄膜干涉现象、单缝衍射与衍射角条件",
                     difficulty: "高级"
                 ),
                 GradeTopic(
-                    id: "relativity_basic",
-                    title: "相对论基础",
+                    id: "thermodynamics_gas",
+                    title: "热学与气体分子动理论",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "狭义相对论、时间膨胀、长度收缩、质能关系",
+                    icon: "🌡️",
+                    description: "理想气体状态方程与过程、气体分子运动论要点、压强微观解释、平均动能与温度关系、热力学第一定律",
                     difficulty: "高级"
                 ),
                 GradeTopic(
-                    id: "modern_physics",
-                    title: "现代物理",
+                    id: "modern_physics_advanced",
+                    title: "近代物理",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "激光、超导、纳米技术、宇宙学基础",
+                    icon: "⚛️",
+                    description: "光量子假说与光电效应、原子模型与能级跃迁、氢原子玻尔模型、谱线、物质波与德布罗意波长",
+                    difficulty: "高级"
+                ),
+                GradeTopic(
+                    id: "nuclear_radioactivity",
+                    title: "原子核与放射性",
+                    subtitle: "物理",
+                    icon: "☢️",
+                    description: "放射性衰变规律与半衰期、核反应方程配平、质量亏损与结合能、核裂变/聚变与核能利用的利弊",
+                    difficulty: "高级"
+                ),
+                GradeTopic(
+                    id: "comprehensive_practice",
+                    title: "综合与实践",
+                    subtitle: "物理",
+                    icon: "🎯",
+                    description: "多主题综合题、图像法、极值/临界、能动量混合、实验设计与评估、控制变量、重复性/灵敏度",
                     difficulty: "高级"
                 )
             ]

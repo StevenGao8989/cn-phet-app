@@ -105,193 +105,192 @@ struct ConcreteTopicsListView: View {
     
     private func getConcreteTopicsForMainTopic(_ mainTopic: GradeTopic) -> [ConcreteTopic] {
         switch mainTopic.id {
-        case "kinematics": // 运动学
+        case "kinematics":
             return [
                 ConcreteTopic(
                     id: "projectile_motion",
                     title: "抛体运动",
                     subtitle: "物理",
-                    icon: "物",
+                    icon: "🚀",
                     description: "平抛运动、斜抛运动、轨迹分析",
                     difficulty: "中等",
-                    concepts: ["平抛运动", "斜抛运动", "轨迹方程", "飞行时间", "射程"],
-                    formulas: ["x = v₀t", "y = v₀ₓt - ½gt²", "t = 2v₀ₓ/g", "R = v₀²sin(2θ)/g"]
+                    concepts: ["平抛运动", "斜抛运动", "轨迹分析", "射程计算", "最高点分析"],
+                    formulas: ["x = v₀t", "y = v₀t - ½gt²", "t = 2v₀sinθ/g", "R = v₀²sin2θ/g"]
                 ),
                 ConcreteTopic(
                     id: "free_fall",
                     title: "自由落体",
                     subtitle: "物理",
-                    icon: "物",
+                    icon: "⬇️",
                     description: "重力加速度、下落时间、落地速度",
-                    difficulty: "基础",
-                    concepts: ["重力加速度", "自由落体", "匀加速运动", "下落时间", "落地速度"],
-                    formulas: ["v = gt", "h = ½gt²", "v² = 2gh", "t = √(2h/g)"]
+                    difficulty: "中等",
+                    concepts: ["自由落体", "重力加速度", "下落时间", "落地速度", "高度计算"],
+                    formulas: ["h = ½gt²", "v = gt", "t = √(2h/g)", "v = √(2gh)"]
                 ),
                 ConcreteTopic(
                     id: "uniform_motion",
                     title: "匀速直线运动",
                     subtitle: "物理",
-                    icon: "物",
+                    icon: "➡️",
                     description: "速度恒定、位移时间关系、图像分析",
                     difficulty: "基础",
-                    concepts: ["匀速运动", "速度恒定", "位移时间关系", "s-t图像", "v-t图像"],
-                    formulas: ["s = vt", "v = s/t", "t = s/v"]
+                    concepts: ["匀速运动", "速度恒定", "位移时间关系", "图像分析", "运动规律"],
+                    formulas: ["v = 常数", "x = vt", "x = x₀ + vt", "t = x/v"]
                 ),
                 ConcreteTopic(
                     id: "uniformly_accelerated_motion",
                     title: "匀变速直线运动",
                     subtitle: "物理",
-                    icon: "物",
+                    icon: "📈",
                     description: "加速度恒定、速度时间关系、位移时间关系",
                     difficulty: "中等",
-                    concepts: ["匀变速运动", "加速度恒定", "速度时间关系", "位移时间关系", "图像分析"],
-                    formulas: ["v = v₀ + at", "s = v₀t + ½at²", "v² = v₀² + 2as"]
+                    concepts: ["匀变速运动", "加速度恒定", "速度时间关系", "位移时间关系", "运动图像"],
+                    formulas: ["v = v₀ + at", "x = v₀t + ½at²", "v² = v₀² + 2ax", "x = (v₀ + v)t/2"]
                 )
             ]
-        case "force_motion": // 力与运动
+        case "force_motion_newton":
             return [
                 ConcreteTopic(
                     id: "force_analysis",
                     title: "受力分析",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "力的合成与分解、平衡条件、受力图",
+                    icon: "⚖️",
+                    description: "受力分析与等效简化、光滑、轻绳、滑轮、质点等",
                     difficulty: "中等",
-                    concepts: ["力的合成", "力的分解", "平衡条件", "受力图", "正交分解"],
-                    formulas: ["F = ma", "ΣF = 0", "Fₓ = Fcosθ", "Fᵧ = Fsinθ"]
+                    concepts: ["受力分析", "等效简化", "光滑面", "轻绳", "滑轮", "质点"],
+                    formulas: ["ΣF = ma", "F = mg", "F = μN", "T = mg"]
                 ),
                 ConcreteTopic(
                     id: "newton_third_law",
                     title: "牛顿第三定律",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "作用力与反作用力、力的相互性",
-                    difficulty: "基础",
-                    concepts: ["作用力", "反作用力", "力的相互性", "大小相等", "方向相反"],
-                    formulas: ["F₁₂ = -F₂₁", "F₁₂ = F₂₁"]
+                    icon: "🔄",
+                    description: "作用力与反作用力、超重/失重、摩擦与约束",
+                    difficulty: "中等",
+                    concepts: ["作用力", "反作用力", "超重", "失重", "摩擦", "约束"],
+                    formulas: ["F₁₂ = -F₂₁", "N = mg + ma", "N = mg - ma", "f = μN"]
                 ),
                 ConcreteTopic(
                     id: "friction_constraint",
-                    title: "摩擦力与约束力",
+                    title: "摩擦与约束",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "静摩擦力、滑动摩擦力、约束力分析",
-                    difficulty: "中等",
-                    concepts: ["静摩擦力", "滑动摩擦力", "约束力", "摩擦系数", "最大静摩擦力"],
-                    formulas: ["f = μN", "fₘₐₓ = μₛN", "fₖ = μₖN"]
+                    icon: "🔒",
+                    description: "多物体系统、连接体、斜面模型、临界问题",
+                    difficulty: "高级",
+                    concepts: ["多物体系统", "连接体", "斜面模型", "临界问题", "约束条件"],
+                    formulas: ["f = μN", "a = gsinθ", "T = m(g - a)", "N = mgcosθ"]
                 )
             ]
-        case "work_energy": // 功与能
+        case "work_energy_advanced":
             return [
                 ConcreteTopic(
                     id: "work_power_efficiency",
-                    title: "功功率与效率",
+                    title: "功与功率",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "功的计算、功率定义、机械效率",
+                    icon: "⚙️",
+                    description: "变力做功与F-x曲线面积、功率（平均/瞬时）",
                     difficulty: "中等",
-                    concepts: ["功", "功率", "效率", "有用功", "总功"],
-                    formulas: ["W = Fs", "P = W/t", "η = W有用/W总", "P = Fv"]
+                    concepts: ["变力做功", "F-x曲线", "平均功率", "瞬时功率", "效率"],
+                    formulas: ["W = ∫Fdx", "P = W/t", "P = Fv", "η = W有用/W总"]
                 ),
                 ConcreteTopic(
                     id: "kinetic_energy_theorem",
                     title: "动能定理",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "动能变化、合外力做功、动能定理应用",
+                    icon: "🔋",
+                    description: "保守力/非保守力、机械能守恒的适用与破坏",
                     difficulty: "中等",
-                    concepts: ["动能", "动能变化", "合外力做功", "动能定理", "应用"],
-                    formulas: ["Eₖ = ½mv²", "W = ΔEₖ", "W = ½mv² - ½mv₀²"]
+                    concepts: ["保守力", "非保守力", "机械能守恒", "能量转化", "动能定理"],
+                    formulas: ["W = ΔEk", "Ek = ½mv²", "W = -ΔEp", "E = Ek + Ep"]
                 ),
                 ConcreteTopic(
                     id: "conservative_mechanical_energy",
-                    title: "保守力与机械能守恒",
+                    title: "机械能守恒",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "保守力、势能、机械能守恒定律",
-                    difficulty: "高级",
-                    concepts: ["保守力", "势能", "机械能", "守恒定律", "能量转化"],
-                    formulas: ["E = Eₖ + Eₚ", "E₁ = E₂", "ΔE = 0"]
+                    icon: "⚡",
+                    description: "能量转化与效率、机械能守恒条件",
+                    difficulty: "中等",
+                    concepts: ["机械能守恒", "能量转化", "效率", "守恒条件", "能量损失"],
+                    formulas: ["E₁ = E₂", "Ek₁ + Ep₁ = Ek₂ + Ep₂", "η = E有用/E总"]
                 )
             ]
-        case "momentum_impulse": // 动量与冲量
+        case "momentum_impulse_advanced":
             return [
                 ConcreteTopic(
                     id: "impulse_theorem",
                     title: "冲量定理",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "冲量定义、动量变化、冲量定理应用",
-                    difficulty: "高级",
-                    concepts: ["冲量", "动量变化", "冲量定理", "力时间", "应用"],
-                    formulas: ["I = Ft", "I = Δp", "Ft = mv - mv₀"]
+                    icon: "💥",
+                    description: "冲量-动量定理、动量守恒（一维/二维）",
+                    difficulty: "中等",
+                    concepts: ["冲量", "动量", "冲量定理", "动量守恒", "一维二维"],
+                    formulas: ["I = Ft", "p = mv", "I = Δp", "Σp = 常数"]
                 ),
                 ConcreteTopic(
                     id: "momentum_conservation",
                     title: "动量守恒",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "动量守恒条件、碰撞前后动量、应用",
+                    icon: "🔄",
+                    description: "碰撞（弹性/非弹性）与反冲/爆炸模型",
                     difficulty: "高级",
-                    concepts: ["动量守恒", "碰撞", "系统动量", "条件", "应用"],
-                    formulas: ["p₁ + p₂ = p₁' + p₂'", "m₁v₁ + m₂v₂ = m₁v₁' + m₂v₂'"]
+                    concepts: ["弹性碰撞", "非弹性碰撞", "反冲", "爆炸", "动量守恒"],
+                    formulas: ["m₁v₁ + m₂v₂ = m₁v₁' + m₂v₂'", "e = (v₂' - v₁')/(v₁ - v₂)"]
                 ),
                 ConcreteTopic(
                     id: "collision_explosion",
                     title: "碰撞与爆炸",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "弹性碰撞、非弹性碰撞、爆炸过程",
+                    icon: "💣",
+                    description: "碰撞分析、爆炸模型、动量守恒应用",
                     difficulty: "高级",
-                    concepts: ["弹性碰撞", "非弹性碰撞", "爆炸", "能量损失", "动量守恒"],
-                    formulas: ["v₁' = (m₁-m₂)v₁/(m₁+m₂) + 2m₂v₂/(m₁+m₂)", "v₂' = (m₂-m₁)v₂/(m₁+m₂) + 2m₁v₁/(m₁+m₂)"]
+                    concepts: ["碰撞分析", "爆炸模型", "动量守恒", "能量损失", "速度计算"],
+                    formulas: ["p₁ + p₂ = p₁' + p₂'", "v₁' = (m₁-m₂)v₁/(m₁+m₂)", "v₂' = 2m₁v₁/(m₁+m₂)"]
                 )
             ]
-        case "electrostatics_basic": // 静电场基础
+        case "electrostatics":
             return [
                 ConcreteTopic(
                     id: "point_charge_interaction",
                     title: "点电荷相互作用",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "库仑定律、电荷间作用力、电场力",
+                    icon: "⚡",
+                    description: "点电荷作用（库仑定律）、电场强度与叠加",
                     difficulty: "中等",
-                    concepts: ["点电荷", "库仑定律", "电荷间作用力", "电场力", "方向"],
-                    formulas: ["F = kq₁q₂/r²", "k = 9×10⁹ N·m²/C²", "F = qE"]
+                    concepts: ["点电荷", "库仑定律", "电场强度", "叠加原理", "电荷性质"],
+                    formulas: ["F = kq₁q₂/r²", "E = F/q", "E = kQ/r²", "E = ΣEᵢ"]
                 ),
                 ConcreteTopic(
                     id: "electric_field_strength",
-                    title: "电场强度与电势差",
+                    title: "电场强度与电势",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "电场强度定义、电势差计算、电场线",
-                    difficulty: "中等",
-                    concepts: ["电场强度", "电势差", "电场线", "方向", "大小"],
-                    formulas: ["E = F/q", "E = kQ/r²", "U = Ed", "E = -∇U"]
+                    icon: "🔋",
+                    description: "电势能与电势、等势面、带电粒子在匀强电场中的类抛体",
+                    difficulty: "高级",
+                    concepts: ["电势能", "电势", "等势面", "匀强电场", "类抛体运动"],
+                    formulas: ["U = qV", "V = kQ/r", "E = -dV/dx", "y = qEx²/(2mv₀²)"]
                 ),
                 ConcreteTopic(
                     id: "capacitance_concept",
-                    title: "电容概念",
+                    title: "电容与电容器",
                     subtitle: "物理",
-                    icon: "物",
-                    description: "电容定义、平行板电容器、电容计算",
+                    icon: "🔌",
+                    description: "电容概念、电容器储能、串并联规律",
                     difficulty: "中等",
-                    concepts: ["电容", "电容器", "电荷量", "电势差", "平行板"],
-                    formulas: ["C = Q/U", "C = ε₀S/d", "U = Q/C"]
+                    concepts: ["电容", "电容器", "储能", "串并联", "电荷分布"],
+                    formulas: ["C = Q/V", "C = ε₀S/d", "U = ½CV²", "1/C = 1/C₁ + 1/C₂"]
                 )
             ]
         default:
-            // 其他知识点的默认配置
             return [
                 ConcreteTopic(
-                    id: "basic_concept",
-                    title: "基础概念",
-                    subtitle: mainTopic.subtitle,
-                    icon: mainTopic.icon,
-                    description: "该知识点的基本概念和定义",
-                    difficulty: "基础",
-                    concepts: ["基本概念", "定义", "原理", "应用"],
-                    formulas: ["基本公式", "计算方法", "应用公式"]
+                    id: "default_topic",
+                    title: "知识点详情",
+                    subtitle: "物理",
+                    icon: "📚",
+                    description: "该知识点的详细内容正在开发中...",
+                    difficulty: "待定",
+                    concepts: ["基础概念", "核心原理", "应用方法"],
+                    formulas: ["基本公式", "推导过程", "应用示例"]
                 )
             ]
         }
