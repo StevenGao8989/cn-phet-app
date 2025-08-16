@@ -12,11 +12,14 @@ struct GradeTopicsView: View {
     let grade: Grade
     @State private var topics: [GradeTopic] = []
     @State private var isLoading = true
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         VStack(spacing: 0) {
-            // 顶部标题
+            
+            // 年级标题 - 居中
             HStack {
+                Spacer()
                 Text(grade.title)
                     .font(.largeTitle)
                     .fontWeight(.bold)
@@ -48,7 +51,7 @@ struct GradeTopicsView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List(topics) { topic in
-                    NavigationLink(value: topic) {
+                    NavigationLink(destination: ConcreteTopicsListView(mainTopic: topic)) {
                         GradeTopicRow(topic: topic)
                     }
                 }
@@ -57,9 +60,7 @@ struct GradeTopicsView: View {
         }
         .navigationTitle(grade.title)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(for: GradeTopic.self) { topic in
-            ConcreteTopicsListView(mainTopic: topic)
-        }
+
         .onAppear {
             loadTopics()
         }

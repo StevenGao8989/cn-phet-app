@@ -47,7 +47,7 @@ struct SimpleGradeTopicsView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List(gradeTopics) { topic in
-                    NavigationLink(value: topic) {
+                    NavigationLink(destination: ConcreteTopicsListView(mainTopic: topic)) {
                         SimpleTopicRow(topic: topic)
                     }
                 }
@@ -56,9 +56,7 @@ struct SimpleGradeTopicsView: View {
         }
         .navigationTitle(grade.title)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(for: GradeTopic.self) { topic in
-            ConcreteTopicsListView(mainTopic: topic)
-        }
+
         .onAppear {
             loadGradeTopics()
         }
