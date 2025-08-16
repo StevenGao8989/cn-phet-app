@@ -115,14 +115,100 @@ struct ProjectileSimView: View {
 
     private func drawAxes(context: inout GraphicsContext, size: CGSize) {
         let margin: CGFloat = 28
+        let drawable = CGSize(width: size.width - margin*2, height: size.height - margin*2)
+        
+        // 计算坐标轴刻度
+        let xMax = max(range, 1)
+        let yMax = max(hMax * 1.2, 1)
+        
+        // 计算合适的刻度间隔
+        let xStep = calculateStep(maxValue: xMax)
+        let yStep = calculateStep(maxValue: yMax)
+        
         var axes = Path()
+        
         // x 轴
         axes.move(to: CGPoint(x: margin, y: size.height - margin))
         axes.addLine(to: CGPoint(x: size.width - margin, y: size.height - margin))
+        
         // y 轴
         axes.move(to: CGPoint(x: margin, y: size.height - margin))
         axes.addLine(to: CGPoint(x: margin, y: margin))
+        
+        // 绘制坐标轴
         context.stroke(axes, with: .color(.secondary), lineWidth: 1)
+        
+        // 绘制 x 轴刻度和标签
+        let scaleX = drawable.width / xMax
+        for i in stride(from: 0, through: xMax, by: xStep) {
+            let x = margin + CGFloat(i) * scaleX
+            if x <= size.width - margin {
+                // 刻度线
+                let tickPath = Path { path in
+                    path.move(to: CGPoint(x: x, y: size.height - margin))
+                    path.addLine(to: CGPoint(x: x, y: size.height - margin + 6))
+                }
+                context.stroke(tickPath, with: .color(.secondary), lineWidth: 1)
+                
+                // 标签
+                let label = "\(Int(i))"
+                let attr = AttributedString(label)
+                context.draw(Text(attr).font(.caption2).foregroundColor(.secondary), 
+                           at: CGPoint(x: x, y: size.height - margin + 12), 
+                           anchor: .top)
+            }
+        }
+        
+        // 绘制 y 轴刻度和标签
+        let scaleY = drawable.height / yMax
+        for i in stride(from: 0, through: yMax, by: yStep) {
+            let y = size.height - margin - CGFloat(i) * scaleY
+            if y >= margin {
+                // 刻度线
+                let tickPath = Path { path in
+                    path.move(to: CGPoint(x: margin, y: y))
+                    path.addLine(to: CGPoint(x: margin - 6, y: y))
+                }
+                context.stroke(tickPath, with: .color(.secondary), lineWidth: 1)
+                
+                // 标签
+                let label = "\(Int(i))"
+                let attr = AttributedString(label)
+                context.draw(Text(attr).font(.caption2).foregroundColor(.secondary), 
+                           at: CGPoint(x: margin - 12, y: y), 
+                           anchor: .trailing)
+            }
+        }
+        
+        // 添加坐标轴标签
+        let xAxisLabel = "距离 (m)"
+        let yAxisLabel = "高度 (m)"
+        
+        // x 轴标签
+        let xLabelAttr = AttributedString(xAxisLabel)
+        context.draw(Text(xLabelAttr).font(.caption).foregroundColor(.secondary), 
+                   at: CGPoint(x: size.width / 2, y: size.height - 8), 
+                   anchor: .top)
+        
+        // y 轴标签
+        let yLabelAttr = AttributedString(yAxisLabel)
+        context.draw(Text(yLabelAttr).font(.caption).foregroundColor(.secondary), 
+                   at: CGPoint(x: 8, y: size.height / 2), 
+                   anchor: .trailing)
+    }
+    
+    // 计算合适的刻度间隔
+    private func calculateStep(maxValue: Double) -> Double {
+        let magnitude = pow(10, floor(log10(maxValue)))
+        let normalized = maxValue / magnitude
+        
+        if normalized < 2 {
+            return magnitude / 5
+        } else if normalized < 5 {
+            return magnitude / 2
+        } else {
+            return magnitude
+        }
     }
 
     private func startTimer() {

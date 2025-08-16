@@ -1,0 +1,1481 @@
+{
+  "metadata": {
+    "title": "中国初一到高三·物理知识点与公式清单",
+    "locale": "zh-CN",
+    "version": "1.0.0",
+    "created_at": "2025-08-16T09:48:01.830677Z",
+    "source": "ChatGPT (GPT-5 Thinking)",
+    "notes": "覆盖新课标常见知识点；不同地区教学进度略有差异。单位采用 SI。Latex 可直接用于前端渲染。"
+  },
+  "constants": [
+    {
+      "symbol": "g",
+      "value": 9.8,
+      "unit": "m/s^2",
+      "zh": "重力加速度(近地面)"
+    },
+    {
+      "symbol": "G",
+      "value": 6.67e-11,
+      "unit": "N·m^2/kg^2",
+      "zh": "万有引力常量"
+    },
+    {
+      "symbol": "k_B",
+      "value": 1.38e-23,
+      "unit": "J/K",
+      "zh": "玻尔兹曼常数"
+    },
+    {
+      "symbol": "R",
+      "value": 8.314,
+      "unit": "J/(mol·K)",
+      "zh": "气体常数"
+    },
+    {
+      "symbol": "μ0",
+      "value": "4π×10^-7",
+      "unit": "N/A^2",
+      "zh": "真空磁导率"
+    },
+    {
+      "symbol": "ε0",
+      "value": 8.85e-12,
+      "unit": "F/m",
+      "zh": "真空介电常数"
+    },
+    {
+      "symbol": "e",
+      "value": 1.6e-19,
+      "unit": "C",
+      "zh": "元电荷"
+    },
+    {
+      "symbol": "h",
+      "value": 6.63e-34,
+      "unit": "J·s",
+      "zh": "普朗克常数"
+    },
+    {
+      "symbol": "c",
+      "value": 300000000.0,
+      "unit": "m/s",
+      "zh": "真空光速"
+    },
+    {
+      "symbol": "k",
+      "value": 8990000000.0,
+      "unit": "N·m^2/C^2",
+      "zh": "库仑常量(1/4π ε0)"
+    }
+  ],
+  "grades": [
+    {
+      "grade": "初一",
+      "units": [
+        {
+          "id": "G7-U1",
+          "title": "科学方法与测量",
+          "concepts": [
+            "理想化、控制变量、实验设计",
+            "SI 基本单位与常用换算",
+            "测量误差：绝对/相对误差、有效数字"
+          ],
+          "formula_refs": []
+        }
+      ]
+    },
+    {
+      "grade": "初二",
+      "units": [
+        {
+          "id": "G8-U1",
+          "title": "运动与力",
+          "concepts": [
+            "位移与路程、速度与加速度",
+            "受力与合力、摩擦力",
+            "匀变速、圆周运动基础"
+          ],
+          "formula_refs": [
+            "F-AVG-VEL",
+            "F-INST-VEL",
+            "F-UV-1",
+            "F-UV-2",
+            "F-UV-3",
+            "F-NEWTON2",
+            "F-FRIC-STATIC",
+            "F-FRIC-KINETIC",
+            "F-CENT-ACC",
+            "F-CENT-FORCE"
+          ]
+        },
+        {
+          "id": "G8-U2",
+          "title": "压强与浮力",
+          "concepts": [
+            "压强与面积关系",
+            "液体压强与深度",
+            "阿基米德原理"
+          ],
+          "formula_refs": [
+            "F-PRESS",
+            "F-HYDRO-P",
+            "F-BUOY"
+          ]
+        },
+        {
+          "id": "G8-U3",
+          "title": "声与光(基础)",
+          "concepts": [
+            "声音的产生与传播、音调/响度/音色",
+            "光的直线传播、反射与折射、全反射"
+          ],
+          "formula_refs": [
+            "F-WAVE-SPEED",
+            "F-SNELL",
+            "F-CRIT"
+          ]
+        },
+        {
+          "id": "G8-U4",
+          "title": "简单电路入门",
+          "concepts": [
+            "电路元件与电路图",
+            "串并联规律",
+            "安全用电"
+          ],
+          "formula_refs": [
+            "F-OHM",
+            "F-RSER",
+            "F-RPAR",
+            "F-EPWR",
+            "F-JOULE"
+          ]
+        }
+      ]
+    },
+    {
+      "grade": "初三",
+      "units": [
+        {
+          "id": "G9-U1",
+          "title": "电学深化",
+          "concepts": [
+            "伏安法测电阻",
+            "焦耳定律与发热",
+            "基尔霍夫定律",
+            "电容与充放电(定性)"
+          ],
+          "formula_refs": [
+            "F-OHM",
+            "F-EPWR",
+            "F-JOULE",
+            "F-KCL",
+            "F-KVL",
+            "F-C",
+            "F-C-PAR",
+            "F-C-SER"
+          ]
+        },
+        {
+          "id": "G9-U2",
+          "title": "功与机械能",
+          "concepts": [
+            "功与功率",
+            "动能/势能",
+            "机械能守恒与能量转化"
+          ],
+          "formula_refs": [
+            "F-WORK",
+            "F-POWER",
+            "F-KE",
+            "F-GPE",
+            "F-SPE",
+            "F-MECH-CONSV",
+            "F-WKT"
+          ]
+        },
+        {
+          "id": "G9-U3",
+          "title": "热与能量",
+          "concepts": [
+            "比热容与热量计算",
+            "物态变化与潜热",
+            "热量的传递方式"
+          ],
+          "formula_refs": [
+            "F-HEAT-SENS",
+            "F-HEAT-LAT"
+          ]
+        }
+      ]
+    },
+    {
+      "grade": "高一",
+      "units": [
+        {
+          "id": "G10-U1",
+          "title": "运动学",
+          "concepts": [
+            "x–t、v–t 图像",
+            "匀变速直线运动",
+            "抛体与曲线运动(定性)"
+          ],
+          "formula_refs": [
+            "F-UV-1",
+            "F-UV-2",
+            "F-UV-3"
+          ]
+        },
+        {
+          "id": "G10-U2",
+          "title": "力与运动",
+          "concepts": [
+            "受力分析与平衡",
+            "牛顿三定律",
+            "摩擦力与约束力",
+            "向心力"
+          ],
+          "formula_refs": [
+            "F-NEWTON2",
+            "F-FRIC-STATIC",
+            "F-FRIC-KINETIC",
+            "F-CENT-ACC",
+            "F-CENT-FORCE",
+            "F-GRAV"
+          ]
+        },
+        {
+          "id": "G10-U3",
+          "title": "功与能",
+          "concepts": [
+            "功功率与效率",
+            "动能定理",
+            "保守力与机械能守恒"
+          ],
+          "formula_refs": [
+            "F-WORK",
+            "F-POWER",
+            "F-WKT",
+            "F-MECH-CONSV"
+          ]
+        },
+        {
+          "id": "G10-U4",
+          "title": "动量与冲量",
+          "concepts": [
+            "冲量定理",
+            "动量守恒(一维/二维)",
+            "碰撞与爆炸"
+          ],
+          "formula_refs": [
+            "F-IMPULSE",
+            "F-MOM",
+            "F-MOM-CONS"
+          ]
+        },
+        {
+          "id": "G10-U5",
+          "title": "静电场基础",
+          "concepts": [
+            "点电荷相互作用",
+            "电场强度与电势差",
+            "电容概念"
+          ],
+          "formula_refs": [
+            "F-COULOMB",
+            "F-EFIELD",
+            "F-PD",
+            "F-C"
+          ]
+        }
+      ]
+    },
+    {
+      "grade": "高二",
+      "units": [
+        {
+          "id": "G11-U1",
+          "title": "电磁学与带电粒子",
+          "concepts": [
+            "磁感线与右手定则",
+            "通电导体受力",
+            "洛伦兹力",
+            "带电粒子在匀强磁场中的圆周/螺旋运动"
+          ],
+          "formula_refs": [
+            "F-B-STRAIGHT",
+            "F-B-LOOP",
+            "F-AMPERE",
+            "F-LORENTZ",
+            "F-CP-R",
+            "F-CP-T"
+          ]
+        },
+        {
+          "id": "G11-U2",
+          "title": "电磁感应与交流电",
+          "concepts": [
+            "法拉第电磁感应定律与楞次定律",
+            "感应电动势",
+            "正弦交流电、阻抗与功率因数",
+            "变压器与输电"
+          ],
+          "formula_refs": [
+            "F-FLUX",
+            "F-FARADAY",
+            "F-AC-U",
+            "F-AC-RMS",
+            "F-XL",
+            "F-XC",
+            "F-Z",
+            "F-AC-PWR",
+            "F-TR"
+          ]
+        },
+        {
+          "id": "G11-U3",
+          "title": "振动与波",
+          "concepts": [
+            "简谐振动及能量变化",
+            "单摆/弹簧振子周期",
+            "机械波与波速、干涉/衍射/共振"
+          ],
+          "formula_refs": [
+            "F-SHM-X",
+            "F-SHM-A",
+            "F-SHM-PEND",
+            "F-SHM-SPRING",
+            "F-WAVE-SPEED",
+            "F-PHASE",
+            "F-INT-CON",
+            "F-INT-DES"
+          ]
+        }
+      ]
+    },
+    {
+      "grade": "高三",
+      "units": [
+        {
+          "id": "G12-U1",
+          "title": "光学深化",
+          "concepts": [
+            "薄透镜成像与放大率",
+            "杨氏双缝干涉与条纹间距",
+            "单缝衍射与极小条件"
+          ],
+          "formula_refs": [
+            "F-LENS",
+            "F-MAG",
+            "F-YOUNG",
+            "F-SINGLE"
+          ]
+        },
+        {
+          "id": "G12-U2",
+          "title": "热学与气体分子动理论",
+          "concepts": [
+            "理想气体状态方程",
+            "等温/等容/等压/绝热(定性)",
+            "热力学第一定律与能量流向"
+          ],
+          "formula_refs": [
+            "F-IG",
+            "F-ISO",
+            "F-ISOC",
+            "F-ISOB",
+            "F-1STLAW",
+            "F-MEANKE"
+          ]
+        },
+        {
+          "id": "G12-U3",
+          "title": "近代物理与原子核",
+          "concepts": [
+            "光电效应与光量子说",
+            "玻尔能级与谱线",
+            "德布罗意波与物质波",
+            "质能方程",
+            "放射性衰变与半衰期"
+          ],
+          "formula_refs": [
+            "F-PE",
+            "F-PE-F0",
+            "F-BOHR-E",
+            "F-DEBRO",
+            "F-ME",
+            "F-DECAY",
+            "F-HALF"
+          ]
+        }
+      ]
+    }
+  ],
+  "formula_catalog": [
+    {
+      "id": "F-AVG-VEL",
+      "name": "平均速度",
+      "latex": "\\bar v=\\frac{\\Delta x}{\\Delta t}",
+      "variables": [
+        {
+          "symbol": "\\Delta x",
+          "zh": "位移",
+          "unit": "m"
+        },
+        {
+          "symbol": "\\Delta t",
+          "zh": "时间间隔",
+          "unit": "s"
+        }
+      ],
+      "tags": [
+        "运动学"
+      ]
+    },
+    {
+      "id": "F-INST-VEL",
+      "name": "瞬时速度(导数)",
+      "latex": "v=\\frac{dx}{dt}",
+      "variables": [
+        {
+          "symbol": "x",
+          "zh": "位移",
+          "unit": "m"
+        },
+        {
+          "symbol": "t",
+          "zh": "时间",
+          "unit": "s"
+        }
+      ],
+      "tags": [
+        "运动学",
+        "微积分"
+      ]
+    },
+    {
+      "id": "F-UV-1",
+      "name": "匀变速速度式",
+      "latex": "v=v_0+at",
+      "variables": [
+        {
+          "symbol": "v_0",
+          "zh": "初速度",
+          "unit": "m/s"
+        },
+        {
+          "symbol": "a",
+          "zh": "加速度",
+          "unit": "m/s^2"
+        },
+        {
+          "symbol": "t",
+          "zh": "时间",
+          "unit": "s"
+        }
+      ],
+      "tags": [
+        "运动学"
+      ]
+    },
+    {
+      "id": "F-UV-2",
+      "name": "匀变速位移式",
+      "latex": "x=v_0 t+\\tfrac12 a t^2",
+      "variables": [
+        {
+          "symbol": "x",
+          "zh": "位移",
+          "unit": "m"
+        }
+      ],
+      "tags": [
+        "运动学"
+      ]
+    },
+    {
+      "id": "F-UV-3",
+      "name": "速度位移关系",
+      "latex": "v^2-v_0^2=2ax",
+      "variables": [],
+      "tags": [
+        "运动学"
+      ]
+    },
+    {
+      "id": "F-CENT-ACC",
+      "name": "向心加速度",
+      "latex": "a_c=\\frac{v^2}{r}=\\omega^2 r",
+      "variables": [
+        {
+          "symbol": "r",
+          "zh": "轨道半径",
+          "unit": "m"
+        }
+      ],
+      "tags": [
+        "动力学",
+        "圆周运动"
+      ]
+    },
+    {
+      "id": "F-CENT-FORCE",
+      "name": "向心力",
+      "latex": "F_c=m\\frac{v^2}{r}=m\\omega^2 r",
+      "variables": [
+        {
+          "symbol": "m",
+          "zh": "质量",
+          "unit": "kg"
+        }
+      ],
+      "tags": [
+        "动力学",
+        "圆周运动"
+      ]
+    },
+    {
+      "id": "F-NEWTON2",
+      "name": "牛顿第二定律",
+      "latex": "\\sum \\vec F=m\\vec a",
+      "variables": [
+        {
+          "symbol": "\\vec F",
+          "zh": "合外力",
+          "unit": "N"
+        },
+        {
+          "symbol": "\\vec a",
+          "zh": "加速度",
+          "unit": "m/s^2"
+        }
+      ],
+      "tags": [
+        "动力学"
+      ]
+    },
+    {
+      "id": "F-FRIC-STATIC",
+      "name": "静摩擦力",
+      "latex": "f_s\\le \\mu_s N",
+      "variables": [
+        {
+          "symbol": "\\mu_s",
+          "zh": "静摩擦系数"
+        },
+        {
+          "symbol": "N",
+          "zh": "支持力",
+          "unit": "N"
+        }
+      ],
+      "tags": [
+        "动力学"
+      ]
+    },
+    {
+      "id": "F-FRIC-KINETIC",
+      "name": "动摩擦力",
+      "latex": "f_k=\\mu_k N",
+      "variables": [
+        {
+          "symbol": "\\mu_k",
+          "zh": "动摩擦系数"
+        },
+        {
+          "symbol": "N",
+          "zh": "支持力",
+          "unit": "N"
+        }
+      ],
+      "tags": [
+        "动力学"
+      ]
+    },
+    {
+      "id": "F-GRAV",
+      "name": "万有引力",
+      "latex": "F=G\\frac{m_1 m_2}{r^2}",
+      "variables": [
+        {
+          "symbol": "m_1,m_2",
+          "zh": "质量",
+          "unit": "kg"
+        },
+        {
+          "symbol": "r",
+          "zh": "距离",
+          "unit": "m"
+        }
+      ],
+      "tags": [
+        "引力"
+      ]
+    },
+    {
+      "id": "F-WORK",
+      "name": "功",
+      "latex": "W=Fs\\cos\\theta",
+      "variables": [
+        {
+          "symbol": "F",
+          "zh": "恒力",
+          "unit": "N"
+        },
+        {
+          "symbol": "s",
+          "zh": "位移",
+          "unit": "m"
+        }
+      ],
+      "tags": [
+        "能量"
+      ]
+    },
+    {
+      "id": "F-WORK-INT",
+      "name": "变力功(积分)",
+      "latex": "W=\\int \\vec F\\cdot d\\vec r",
+      "variables": [],
+      "tags": [
+        "能量",
+        "微积分"
+      ]
+    },
+    {
+      "id": "F-POWER",
+      "name": "功率",
+      "latex": "P=\\frac{W}{t}=Fv\\cos\\theta",
+      "variables": [
+        {
+          "symbol": "P",
+          "zh": "功率",
+          "unit": "W"
+        }
+      ],
+      "tags": [
+        "能量"
+      ]
+    },
+    {
+      "id": "F-GPE",
+      "name": "重力势能(近地)",
+      "latex": "E_p=mgh",
+      "variables": [
+        {
+          "symbol": "h",
+          "zh": "高度",
+          "unit": "m"
+        }
+      ],
+      "tags": [
+        "能量"
+      ]
+    },
+    {
+      "id": "F-SPE",
+      "name": "弹性势能",
+      "latex": "E_e=\\tfrac12 kx^2",
+      "variables": [
+        {
+          "symbol": "k",
+          "zh": "弹簧劲度系数",
+          "unit": "N/m"
+        },
+        {
+          "symbol": "x",
+          "zh": "形变量",
+          "unit": "m"
+        }
+      ],
+      "tags": [
+        "能量"
+      ]
+    },
+    {
+      "id": "F-KE",
+      "name": "动能",
+      "latex": "E_k=\\tfrac12 mv^2",
+      "variables": [
+        {
+          "symbol": "m",
+          "zh": "质量",
+          "unit": "kg"
+        },
+        {
+          "symbol": "v",
+          "zh": "速度",
+          "unit": "m/s"
+        }
+      ],
+      "tags": [
+        "能量"
+      ]
+    },
+    {
+      "id": "F-MECH-CONSV",
+      "name": "机械能守恒",
+      "latex": "\\Delta(E_k+E_p)=0",
+      "variables": [],
+      "tags": [
+        "能量"
+      ]
+    },
+    {
+      "id": "F-WKT",
+      "name": "动能定理",
+      "latex": "\\Delta E_k=W_{\\text{合}}",
+      "variables": [],
+      "tags": [
+        "能量"
+      ]
+    },
+    {
+      "id": "F-IMPULSE",
+      "name": "冲量",
+      "latex": "\\vec I=\\int \\vec F\\,dt=\\Delta \\vec p",
+      "variables": [],
+      "tags": [
+        "动量"
+      ]
+    },
+    {
+      "id": "F-MOM",
+      "name": "动量",
+      "latex": "\\vec p=m\\vec v",
+      "variables": [],
+      "tags": [
+        "动量"
+      ]
+    },
+    {
+      "id": "F-MOM-CONS",
+      "name": "动量守恒",
+      "latex": "\\sum \\vec p=\\text{常量}",
+      "variables": [],
+      "tags": [
+        "动量"
+      ]
+    },
+    {
+      "id": "F-PRESS",
+      "name": "压强",
+      "latex": "p=\\frac{F}{S}",
+      "variables": [
+        {
+          "symbol": "S",
+          "zh": "受力面积",
+          "unit": "m^2"
+        }
+      ],
+      "tags": [
+        "流体"
+      ]
+    },
+    {
+      "id": "F-HYDRO-P",
+      "name": "液体压强",
+      "latex": "p=\\rho gh",
+      "variables": [
+        {
+          "symbol": "\\rho",
+          "zh": "液体密度",
+          "unit": "kg/m^3"
+        }
+      ],
+      "tags": [
+        "流体"
+      ]
+    },
+    {
+      "id": "F-BUOY",
+      "name": "浮力",
+      "latex": "F_b=\\rho g V_{\\text{排}}",
+      "variables": [
+        {
+          "symbol": "V_{\\text{排}}",
+          "zh": "排开体积",
+          "unit": "m^3"
+        }
+      ],
+      "tags": [
+        "流体"
+      ]
+    },
+    {
+      "id": "F-HEAT-SENS",
+      "name": "热量(显热)",
+      "latex": "Q=cm\\Delta T",
+      "variables": [
+        {
+          "symbol": "c",
+          "zh": "比热容",
+          "unit": "J/(kg·K)"
+        }
+      ],
+      "tags": [
+        "热学"
+      ]
+    },
+    {
+      "id": "F-HEAT-LAT",
+      "name": "热量(潜热)",
+      "latex": "Q=L m",
+      "variables": [
+        {
+          "symbol": "L",
+          "zh": "比潜热",
+          "unit": "J/kg"
+        }
+      ],
+      "tags": [
+        "热学"
+      ]
+    },
+    {
+      "id": "F-1STLAW",
+      "name": "热力学第一定律",
+      "latex": "\\Delta U=Q-W",
+      "variables": [
+        {
+          "symbol": "U",
+          "zh": "内能",
+          "unit": "J"
+        }
+      ],
+      "tags": [
+        "热学"
+      ]
+    },
+    {
+      "id": "F-IG",
+      "name": "理想气体状态方程",
+      "latex": "pV=nRT=\\frac{m}{M}RT",
+      "variables": [
+        {
+          "symbol": "p",
+          "zh": "压强",
+          "unit": "Pa"
+        },
+        {
+          "symbol": "V",
+          "zh": "体积",
+          "unit": "m^3"
+        }
+      ],
+      "tags": [
+        "气体"
+      ]
+    },
+    {
+      "id": "F-ISO",
+      "name": "等温过程",
+      "latex": "pV=\\text{常量}",
+      "variables": [],
+      "tags": [
+        "气体"
+      ]
+    },
+    {
+      "id": "F-ISOC",
+      "name": "等容过程",
+      "latex": "\\frac{p}{T}=\\text{常量}",
+      "variables": [],
+      "tags": [
+        "气体"
+      ]
+    },
+    {
+      "id": "F-ISOB",
+      "name": "等压过程",
+      "latex": "\\frac{V}{T}=\\text{常量}",
+      "variables": [],
+      "tags": [
+        "气体"
+      ]
+    },
+    {
+      "id": "F-MEANKE",
+      "name": "分子平均动能",
+      "latex": "\\bar E_k=\\tfrac32 k_B T",
+      "variables": [],
+      "tags": [
+        "气体"
+      ]
+    },
+    {
+      "id": "F-SHM-X",
+      "name": "简谐振动位移",
+      "latex": "x=A\\cos(\\omega t+\\varphi)",
+      "variables": [
+        {
+          "symbol": "A",
+          "zh": "振幅",
+          "unit": "m"
+        }
+      ],
+      "tags": [
+        "振动波"
+      ]
+    },
+    {
+      "id": "F-SHM-A",
+      "name": "简谐振动加速度",
+      "latex": "a=-\\omega^2 x",
+      "variables": [],
+      "tags": [
+        "振动波"
+      ]
+    },
+    {
+      "id": "F-SHM-SPRING",
+      "name": "弹簧振子周期",
+      "latex": "T=2\\pi\\sqrt{\\frac{m}{k}}",
+      "variables": [],
+      "tags": [
+        "振动波"
+      ]
+    },
+    {
+      "id": "F-SHM-PEND",
+      "name": "单摆小角周期",
+      "latex": "T=2\\pi\\sqrt{\\frac{l}{g}}",
+      "variables": [],
+      "tags": [
+        "振动波"
+      ]
+    },
+    {
+      "id": "F-WAVE-SPEED",
+      "name": "波速",
+      "latex": "v=f\\lambda",
+      "variables": [
+        {
+          "symbol": "f",
+          "zh": "频率",
+          "unit": "Hz"
+        },
+        {
+          "symbol": "\\lambda",
+          "zh": "波长",
+          "unit": "m"
+        }
+      ],
+      "tags": [
+        "振动波"
+      ]
+    },
+    {
+      "id": "F-PHASE",
+      "name": "相位差",
+      "latex": "\\Delta\\phi=2\\pi\\frac{\\Delta r}{\\lambda}",
+      "variables": [],
+      "tags": [
+        "振动波"
+      ]
+    },
+    {
+      "id": "F-INT-CON",
+      "name": "干涉加强条件",
+      "latex": "\\Delta r=m\\lambda",
+      "variables": [],
+      "tags": [
+        "振动波"
+      ]
+    },
+    {
+      "id": "F-INT-DES",
+      "name": "干涉减弱条件",
+      "latex": "\\Delta r=(m+\\tfrac12)\\lambda",
+      "variables": [],
+      "tags": [
+        "振动波"
+      ]
+    },
+    {
+      "id": "F-SNELL",
+      "name": "折射定律",
+      "latex": "n_1\\sin i=n_2\\sin r",
+      "variables": [
+        {
+          "symbol": "n",
+          "zh": "折射率"
+        }
+      ],
+      "tags": [
+        "光学"
+      ]
+    },
+    {
+      "id": "F-CRIT",
+      "name": "全反射临界角",
+      "latex": "\\sin i_c=\\frac{n_2}{n_1}\\,(n_1>n_2)",
+      "variables": [],
+      "tags": [
+        "光学"
+      ]
+    },
+    {
+      "id": "F-LENS",
+      "name": "薄透镜公式",
+      "latex": "\\frac{1}{f}=\\frac{1}{u}+\\frac{1}{v}",
+      "variables": [
+        {
+          "symbol": "f",
+          "zh": "焦距",
+          "unit": "m"
+        },
+        {
+          "symbol": "u",
+          "zh": "物距",
+          "unit": "m"
+        },
+        {
+          "symbol": "v",
+          "zh": "像距",
+          "unit": "m"
+        }
+      ],
+      "tags": [
+        "光学"
+      ]
+    },
+    {
+      "id": "F-MAG",
+      "name": "放大率",
+      "latex": "\\beta=\\frac{h'}{h}=\\frac{v}{u}",
+      "variables": [],
+      "tags": [
+        "光学"
+      ]
+    },
+    {
+      "id": "F-YOUNG",
+      "name": "杨氏双缝条纹间距",
+      "latex": "\\Delta y=\\frac{\\lambda L}{d}",
+      "variables": [
+        {
+          "symbol": "L",
+          "zh": "屏距",
+          "unit": "m"
+        },
+        {
+          "symbol": "d",
+          "zh": "缝距",
+          "unit": "m"
+        }
+      ],
+      "tags": [
+        "光学"
+      ]
+    },
+    {
+      "id": "F-SINGLE",
+      "name": "单缝衍射极小条件",
+      "latex": "a\\sin\\theta=m\\lambda",
+      "variables": [
+        {
+          "symbol": "a",
+          "zh": "缝宽",
+          "unit": "m"
+        }
+      ],
+      "tags": [
+        "光学"
+      ]
+    },
+    {
+      "id": "F-OHM",
+      "name": "欧姆定律",
+      "latex": "U=IR",
+      "variables": [
+        {
+          "symbol": "U",
+          "zh": "电压",
+          "unit": "V"
+        },
+        {
+          "symbol": "I",
+          "zh": "电流",
+          "unit": "A"
+        },
+        {
+          "symbol": "R",
+          "zh": "电阻",
+          "unit": "Ω"
+        }
+      ],
+      "tags": [
+        "电学"
+      ]
+    },
+    {
+      "id": "F-RSER",
+      "name": "电阻串联",
+      "latex": "R_{\\text{串}}=\\sum R_i",
+      "variables": [],
+      "tags": [
+        "电学"
+      ]
+    },
+    {
+      "id": "F-RPAR",
+      "name": "电阻并联",
+      "latex": "\\frac{1}{R_{\\text{并}}}=\\sum \\frac{1}{R_i}",
+      "variables": [],
+      "tags": [
+        "电学"
+      ]
+    },
+    {
+      "id": "F-EPWR",
+      "name": "电功率",
+      "latex": "P=UI=I^2R=\\frac{U^2}{R}",
+      "variables": [],
+      "tags": [
+        "电学"
+      ]
+    },
+    {
+      "id": "F-JOULE",
+      "name": "焦耳定律",
+      "latex": "Q=I^2Rt",
+      "variables": [
+        {
+          "symbol": "t",
+          "zh": "时间",
+          "unit": "s"
+        }
+      ],
+      "tags": [
+        "电学"
+      ]
+    },
+    {
+      "id": "F-KCL",
+      "name": "基尔霍夫电流定律",
+      "latex": "\\sum I_\\text{入}=\\sum I_\\text{出}",
+      "variables": [],
+      "tags": [
+        "电路"
+      ]
+    },
+    {
+      "id": "F-KVL",
+      "name": "基尔霍夫电压定律",
+      "latex": "\\sum \\Delta U=0(回路)",
+      "variables": [],
+      "tags": [
+        "电路"
+      ]
+    },
+    {
+      "id": "F-C",
+      "name": "电容定义",
+      "latex": "C=\\frac{Q}{U}",
+      "variables": [
+        {
+          "symbol": "Q",
+          "zh": "电荷量",
+          "unit": "C"
+        }
+      ],
+      "tags": [
+        "电容"
+      ]
+    },
+    {
+      "id": "F-C-PAR",
+      "name": "电容并联",
+      "latex": "C_{\\parallel}=\\sum C_i",
+      "variables": [],
+      "tags": [
+        "电容"
+      ]
+    },
+    {
+      "id": "F-C-SER",
+      "name": "电容串联",
+      "latex": "\\frac{1}{C_{\\text{串}}}=\\sum \\frac{1}{C_i}",
+      "variables": [],
+      "tags": [
+        "电容"
+      ]
+    },
+    {
+      "id": "F-COULOMB",
+      "name": "库仑定律",
+      "latex": "F=k\\frac{|q_1 q_2|}{r^2}",
+      "variables": [
+        {
+          "symbol": "q_1,q_2",
+          "zh": "电荷量",
+          "unit": "C"
+        }
+      ],
+      "tags": [
+        "静电"
+      ]
+    },
+    {
+      "id": "F-EFIELD",
+      "name": "电场强度",
+      "latex": "E=\\frac{F}{q}",
+      "variables": [
+        {
+          "symbol": "E",
+          "zh": "电场强度",
+          "unit": "N/C"
+        }
+      ],
+      "tags": [
+        "静电"
+      ]
+    },
+    {
+      "id": "F-PD",
+      "name": "电势差",
+      "latex": "\\Delta \\varphi=\\frac{W}{q}",
+      "variables": [],
+      "tags": [
+        "静电"
+      ]
+    },
+    {
+      "id": "F-B-STRAIGHT",
+      "name": "直导线磁场",
+      "latex": "B=\\frac{\\mu_0 I}{2\\pi r}",
+      "variables": [
+        {
+          "symbol": "B",
+          "zh": "磁感应强度",
+          "unit": "T"
+        }
+      ],
+      "tags": [
+        "磁场"
+      ]
+    },
+    {
+      "id": "F-B-LOOP",
+      "name": "圆环中心磁场",
+      "latex": "B=\\frac{\\mu_0 I}{2R}",
+      "variables": [],
+      "tags": [
+        "磁场"
+      ]
+    },
+    {
+      "id": "F-LORENTZ",
+      "name": "洛伦兹力",
+      "latex": "F=qvB\\sin\\theta",
+      "variables": [
+        {
+          "symbol": "q",
+          "zh": "电荷量",
+          "unit": "C"
+        },
+        {
+          "symbol": "v",
+          "zh": "速度",
+          "unit": "m/s"
+        }
+      ],
+      "tags": [
+        "磁场"
+      ]
+    },
+    {
+      "id": "F-AMPERE",
+      "name": "安培力",
+      "latex": "F=BI l\\sin\\theta",
+      "variables": [
+        {
+          "symbol": "l",
+          "zh": "导线有效长度",
+          "unit": "m"
+        }
+      ],
+      "tags": [
+        "磁场"
+      ]
+    },
+    {
+      "id": "F-CP-R",
+      "name": "带电粒子回旋半径",
+      "latex": "r=\\frac{mv}{qB}",
+      "variables": [],
+      "tags": [
+        "磁场",
+        "粒子运动"
+      ]
+    },
+    {
+      "id": "F-CP-T",
+      "name": "带电粒子回旋周期",
+      "latex": "T=\\frac{2\\pi m}{qB}",
+      "variables": [],
+      "tags": [
+        "磁场",
+        "粒子运动"
+      ]
+    },
+    {
+      "id": "F-FLUX",
+      "name": "磁通量",
+      "latex": "\\Phi=\\int \\vec B\\cdot d\\vec S",
+      "variables": [],
+      "tags": [
+        "电磁感应"
+      ]
+    },
+    {
+      "id": "F-FARADAY",
+      "name": "法拉第电磁感应定律",
+      "latex": "\\mathcal E=-\\frac{d\\Phi}{dt}",
+      "variables": [
+        {
+          "symbol": "\\mathcal E",
+          "zh": "感应电动势",
+          "unit": "V"
+        }
+      ],
+      "tags": [
+        "电磁感应"
+      ]
+    },
+    {
+      "id": "F-AC-U",
+      "name": "交流电压(正弦)",
+      "latex": "u=U_m\\sin(\\omega t+\\phi)",
+      "variables": [],
+      "tags": [
+        "交流"
+      ]
+    },
+    {
+      "id": "F-AC-RMS",
+      "name": "有效值",
+      "latex": "U_{\\text{rms}}=\\frac{U_m}{\\sqrt2}",
+      "variables": [],
+      "tags": [
+        "交流"
+      ]
+    },
+    {
+      "id": "F-XL",
+      "name": "感抗",
+      "latex": "X_L=\\omega L",
+      "variables": [],
+      "tags": [
+        "交流"
+      ]
+    },
+    {
+      "id": "F-XC",
+      "name": "容抗",
+      "latex": "X_C=\\frac{1}{\\omega C}",
+      "variables": [],
+      "tags": [
+        "交流"
+      ]
+    },
+    {
+      "id": "F-Z",
+      "name": "阻抗",
+      "latex": "Z=\\sqrt{R^2+(X_L-X_C)^2}",
+      "variables": [],
+      "tags": [
+        "交流"
+      ]
+    },
+    {
+      "id": "F-AC-PWR",
+      "name": "有功功率",
+      "latex": "P=UI\\cos\\varphi",
+      "variables": [],
+      "tags": [
+        "交流"
+      ]
+    },
+    {
+      "id": "F-TR",
+      "name": "变压器(理想)",
+      "latex": "\\frac{U_1}{U_2}=\\frac{N_1}{N_2}",
+      "variables": [],
+      "tags": [
+        "交流"
+      ]
+    },
+    {
+      "id": "F-PE",
+      "name": "光电效应最大动能",
+      "latex": "E_{k,\\max}=hf-\\phi",
+      "variables": [
+        {
+          "symbol": "\\phi",
+          "zh": "逸出功",
+          "unit": "J"
+        }
+      ],
+      "tags": [
+        "近代物理"
+      ]
+    },
+    {
+      "id": "F-PE-F0",
+      "name": "截止频率",
+      "latex": "f_0=\\frac{\\phi}{h}",
+      "variables": [],
+      "tags": [
+        "近代物理"
+      ]
+    },
+    {
+      "id": "F-BOHR-E",
+      "name": "玻尔能级(氢)",
+      "latex": "E_n=-\\frac{13.6\\,\\text{eV}}{n^2}",
+      "variables": [],
+      "tags": [
+        "近代物理"
+      ]
+    },
+    {
+      "id": "F-DEBRO",
+      "name": "德布罗意波长",
+      "latex": "\\lambda=\\frac{h}{p}=\\frac{h}{mv}",
+      "variables": [],
+      "tags": [
+        "近代物理"
+      ]
+    },
+    {
+      "id": "F-ME",
+      "name": "质能方程",
+      "latex": "E=\\Delta m\\,c^2",
+      "variables": [],
+      "tags": [
+        "相对论"
+      ]
+    },
+    {
+      "id": "F-DECAY",
+      "name": "放射性衰变",
+      "latex": "N=N_0 e^{-\\lambda t}",
+      "variables": [],
+      "tags": [
+        "核物理"
+      ]
+    },
+    {
+      "id": "F-HALF",
+      "name": "半衰期",
+      "latex": "T_{1/2}=\\frac{\\ln 2}{\\lambda}",
+      "variables": [],
+      "tags": [
+        "核物理"
+      ]
+    }
+  ]
+}

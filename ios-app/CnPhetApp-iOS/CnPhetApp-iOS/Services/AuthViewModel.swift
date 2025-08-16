@@ -17,6 +17,8 @@ private struct NewProfile: Encodable {
     let display_name: String?
 }
 
+
+
 private struct UpdateProfileInput: Encodable {
     let display_name: String
 }
@@ -44,6 +46,12 @@ final class AuthViewModel: ObservableObject {
     @Published var isForgotPasswordFlow = false
     @Published var forgotPasswordEmail: String? = nil
     @Published var forgotPasswordOTP = ""
+    
+    // 登录界面状态
+    @Published var loginEmail = ""
+    @Published var loginPassword = ""
+    @Published var showPassword = false
+    @Published var rememberMe = false
 
     private let client = SupabaseService.shared.client
     private var authWatcher: Task<Void, Never>?
@@ -66,6 +74,11 @@ final class AuthViewModel: ObservableObject {
     }
 
     deinit { authWatcher?.cancel() }
+    
+    // MARK: - 计算属性
+    var isLoginButtonEnabled: Bool {
+        return !loginEmail.isEmpty && !loginPassword.isEmpty
+    }
 
     
     // MARK: - 步骤 1：注册并发送验证码（不自动登录）
@@ -106,17 +119,17 @@ final class AuthViewModel: ObservableObject {
             do {
                 // 1️⃣ 校验验证码（这一步会建立 session）
                 let result = try await self.client.auth.verifyOTP(
-                    email: email,
-                    token: code,
-                    type: .signup
-                )
-                
+                email: email,
+                token: code,
+                type: .signup
+            )
+
                 // 验证码验证成功后，直接使用 result.user
                 let user = result.user
 
                 // 2️⃣ 登录（确保 session 建立）
-                _ = try await self.client.auth.signIn(email: email, password: pwd)
-                
+            _ = try await self.client.auth.signIn(email: email, password: pwd)
+
                 // 3️⃣ 落库用户资料
                 let newProfile = NewProfile(
                     id: user.id,
@@ -133,10 +146,10 @@ final class AuthViewModel: ObservableObject {
                 try await self.loadCurrentUserAndProfile()
                 
                 // 5️⃣ 清理状态
-                self.awaitingEmailOTP = false
-                self.pendingEmail = nil
-                self.pendingPassword = nil
-                self.pendingDisplayName = nil
+            self.awaitingEmailOTP = false
+            self.pendingEmail = nil
+            self.pendingPassword = nil
+            self.pendingDisplayName = nil
                 self.errorMessage = nil
                 
                 print("✅ 注册完成，用户已登录")
@@ -690,8 +703,22 @@ final class AuthViewModel: ObservableObject {
     // MARK: - 其他现有能力（保持不变）
     func signIn(email: String, password: String) async {
         await run {
+            print("🔐 开始登录流程，邮箱: \(email)")
+            
+            // 验证邮箱格式
+            guard email.contains("@") else {
+                self.errorMessage = "请输入有效的邮箱地址"
+                print("❌ 登录失败: 邮箱格式不正确")
+                return
+            }
+            
+            // 直接使用邮箱登录
             _ = try await self.client.auth.signIn(email: email, password: password)
             try await self.loadCurrentUserAndProfile()
+            
+            // 登录成功后保存登录信息
+            self.saveLoginInfo()
+            print("🎉 登录成功！")
         }
     }
 
@@ -700,6 +727,9 @@ final class AuthViewModel: ObservableObject {
             try await self.client.auth.signOut()
             self.user = nil
             self.profile = nil
+            
+            // 登出时清除保存的登录信息
+            self.clearSavedLoginInfo()
         }
     }
     
@@ -713,7 +743,7 @@ final class AuthViewModel: ObservableObject {
     func deleteAccountFromUI(confirmPassword: String) {
         Task { await self.deleteAccount(confirmPassword: confirmPassword) }
     }
-
+    
     // MARK: - 用户信息（便于 UI 直接拿）
     var accountEmail: String { user?.email ?? "" }
     var accountDisplayName: String { profile?.display_name ?? "" }
@@ -752,10 +782,10 @@ final class AuthViewModel: ObservableObject {
             
             do {
                 // 先验证旧密码
-                _ = try await self.client.auth.signIn(email: email, password: oldPassword)
+            _ = try await self.client.auth.signIn(email: email, password: oldPassword)
                 
                 // 更新新密码
-                try await self.client.auth.update(user: .init(password: newPassword))
+            try await self.client.auth.update(user: .init(password: newPassword))
                 
                 // 重新加载用户信息
                 try await self.loadCurrentUserAndProfile()
@@ -796,8 +826,8 @@ final class AuthViewModel: ObservableObject {
             
             do {
                 // 先验证密码
-                _ = try await self.client.auth.signIn(email: email, password: confirmPassword)
-                
+            _ = try await self.client.auth.signIn(email: email, password: confirmPassword)
+
                 // 删除用户资料
                 if let uid = self.user?.id {
                     _ = try await self.client.database
@@ -813,7 +843,7 @@ final class AuthViewModel: ObservableObject {
                 print("✅ 用户账号删除成功")
                 
                 // 退出登录
-                try await self.client.auth.signOut()
+            try await self.client.auth.signOut()
                 self.user = nil
                 self.profile = nil
                 
@@ -858,10 +888,10 @@ final class AuthViewModel: ObservableObject {
                 )
                 
                 _ = try await self.client.database
-                    .from("profiles")
+                .from("profiles")
                     .update(updateData)
-                    .eq("id", value: uid)
-                    .execute()
+                .eq("id", value: uid)
+                .execute()
                 print("✅ profiles表更新成功")
             } catch let error as NSError {
                 print("⚠️ profiles表更新失败: \(error.localizedDescription)")
@@ -895,13 +925,67 @@ final class AuthViewModel: ObservableObject {
         let session = try? await self.client.auth.session
         self.user = session?.user
         if let uid = session?.user.id {
-            self.profile = try? await self.client.database
+            let result = try? await self.client.database
                 .from("profiles")
-                .select()
+                .select("*")  // 选择所有字段
                 .eq("id", value: uid)
-                .single()
                 .execute()
-                .value
+            
+            print("🔍 加载用户资料，UID: \(uid)")
+            print("🔍 查询结果: \(result)")
+            
+            guard let result = result else {
+                print("⚠️ 查询结果为空")
+                self.profile = nil
+                return
+            }
+            
+            print("🔍 result.data 类型: \(type(of: result.data))")
+            print("🔍 result.data 内容 (UTF8): \(String(data: result.data, encoding: .utf8) ?? "nil")")
+            
+            // 尝试从 result.data 解码为 [UserProfile]
+            if let profiles = try? JSONDecoder().decode([UserProfile].self, from: result.data) {
+                print("✅ 成功从 Data 解码为 [UserProfile]，共 \(profiles.count) 条记录")
+                if let firstProfile = profiles.first {
+                    self.profile = firstProfile
+                    print("✅ 成功加载用户资料: \(firstProfile)")
+                } else {
+                    print("⚠️ 解码成功但数组为空")
+                    self.profile = nil
+                }
+            } else {
+                print("❌ 从 Data 解码为 [UserProfile] 失败。")
+                // Fallback to dictionary parsing
+                if let profiles = try? JSONSerialization.jsonObject(with: result.data, options: []) as? [[String: Any]] {
+                    print("✅ 成功从 Data 解码为 [[String: Any]]，共 \(profiles.count) 条记录")
+                    if let firstProfile = profiles.first {
+                        // 从字典创建 UserProfile 对象
+                        if let idString = firstProfile["id"] as? String,
+                           let id = UUID(uuidString: idString) {
+                            let profile = UserProfile(
+                                id: id,
+                                email: firstProfile["email"] as? String,
+                                display_name: firstProfile["display_name"] as? String,
+                                avatar_url: firstProfile["avatar_url"] as? String,
+                                created_at: firstProfile["created_at"] as? Date,
+                                updated_at: firstProfile["updated_at"] as? Date
+                            )
+                            self.profile = profile
+                            print("✅ 成功加载用户资料 (字典): \(profile)")
+                        } else {
+                            print("⚠️ ID 转换失败")
+                            self.profile = nil
+                        }
+                    } else {
+                        print("⚠️ 字典解码成功但数组为空")
+                        self.profile = nil
+                    }
+                } else {
+                    print("❌ 从 Data 解码为 [[String: Any]] 失败。")
+                    print("⚠️ result.data 内容: \(result.data)")
+                    self.profile = nil
+                }
+            }
         } else {
             self.profile = nil
         }
@@ -925,5 +1009,108 @@ final class AuthViewModel: ObservableObject {
             print("Auth error:", error)
         }
         isBusy = false
+    }
+    
+    // MARK: - 第三方登录方法
+    func wechatLogin() async {
+        await run {
+            // TODO: 实现微信登录
+            print("微信登录功能待实现")
+            self.errorMessage = "微信登录功能正在开发中，请稍后再试"
+        }
+    }
+    
+    func qqLogin() async {
+        await run {
+            // TODO: 实现QQ登录
+            print("QQ登录功能待实现")
+            self.errorMessage = "QQ登录功能正在开发中，请稍后再试"
+        }
+    }
+    
+    func weiboLogin() async {
+        await run {
+            // TODO: 实现微博登录
+            print("微博登录功能待实现")
+            self.errorMessage = "微博登录功能正在开发中，请稍后再试"
+        }
+    }
+    
+    // MARK: - 登录信息管理
+    func loadSavedLoginInfo() {
+        // 从UserDefaults加载保存的登录信息
+        if let savedEmail = UserDefaults.standard.string(forKey: "savedLoginEmail") {
+            loginEmail = savedEmail
+        }
+        
+        if let savedPassword = UserDefaults.standard.string(forKey: "savedLoginPassword") {
+            loginPassword = savedPassword
+        }
+        
+        rememberMe = UserDefaults.standard.bool(forKey: "rememberMe")
+    }
+    
+    func saveLoginInfo() {
+        if rememberMe {
+            UserDefaults.standard.set(loginEmail, forKey: "savedLoginEmail")
+            UserDefaults.standard.set(loginPassword, forKey: "savedLoginPassword")
+            UserDefaults.standard.set(true, forKey: "rememberMe")
+        } else {
+            UserDefaults.standard.removeObject(forKey: "savedLoginEmail")
+            UserDefaults.standard.removeObject(forKey: "savedLoginPassword")
+            UserDefaults.standard.set(false, forKey: "rememberMe")
+        }
+    }
+    
+    func clearSavedLoginInfo() {
+        UserDefaults.standard.removeObject(forKey: "savedLoginEmail")
+        UserDefaults.standard.removeObject(forKey: "savedLoginPassword")
+        UserDefaults.standard.set(false, forKey: "rememberMe")
+        loginEmail = ""
+        loginPassword = ""
+    }
+    
+
+    
+
+    
+
+    
+    /// 测试数据库连接和查询（调试用）
+    func testDatabaseConnection() async {
+        print("🔍 开始测试数据库连接...")
+        
+        do {
+            let result = try await self.client.database
+                .from("profiles")
+                .select("*")
+                .execute()
+            
+            print("🔍 数据库查询结果: \(result)")
+            print("🔍 result.data 类型: \(type(of: result.data))")
+            print("🔍 result.data 内容 (UTF8): \(String(data: result.data, encoding: .utf8) ?? "nil")")
+            
+            // 尝试从 result.data 解码为 [UserProfile]
+            if let profiles = try? JSONDecoder().decode([UserProfile].self, from: result.data) {
+                print("✅ 成功从 Data 解码为 [UserProfile]，共 \(profiles.count) 条记录")
+                for (index, profile) in profiles.enumerated() {
+                    print("📋 记录 \(index + 1): \(profile)")
+                }
+            } else {
+                print("❌ 从 Data 解码为 [UserProfile] 失败。")
+                // Fallback to dictionary parsing
+                if let profiles = try? JSONSerialization.jsonObject(with: result.data, options: []) as? [[String: Any]] {
+                    print("✅ 成功从 Data 解码为 [[String: Any]]，共 \(profiles.count) 条记录")
+                    for (index, profile) in profiles.enumerated() {
+                        print("📋 记录 \(index + 1): \(profile)")
+                    }
+                } else {
+                    print("❌ 从 Data 解码为 [[String: Any]] 失败。")
+                    print("⚠️ result.data 内容: \(result.data)")
+                }
+            }
+        } catch {
+            print("❌ 数据库连接测试失败: \(error)")
+        }
     }
 }
