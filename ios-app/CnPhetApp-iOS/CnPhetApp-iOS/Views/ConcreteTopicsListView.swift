@@ -105,6 +105,7 @@ struct ConcreteTopicsListView: View {
     
     private func getConcreteTopicsForMainTopic(_ mainTopic: GradeTopic) -> [ConcreteTopic] {
         switch mainTopic.id {
+        // 物理知识点
         case "kinematics":
             return [
                 ConcreteTopic(
@@ -280,12 +281,1545 @@ struct ConcreteTopicsListView: View {
                     formulas: ["C = Q/V", "C = ε₀S/d", "U = ½CV²", "1/C = 1/C₁ + 1/C₂"]
                 )
             ]
+        
+        // 化学知识点
+        case "chemical_concepts_experiment":
+            return [
+                ConcreteTopic(
+                    id: "chemical_physical_changes",
+                    title: "物理/化学变化区分",
+                    subtitle: "化学",
+                    icon: "🔬",
+                    description: "化学研究对象与物理/化学变化的区分",
+                    difficulty: "基础",
+                    concepts: ["物理变化", "化学变化", "化学研究对象", "变化特征", "判断方法"],
+                    formulas: ["无化学公式", "观察法", "性质变化", "新物质生成"]
+                ),
+                ConcreteTopic(
+                    id: "experiment_safety",
+                    title: "实验安全",
+                    subtitle: "化学",
+                    icon: "⚠️",
+                    description: "基本实验仪器与实验安全、火焰使用、毒/腐/易燃标识、废液分类",
+                    difficulty: "基础",
+                    concepts: ["实验仪器", "安全操作", "危险标识", "废液处理", "个人防护"],
+                    formulas: ["安全第一", "规范操作", "废物分类", "应急预案"]
+                )
+            ]
+        case "matter_properties":
+            return [
+                ConcreteTopic(
+                    id: "pure_mixture",
+                    title: "纯净物与混合物",
+                    subtitle: "化学",
+                    icon: "🧪",
+                    description: "纯净物/混合物、物理性质/化学性质",
+                    difficulty: "基础",
+                    concepts: ["纯净物", "混合物", "物理性质", "化学性质", "分离方法"],
+                    formulas: ["无化学公式", "性质差异", "分离原理", "提纯技术"]
+                ),
+                ConcreteTopic(
+                    id: "separation_purification",
+                    title: "分离与提纯",
+                    subtitle: "化学",
+                    icon: "🔬",
+                    description: "过滤、蒸发、蒸馏、萃取、结晶、简单色谱",
+                    difficulty: "基础",
+                    concepts: ["过滤", "蒸发", "蒸馏", "萃取", "结晶", "色谱"],
+                    formulas: ["无化学公式", "物理分离", "溶解度差异", "沸点差异"]
+                )
+            ]
+        case "solution_basics":
+            return [
+                ConcreteTopic(
+                    id: "dissolution_solubility",
+                    title: "溶解与溶解度",
+                    subtitle: "化学",
+                    icon: "💧",
+                    description: "溶解/溶解度、饱和/不饱和溶液、影响因素（温度、搅拌、粒度）",
+                    difficulty: "基础",
+                    concepts: ["溶解", "溶解度", "饱和溶液", "不饱和溶液", "影响因素"],
+                    formulas: ["溶解度 = 溶质质量/溶剂质量", "温度影响", "搅拌影响", "粒度影响"]
+                )
+            ]
+        case "particle_view_formula":
+            return [
+                ConcreteTopic(
+                    id: "atoms_molecules_ions",
+                    title: "原子、分子、离子",
+                    subtitle: "化学",
+                    icon: "⚛️",
+                    description: "原子、分子、离子概念、元素与同位素",
+                    difficulty: "基础",
+                    concepts: ["原子", "分子", "离子", "元素", "同位素"],
+                    formulas: ["原子序数", "质量数", "电荷数", "电子数"]
+                ),
+                ConcreteTopic(
+                    id: "chemical_symbols_formulas",
+                    title: "化学符号与化学式",
+                    subtitle: "化学",
+                    icon: "🔤",
+                    description: "化学符号、化学式与式量、化合价与配比",
+                    difficulty: "基础",
+                    concepts: ["化学符号", "化学式", "式量", "化合价", "配比"],
+                    formulas: ["式量计算", "化合价规则", "配平方法"]
+                )
+            ]
+        case "chemical_reactions_equations":
+            return [
+                ConcreteTopic(
+                    id: "mass_conservation",
+                    title: "质量守恒定律",
+                    subtitle: "化学",
+                    icon: "⚖️",
+                    description: "质量守恒定律、化学方程式的书写与配平",
+                    difficulty: "中等",
+                    concepts: ["质量守恒", "化学方程式", "配平", "反应物", "生成物"],
+                    formulas: ["反应物质量 = 生成物质量", "配平系数", "原子守恒"]
+                ),
+                ConcreteTopic(
+                    id: "reaction_types",
+                    title: "反应类型",
+                    subtitle: "化学",
+                    icon: "🔄",
+                    description: "化合/分解/置换/复分解、热化学反应（放/吸热）",
+                    difficulty: "中等",
+                    concepts: ["化合反应", "分解反应", "置换反应", "复分解反应", "热效应"],
+                    formulas: ["A + B → AB", "AB → A + B", "A + BC → AC + B", "AB + CD → AD + CB"]
+                )
+            ]
+        case "acid_base_salt":
+            return [
+                ConcreteTopic(
+                    id: "acid_base_properties",
+                    title: "酸碱性质",
+                    subtitle: "化学",
+                    icon: "🧪",
+                    description: "酸、碱、盐的性质与相互转化、中和反应",
+                    difficulty: "中等",
+                    concepts: ["酸的性质", "碱的性质", "盐的性质", "相互转化", "中和反应"],
+                    formulas: ["酸 + 碱 → 盐 + 水", "pH值", "指示剂变色"]
+                ),
+                ConcreteTopic(
+                    id: "acid_base_strength",
+                    title: "酸碱强弱",
+                    subtitle: "化学",
+                    icon: "📊",
+                    description: "酸碱强弱与指示剂（石蕊、酚酞等）、滴定基本操作",
+                    difficulty: "中等",
+                    concepts: ["酸碱强弱", "指示剂", "石蕊", "酚酞", "滴定操作"],
+                    formulas: ["pH = -log[H⁺]", "pOH = -log[OH⁻]", "pH + pOH = 14"]
+                )
+            ]
+        case "atomic_structure_periodic":
+            return [
+                ConcreteTopic(
+                    id: "electron_configuration",
+                    title: "电子排布",
+                    subtitle: "化学",
+                    icon: "🔬",
+                    description: "电子排布、核外电子层与副层、价电子与化学性质",
+                    difficulty: "中等",
+                    concepts: ["电子排布", "电子层", "副层", "价电子", "化学性质"],
+                    formulas: ["2n²", "s、p、d、f轨道", "价电子数", "最外层电子"]
+                ),
+                ConcreteTopic(
+                    id: "periodic_trends",
+                    title: "周期律与周期性",
+                    subtitle: "化学",
+                    icon: "📈",
+                    description: "周期律与周期性、原子半径、电离能、电负性、金属性/非金属性的趋势",
+                    difficulty: "中等",
+                    concepts: ["周期律", "周期性", "原子半径", "电离能", "电负性"],
+                    formulas: ["原子半径变化", "电离能变化", "电负性变化", "金属性变化"]
+                )
+            ]
+        case "chemical_bonds_structure":
+            return [
+                ConcreteTopic(
+                    id: "bond_types",
+                    title: "化学键类型",
+                    subtitle: "化学",
+                    icon: "🔗",
+                    description: "离子键、共价键、金属键、价键理论与八隅体规则",
+                    difficulty: "中等",
+                    concepts: ["离子键", "共价键", "金属键", "价键理论", "八隅体规则"],
+                    formulas: ["离子键形成", "共价键形成", "电子对共享", "八电子稳定"]
+                ),
+                ConcreteTopic(
+                    id: "molecular_forces",
+                    title: "分子间作用力",
+                    subtitle: "化学",
+                    icon: "💫",
+                    description: "极性/非极性键、分子极性、分子间作用力（氢键、偶极-偶极、色散力）",
+                    difficulty: "中等",
+                    concepts: ["极性键", "非极性键", "分子极性", "氢键", "范德华力"],
+                    formulas: ["偶极矩", "氢键强度", "色散力大小"]
+                )
+            ]
+        case "gas_state_equation":
+            return [
+                ConcreteTopic(
+                    id: "ideal_gas_law",
+                    title: "理想气体方程",
+                    subtitle: "化学",
+                    icon: "📊",
+                    description: "理想气体方程pV=nRT的应用、等温/等压/等容变化定性分析",
+                    difficulty: "中等",
+                    concepts: ["理想气体", "状态方程", "等温变化", "等压变化", "等容变化"],
+                    formulas: ["pV = nRT", "p₁V₁ = p₂V₂", "V₁/T₁ = V₂/T₂", "p₁/T₁ = p₂/T₂"]
+                )
+            ]
+        case "thermochemistry_basic":
+            return [
+                ConcreteTopic(
+                    id: "reaction_heat_enthalpy",
+                    title: "反应热与焓变",
+                    subtitle: "化学",
+                    icon: "🔥",
+                    description: "反应热与焓变、量热法、亥斯定律的应用",
+                    difficulty: "中等",
+                    concepts: ["反应热", "焓变", "量热法", "亥斯定律", "热化学方程式"],
+                    formulas: ["ΔH = H生成物 - H反应物", "q = mcΔT", "ΔH = ΣΔH生成物 - ΣΔH反应物"]
+                )
+            ]
+        case "reaction_rate":
+            return [
+                ConcreteTopic(
+                    id: "rate_definition_measurement",
+                    title: "速率定义与测定",
+                    subtitle: "化学",
+                    icon: "⚡",
+                    description: "速率的定义与测定方式、温度、浓度、催化剂、表面积的影响",
+                    difficulty: "中等",
+                    concepts: ["反应速率", "速率测定", "影响因素", "温度", "浓度"],
+                    formulas: ["v = Δc/Δt", "阿伦尼乌斯方程", "活化能", "碰撞理论"]
+                )
+            ]
+        case "chemical_equilibrium_basic":
+            return [
+                ConcreteTopic(
+                    id: "reversible_reactions",
+                    title: "可逆反应与平衡",
+                    subtitle: "化学",
+                    icon: "⚖️",
+                    description: "可逆反应与平衡常数、勒沙特列原理、温度、压强、浓度变化对平衡的影响",
+                    difficulty: "中等",
+                    concepts: ["可逆反应", "化学平衡", "平衡常数", "勒沙特列原理", "平衡移动"],
+                    formulas: ["Kc = [C]ᶜ[D]ᵈ/[A]ᵃ[B]ᵇ", "Q与K比较", "平衡移动方向"]
+                )
+            ]
+        case "electrolyte_acid_base":
+            return [
+                ConcreteTopic(
+                    id: "strong_weak_electrolytes",
+                    title: "强/弱电解质",
+                    subtitle: "化学",
+                    icon: "⚡",
+                    description: "强/弱电解质、电离平衡与电导概念、酸碱理论、pH与指示剂",
+                    difficulty: "中等",
+                    concepts: ["强电解质", "弱电解质", "电离平衡", "电导", "pH值"],
+                    formulas: ["Ka = [H⁺][A⁻]/[HA]", "Kb = [OH⁻][HB⁺]/[B]", "pH = -log[H⁺]"]
+                )
+            ]
+        case "solubility_equilibrium":
+            return [
+                ConcreteTopic(
+                    id: "solubility_product",
+                    title: "溶度积",
+                    subtitle: "化学",
+                    icon: "💧",
+                    description: "溶度积Ksp、共离子效应、沉淀溶解判据、选择性沉淀与分离",
+                    difficulty: "高级",
+                    concepts: ["溶度积", "共离子效应", "沉淀溶解", "选择性沉淀", "分离方法"],
+                    formulas: ["Ksp = [A⁺]ᵃ[B⁻]ᵇ", "Qsp与Ksp比较", "沉淀条件"]
+                )
+            ]
+        case "acid_base_equilibrium":
+            return [
+                ConcreteTopic(
+                    id: "weak_acid_base_ionization",
+                    title: "弱酸弱碱电离",
+                    subtitle: "化学",
+                    icon: "🧪",
+                    description: "弱酸/弱碱的电离常数、pKa/pKb、Henderson–Hasselbalch公式与缓冲溶液",
+                    difficulty: "高级",
+                    concepts: ["弱酸电离", "弱碱电离", "电离常数", "pKa", "pKb", "缓冲溶液"],
+                    formulas: ["Ka = [H⁺][A⁻]/[HA]", "Kb = [OH⁻][HB⁺]/[B]", "pH = pKa + log([A⁻]/[HA])"]
+                )
+            ]
+        case "chemical_kinetics_advanced":
+            return [
+                ConcreteTopic(
+                    id: "rate_equations",
+                    title: "速率方程",
+                    subtitle: "化学",
+                    icon: "📊",
+                    description: "速率方程、反应级数与半衰期、阿伦尼乌斯方程、活化能的实验求取",
+                    difficulty: "高级",
+                    concepts: ["速率方程", "反应级数", "半衰期", "阿伦尼乌斯方程", "活化能"],
+                    formulas: ["v = k[A]ᵃ[B]ᵇ", "t₁/₂ = ln2/k", "k = Ae^(-Ea/RT)"]
+                )
+            ]
+        case "electrochemistry":
+            return [
+                ConcreteTopic(
+                    id: "galvanic_electrolytic_cells",
+                    title: "原电池与电解池",
+                    subtitle: "化学",
+                    icon: "🔋",
+                    description: "原电池/电解池、电极反应、标准电极电势、能斯特方程、电解与法拉第定律",
+                    difficulty: "高级",
+                    concepts: ["原电池", "电解池", "电极反应", "电极电势", "能斯特方程"],
+                    formulas: ["E = E° - (RT/nF)lnQ", "ΔG° = -nFE°", "m = (M/nF)Q"]
+                )
+            ]
+        case "organic_chemistry_basic":
+            return [
+                ConcreteTopic(
+                    id: "naming_isomerism",
+                    title: "命名与同分异构",
+                    subtitle: "化学",
+                    icon: "⚛️",
+                    description: "命名与同分异构（结构/位置/官能团/构象）、烷烃、烯烃、炔烃、芳香烃",
+                    difficulty: "高级",
+                    concepts: ["有机命名", "同分异构", "结构异构", "位置异构", "官能团异构"],
+                    formulas: ["IUPAC命名规则", "同分异构体数量", "构象分析"]
+                ),
+                ConcreteTopic(
+                    id: "functional_groups",
+                    title: "官能团与性质",
+                    subtitle: "化学",
+                    icon: "🔬",
+                    description: "卤代烃、醇、醛酮、羧酸及其衍生物、官能团识别与性质对比",
+                    difficulty: "高级",
+                    concepts: ["卤代烃", "醇", "醛", "酮", "羧酸", "酯"],
+                    formulas: ["取代反应", "加成反应", "氧化反应", "还原反应", "酯化反应"]
+                )
+            ]
+        case "polymers_materials":
+            return [
+                ConcreteTopic(
+                    id: "polymerization_reactions",
+                    title: "聚合反应",
+                    subtitle: "化学",
+                    icon: "🔗",
+                    description: "加聚/缩聚反应、常见聚合物性质与应用、材料化学：陶瓷、半导体、复合材料",
+                    difficulty: "高级",
+                    concepts: ["加聚反应", "缩聚反应", "聚合物", "陶瓷", "半导体", "复合材料"],
+                    formulas: ["nA → (A)ₙ", "加聚机理", "缩聚机理", "材料性能"]
+                )
+            ]
+        case "organic_chemistry_advanced":
+            return [
+                ConcreteTopic(
+                    id: "reaction_mechanisms",
+                    title: "反应机理",
+                    subtitle: "化学",
+                    icon: "⚛️",
+                    description: "反应机理与选择性、区域/立体选择性、E/Z与R/S、芳香性与取代定位规则",
+                    difficulty: "高级",
+                    concepts: ["反应机理", "区域选择性", "立体选择性", "E/Z构型", "R/S构型"],
+                    formulas: ["亲电加成", "亲核取代", "自由基反应", "立体化学"]
+                )
+            ]
+        case "analytical_chemistry":
+            return [
+                ConcreteTopic(
+                    id: "volumetric_analysis",
+                    title: "容量分析",
+                    subtitle: "化学",
+                    icon: "🧪",
+                    description: "酸碱滴定、配位滴定（EDTA）、氧化还原滴定（KMnO₄、K₂Cr₂O₇）",
+                    difficulty: "高级",
+                    concepts: ["容量分析", "酸碱滴定", "配位滴定", "氧化还原滴定", "滴定曲线"],
+                    formulas: ["c₁V₁ = c₂V₂", "滴定终点", "指示剂选择", "误差分析"]
+                ),
+                ConcreteTopic(
+                    id: "spectroscopic_analysis",
+                    title: "光谱分析",
+                    subtitle: "化学",
+                    icon: "🔬",
+                    description: "IR识别官能团、¹H NMR/¹³C NMR化学位移与裂分、MS分子峰",
+                    difficulty: "高级",
+                    concepts: ["红外光谱", "核磁共振", "质谱", "官能团识别", "结构解析"],
+                    formulas: ["化学位移", "裂分模式", "分子离子峰", "碎片离子"]
+                )
+            ]
+        case "chemical_thermodynamics":
+            return [
+                ConcreteTopic(
+                    id: "spontaneity_criteria",
+                    title: "自发性判据",
+                    subtitle: "化学",
+                    icon: "🔥",
+                    description: "ΔH、ΔS、ΔG与反应自发性判据、ΔG°与平衡常数的关系、温度对K的影响",
+                    difficulty: "高级",
+                    concepts: ["焓变", "熵变", "吉布斯自由能", "自发性", "平衡常数"],
+                    formulas: ["ΔG = ΔH - TΔS", "ΔG° = -RTlnK", "范特霍夫方程"]
+                )
+            ]
+        case "electrochemistry_energy":
+            return [
+                ConcreteTopic(
+                    id: "battery_types",
+                    title: "电池类型",
+                    subtitle: "化学",
+                    icon: "🔋",
+                    description: "二次电池工作原理与比较、燃料电池与电极催化、超级电容、腐蚀机理与防护",
+                    difficulty: "高级",
+                    concepts: ["锂离子电池", "铅酸电池", "镍氢电池", "燃料电池", "超级电容"],
+                    formulas: ["电池反应", "电极电势", "容量计算", "循环寿命"]
+                )
+            ]
+        case "green_sustainable_chemistry":
+            return [
+                ConcreteTopic(
+                    id: "green_chemistry_principles",
+                    title: "绿色化学原则",
+                    subtitle: "化学",
+                    icon: "🌱",
+                    description: "原子经济性、危害最小化、可再生原料、能效、可降解材料、环境化学与治理",
+                    difficulty: "高级",
+                    concepts: ["原子经济性", "危害最小化", "可再生原料", "能效", "可降解材料"],
+                    formulas: ["原子经济性 = 目标产物质量/反应物质量", "环境友好", "可持续发展"]
+                )
+            ]
+        case "comprehensive_experiment":
+            return [
+                ConcreteTopic(
+                    id: "experiment_design",
+                    title: "实验设计",
+                    subtitle: "化学",
+                    icon: "🧪",
+                    description: "实验设计、变量控制、空白/对照、重复性与灵敏度、数据处理",
+                    difficulty: "高级",
+                    concepts: ["实验设计", "变量控制", "空白对照", "重复性", "灵敏度"],
+                    formulas: ["有效数字", "不确定度评估", "线性拟合", "误差分析"]
+                ),
+                ConcreteTopic(
+                    id: "safety_culture",
+                    title: "安全文化",
+                    subtitle: "化学",
+                    icon: "⚠️",
+                    description: "化学品分类与SDS、个人防护、废弃物管理、常见操作要点",
+                    difficulty: "高级",
+                    concepts: ["化学品分类", "SDS", "个人防护", "废弃物管理", "安全操作"],
+                    formulas: ["安全第一", "规范操作", "废物分类", "应急预案"]
+                )
+            ]
+        
+        // 生物知识点
+        case "life_characteristics_scientific_method":
+            return [
+                ConcreteTopic(
+                    id: "life_characteristics",
+                    title: "生命体共同特征",
+                    subtitle: "生物",
+                    icon: "🔬",
+                    description: "代谢、生长、繁殖、应激、遗传与进化",
+                    difficulty: "基础",
+                    concepts: ["代谢", "生长", "繁殖", "应激", "遗传", "进化"],
+                    formulas: ["无生物公式", "生命特征观察", "实验验证", "科学方法"]
+                ),
+                ConcreteTopic(
+                    id: "scientific_inquiry",
+                    title: "科学探究",
+                    subtitle: "生物",
+                    icon: "🔬",
+                    description: "变量控制、对照实验、数据记录与基本统计",
+                    difficulty: "基础",
+                    concepts: ["变量控制", "对照实验", "数据记录", "基本统计", "科学方法"],
+                    formulas: ["实验设计", "数据收集", "统计分析", "结论得出"]
+                ),
+                ConcreteTopic(
+                    id: "microscope_usage",
+                    title: "显微镜使用",
+                    subtitle: "生物",
+                    icon: "🔬",
+                    description: "显微镜结构与使用、放大倍数计算与切片制备",
+                    difficulty: "基础",
+                    concepts: ["显微镜结构", "使用方法", "放大倍数", "切片制备", "观察技巧"],
+                    formulas: ["总放大倍数 = 目镜放大倍数 × 物镜放大倍数", "分辨率计算"]
+                )
+            ]
+        case "cells_biomolecules":
+            return [
+                ConcreteTopic(
+                    id: "cell_theory",
+                    title: "细胞学说",
+                    subtitle: "生物",
+                    icon: "🧬",
+                    description: "细胞学说、原核/真核差异、细胞膜、质、核的基本功能",
+                    difficulty: "基础",
+                    concepts: ["细胞学说", "原核细胞", "真核细胞", "细胞膜", "细胞质", "细胞核"],
+                    formulas: ["细胞基本单位", "结构差异", "功能特点"]
+                ),
+                ConcreteTopic(
+                    id: "cell_organelles",
+                    title: "细胞器功能",
+                    subtitle: "生物",
+                    icon: "🔬",
+                    description: "主要细胞器（叶绿体、线粒体、液泡、内质网、高尔基体、核糖体等）的入门认识",
+                    difficulty: "基础",
+                    concepts: ["叶绿体", "线粒体", "液泡", "内质网", "高尔基体", "核糖体"],
+                    formulas: ["细胞器功能", "结构特点", "相互协作"]
+                ),
+                ConcreteTopic(
+                    id: "biomolecules",
+                    title: "生物大分子",
+                    subtitle: "生物",
+                    icon: "🧬",
+                    description: "糖类、脂质、蛋白质、核酸的组成与功能",
+                    difficulty: "基础",
+                    concepts: ["糖类", "脂质", "蛋白质", "核酸", "组成", "功能"],
+                    formulas: ["分子结构", "功能关系", "代谢途径"]
+                ),
+                ConcreteTopic(
+                    id: "membrane_transport",
+                    title: "物质跨膜运输",
+                    subtitle: "生物",
+                    icon: "🔄",
+                    description: "扩散、渗透（选择透过性概念）",
+                    difficulty: "基础",
+                    concepts: ["扩散", "渗透", "选择透过性", "浓度梯度", "膜结构"],
+                    formulas: ["扩散速率", "渗透压", "浓度差影响"]
+                )
+            ]
+        case "tissue_organ_system":
+            return [
+                ConcreteTopic(
+                    id: "plant_tissues_organs",
+                    title: "植物组织与器官",
+                    subtitle: "生物",
+                    icon: "🌿",
+                    description: "分生/基本/输导组织、根、茎、叶、花、果、种子的结构与功能",
+                    difficulty: "基础",
+                    concepts: ["分生组织", "基本组织", "输导组织", "根", "茎", "叶", "花", "果实", "种子"],
+                    formulas: ["组织功能", "器官结构", "生长发育"]
+                ),
+                ConcreteTopic(
+                    id: "animal_tissues_systems",
+                    title: "动物组织与系统",
+                    subtitle: "生物",
+                    icon: "🫀",
+                    description: "上皮、结缔、肌、神经组织、消化、循环、呼吸、排泄、神经/内分泌系统概览",
+                    difficulty: "基础",
+                    concepts: ["上皮组织", "结缔组织", "肌肉组织", "神经组织", "消化系统", "循环系统", "呼吸系统", "排泄系统", "神经系统", "内分泌系统"],
+                    formulas: ["组织特点", "系统功能", "协调工作"]
+                ),
+                ConcreteTopic(
+                    id: "homeostasis_concept",
+                    title: "稳态概念",
+                    subtitle: "生物",
+                    icon: "⚖️",
+                    description: "稳态概念与体内环境（定性）",
+                    difficulty: "基础",
+                    concepts: ["稳态", "体内环境", "平衡调节", "反馈机制", "适应性"],
+                    formulas: ["稳态维持", "调节机制", "平衡状态"]
+                )
+            ]
+        case "ecology_basics":
+            return [
+                ConcreteTopic(
+                    id: "ecosystem_composition",
+                    title: "生态系统组成",
+                    subtitle: "生物",
+                    icon: "🌍",
+                    description: "生产者/消费者/分解者、能量流动与物质循环",
+                    difficulty: "基础",
+                    concepts: ["生产者", "消费者", "分解者", "能量流动", "物质循环", "生态平衡"],
+                    formulas: ["能量传递效率", "物质循环路径", "生态系统稳定性"]
+                ),
+                ConcreteTopic(
+                    id: "food_chains_webs",
+                    title: "食物链与食物网",
+                    subtitle: "生物",
+                    icon: "🕸️",
+                    description: "食物链/食物网、能量金字塔与生态效率",
+                    difficulty: "基础",
+                    concepts: ["食物链", "食物网", "能量金字塔", "生态效率", "营养级", "能量损失"],
+                    formulas: ["能量传递效率 = 10%", "营养级数量", "能量金字塔形状"]
+                ),
+                ConcreteTopic(
+                    id: "population_community",
+                    title: "种群与群落",
+                    subtitle: "生物",
+                    icon: "👥",
+                    description: "种群特征（数量、密度、年龄结构）与增长曲线、群落演替与生态位",
+                    difficulty: "基础",
+                    concepts: ["种群数量", "种群密度", "年龄结构", "增长曲线", "群落演替", "生态位"],
+                    formulas: ["种群密度 = 个体数/面积", "增长率计算", "生态位宽度"]
+                )
+            ]
+        case "genetics_variation":
+            return [
+                ConcreteTopic(
+                    id: "genes_alleles",
+                    title: "基因与等位基因",
+                    subtitle: "生物",
+                    icon: "🧬",
+                    description: "基因、等位基因、基因型/表现型、孟德尔分离律与自由组合律",
+                    difficulty: "中等",
+                    concepts: ["基因", "等位基因", "基因型", "表现型", "分离律", "自由组合律"],
+                    formulas: ["基因型比例", "表现型比例", "遗传概率计算"]
+                ),
+                ConcreteTopic(
+                    id: "meiosis_genetic_diagrams",
+                    title: "减数分裂与遗传图解",
+                    subtitle: "生物",
+                    icon: "🔬",
+                    description: "减数分裂与遗传图解、联锁与交换（入门）、人类遗传与家系图阅读",
+                    difficulty: "中等",
+                    concepts: ["减数分裂", "遗传图解", "联锁", "交换", "人类遗传", "家系图"],
+                    formulas: ["减数分裂过程", "遗传图解绘制", "家系图分析"]
+                ),
+                ConcreteTopic(
+                    id: "variation_sources",
+                    title: "变异来源",
+                    subtitle: "生物",
+                    icon: "🔄",
+                    description: "变异来源：基因突变、染色体异常（入门）",
+                    difficulty: "中等",
+                    concepts: ["基因突变", "染色体异常", "变异类型", "变异频率", "变异意义"],
+                    formulas: ["突变频率", "变异率计算", "遗传变异分析"]
+                )
+            ]
+        case "metabolism_photosynthesis_respiration":
+            return [
+                ConcreteTopic(
+                    id: "photosynthesis",
+                    title: "光合作用",
+                    subtitle: "生物",
+                    icon: "🌱",
+                    description: "光反应与碳反应（C₃/C₄/CAM了解）、影响因素、叶绿体结构",
+                    difficulty: "中等",
+                    concepts: ["光反应", "碳反应", "C₃植物", "C₄植物", "CAM植物", "叶绿体结构", "影响因素"],
+                    formulas: ["光合作用方程式", "光能转化", "CO₂固定途径"]
+                ),
+                ConcreteTopic(
+                    id: "cellular_respiration",
+                    title: "细胞呼吸",
+                    subtitle: "生物",
+                    icon: "🫁",
+                    description: "有氧/无氧、ATP概念与能量转化、线粒体结构",
+                    difficulty: "中等",
+                    concepts: ["有氧呼吸", "无氧呼吸", "ATP", "能量转化", "线粒体结构", "呼吸过程"],
+                    formulas: ["呼吸作用方程式", "ATP生成量", "能量转化效率"]
+                ),
+                ConcreteTopic(
+                    id: "enzyme_nature_function",
+                    title: "酶的本质与作用",
+                    subtitle: "生物",
+                    icon: "⚡",
+                    description: "酶的本质与作用特点、温度/pH/底物浓度对酶活性影响",
+                    difficulty: "中等",
+                    concepts: ["酶的本质", "作用特点", "温度影响", "pH影响", "底物浓度影响", "酶活性"],
+                    formulas: ["酶活性测定", "最适温度", "最适pH", "米氏方程"]
+                )
+            ]
+        case "cell_structure_function_advanced":
+            return [
+                ConcreteTopic(
+                    id: "biomembrane_system",
+                    title: "生物膜系统",
+                    subtitle: "生物",
+                    icon: "🔬",
+                    description: "生物膜系统与跨膜运输（易化扩散、主动运输、胞吞/胞吐）",
+                    difficulty: "中等",
+                    concepts: ["生物膜系统", "易化扩散", "主动运输", "胞吞", "胞吐", "膜结构"],
+                    formulas: ["运输速率", "能量消耗", "浓度梯度"]
+                ),
+                ConcreteTopic(
+                    id: "cytoskeleton_cell_cycle",
+                    title: "细胞骨架与细胞周期",
+                    subtitle: "生物",
+                    icon: "🔬",
+                    description: "细胞骨架、细胞周期与有丝分裂（分裂各期识别与意义）",
+                    difficulty: "中等",
+                    concepts: ["细胞骨架", "微管", "微丝", "中间纤维", "细胞周期", "有丝分裂", "分裂期"],
+                    formulas: ["细胞周期时间", "分裂期比例", "染色体数量变化"]
+                ),
+                ConcreteTopic(
+                    id: "surface_volume_ratio",
+                    title: "表面积/体积比",
+                    subtitle: "生物",
+                    icon: "📊",
+                    description: "表面积/体积比对物质运输和代谢效率的影响",
+                    difficulty: "中等",
+                    concepts: ["表面积", "体积", "表面积/体积比", "物质运输", "代谢效率", "细胞大小"],
+                    formulas: ["表面积/体积比 = 表面积/体积", "运输效率", "代谢速率"]
+                )
+            ]
+        case "physiology_homeostasis":
+            return [
+                ConcreteTopic(
+                    id: "plant_physiology",
+                    title: "植物生理",
+                    subtitle: "生物",
+                    icon: "🌿",
+                    description: "蒸腾作用、矿质吸收、水分运输、植物激素（生长素等）与向性",
+                    difficulty: "中等",
+                    concepts: ["蒸腾作用", "矿质吸收", "水分运输", "植物激素", "生长素", "向性", "向光性", "向地性"],
+                    formulas: ["蒸腾速率", "水分运输速度", "激素浓度效应"]
+                ),
+                ConcreteTopic(
+                    id: "animal_physiology",
+                    title: "动物生理",
+                    subtitle: "生物",
+                    icon: "🫀",
+                    description: "体液、内环境与稳态、神经调节与体液调节的协同、渗透调节与排泄、体温调节",
+                    difficulty: "中等",
+                    concepts: ["体液", "内环境", "稳态", "神经调节", "体液调节", "渗透调节", "排泄", "体温调节"],
+                    formulas: ["体液平衡", "调节机制", "反馈控制"]
+                )
+            ]
+        case "molecular_genetics_biotechnology":
+            return [
+                ConcreteTopic(
+                    id: "dna_structure_function",
+                    title: "DNA结构与功能",
+                    subtitle: "生物",
+                    icon: "🧬",
+                    description: "DNA双螺旋与染色质、复制、转录、翻译、基因表达调控（原核/真核差异）",
+                    difficulty: "高级",
+                    concepts: ["DNA双螺旋", "染色质", "DNA复制", "转录", "翻译", "基因表达调控", "原核生物", "真核生物"],
+                    formulas: ["碱基配对", "复制准确性", "转录效率", "翻译速率"]
+                ),
+                ConcreteTopic(
+                    id: "mutation_repair",
+                    title: "突变与修复",
+                    subtitle: "生物",
+                    icon: "🔄",
+                    description: "突变与修复、染色体结构变异与基因组概览",
+                    difficulty: "高级",
+                    concepts: ["基因突变", "DNA修复", "染色体变异", "基因组", "变异类型", "修复机制"],
+                    formulas: ["突变率", "修复效率", "变异频率"]
+                ),
+                ConcreteTopic(
+                    id: "biotechnology_principles",
+                    title: "生物技术原理",
+                    subtitle: "生物",
+                    icon: "🔬",
+                    description: "PCR、限制性内切酶、质粒载体、克隆、测序、转基因与基因编辑（CRISPR）原理与伦理",
+                    difficulty: "高级",
+                    concepts: ["PCR", "限制性内切酶", "质粒载体", "克隆", "测序", "转基因", "基因编辑", "CRISPR", "伦理问题"],
+                    formulas: ["PCR扩增倍数", "酶切效率", "克隆成功率"]
+                )
+            ]
+        case "ecosystem_behavior":
+            return [
+                ConcreteTopic(
+                    id: "community_diversity",
+                    title: "群落多样性",
+                    subtitle: "生物",
+                    icon: "🌍",
+                    description: "群落多样性、关键种、物种间关系（竞争/互利/捕食/寄生）",
+                    difficulty: "高级",
+                    concepts: ["群落多样性", "关键种", "竞争关系", "互利关系", "捕食关系", "寄生关系", "物种丰富度"],
+                    formulas: ["多样性指数", "物种丰富度", "关系强度"]
+                ),
+                ConcreteTopic(
+                    id: "population_dynamics",
+                    title: "种群动力学",
+                    subtitle: "生物",
+                    icon: "📈",
+                    description: "种群动力学：指数/逻辑斯谛模型、r/K选择策略、密度制约",
+                    difficulty: "高级",
+                    concepts: ["指数增长", "逻辑斯谛增长", "r选择", "K选择", "密度制约", "种群调节", "增长模型"],
+                    formulas: ["指数增长方程", "逻辑斯谛方程", "r值计算", "K值确定"]
+                ),
+                ConcreteTopic(
+                    id: "behavioral_ecology",
+                    title: "行为生态学",
+                    subtitle: "生物",
+                    icon: "🧠",
+                    description: "行为生态学：先天行为/学习行为、信号与通讯、最优化理论、社会行为",
+                    difficulty: "高级",
+                    concepts: ["先天行为", "学习行为", "信号通讯", "最优化理论", "社会行为", "行为适应", "行为进化"],
+                    formulas: ["行为频率", "学习曲线", "适应度计算"]
+                )
+            ]
+        case "evolution_speciation":
+            return [
+                ConcreteTopic(
+                    id: "evolutionary_forces",
+                    title: "进化驱动力",
+                    subtitle: "生物",
+                    icon: "🦕",
+                    description: "进化驱动力：自然选择、性选择、遗传漂变、基因流、突变",
+                    difficulty: "高级",
+                    concepts: ["自然选择", "性选择", "遗传漂变", "基因流", "突变", "选择压力", "适应度"],
+                    formulas: ["选择系数", "遗传漂变强度", "基因流速率"]
+                ),
+                ConcreteTopic(
+                    id: "species_concept_isolation",
+                    title: "物种概念与隔离",
+                    subtitle: "生物",
+                    icon: "🔒",
+                    description: "物种概念与生殖隔离、适应与趋同/分歧进化",
+                    difficulty: "高级",
+                    concepts: ["物种概念", "生殖隔离", "地理隔离", "生态隔离", "趋同进化", "分歧进化", "适应"],
+                    formulas: ["隔离指数", "分化程度", "进化速率"]
+                ),
+                ConcreteTopic(
+                    id: "phylogeny_molecular_clock",
+                    title: "系统发生与分子钟",
+                    subtitle: "生物",
+                    icon: "🕰️",
+                    description: "系统发生、同源/同功结构、分子钟与系统发育树解读",
+                    difficulty: "高级",
+                    concepts: ["系统发生", "同源结构", "同功结构", "分子钟", "系统发育树", "进化关系", "共同祖先"],
+                    formulas: ["分子钟速率", "分歧时间", "进化距离"]
+                )
+            ]
+        case "human_physiology_special":
+            return [
+                ConcreteTopic(
+                    id: "circulatory_system",
+                    title: "循环系统",
+                    subtitle: "生物",
+                    icon: "🫀",
+                    description: "心动周期、血压调控、血液成分与免疫基础",
+                    difficulty: "高级",
+                    concepts: ["心动周期", "血压调控", "血液成分", "免疫基础", "心脏功能", "血管调节", "血液循环"],
+                    formulas: ["心率", "血压", "心输出量", "血流速度"]
+                ),
+                ConcreteTopic(
+                    id: "respiratory_system",
+                    title: "呼吸系统",
+                    subtitle: "生物",
+                    icon: "🫁",
+                    description: "通气与气体交换、呼吸调节",
+                    difficulty: "高级",
+                    concepts: ["通气", "气体交换", "呼吸调节", "肺功能", "呼吸中枢", "呼吸频率", "肺活量"],
+                    formulas: ["通气量", "气体交换效率", "呼吸商"]
+                ),
+                ConcreteTopic(
+                    id: "digestive_system",
+                    title: "消化系统",
+                    subtitle: "生物",
+                    icon: "🍽️",
+                    description: "消化与吸收、营养代谢与能量平衡",
+                    difficulty: "高级",
+                    concepts: ["消化", "吸收", "营养代谢", "能量平衡", "消化酶", "吸收效率", "营养需求"],
+                    formulas: ["消化率", "吸收率", "能量消耗", "营养利用率"]
+                ),
+                ConcreteTopic(
+                    id: "urinary_system",
+                    title: "泌尿系统",
+                    subtitle: "生物",
+                    icon: "💧",
+                    description: "肾单位结构、滤过/重吸收/分泌与渗透调节",
+                    difficulty: "高级",
+                    concepts: ["肾单位", "滤过", "重吸收", "分泌", "渗透调节", "尿液形成", "水盐平衡"],
+                    formulas: ["滤过率", "重吸收率", "尿液浓度", "渗透压"]
+                ),
+                ConcreteTopic(
+                    id: "neuroendocrine_integration",
+                    title: "神经-内分泌整合",
+                    subtitle: "生物",
+                    icon: "🧠",
+                    description: "下丘脑—垂体—靶腺轴、负反馈调控",
+                    difficulty: "高级",
+                    concepts: ["下丘脑", "垂体", "靶腺", "激素轴", "负反馈", "神经调节", "内分泌调节"],
+                    formulas: ["激素水平", "反馈强度", "调节效率"]
+                ),
+                ConcreteTopic(
+                    id: "immune_system",
+                    title: "免疫系统",
+                    subtitle: "生物",
+                    icon: "🛡️",
+                    description: "非特异/特异免疫、体液/细胞免疫、疫苗与免疫记忆",
+                    difficulty: "高级",
+                    concepts: ["非特异免疫", "特异免疫", "体液免疫", "细胞免疫", "疫苗", "免疫记忆", "免疫应答"],
+                    formulas: ["抗体水平", "免疫细胞数量", "免疫应答强度"]
+                )
+            ]
+        case "scientific_inquiry_biosafety":
+            return [
+                ConcreteTopic(
+                    id: "experiment_design_bio",
+                    title: "实验设计",
+                    subtitle: "生物",
+                    icon: "🔬",
+                    description: "变量控制、对照/空白、重复性与灵敏度",
+                    difficulty: "高级",
+                    concepts: ["变量控制", "对照实验", "空白实验", "重复性", "灵敏度", "实验设计", "数据收集"],
+                    formulas: ["实验误差", "重复性指标", "灵敏度测定"]
+                ),
+                ConcreteTopic(
+                    id: "data_processing_bio",
+                    title: "数据处理",
+                    subtitle: "生物",
+                    icon: "📊",
+                    description: "有效数字、误差/不确定度、卡方检验等基础统计",
+                    difficulty: "高级",
+                    concepts: ["有效数字", "误差", "不确定度", "卡方检验", "统计分析", "数据可靠性"],
+                    formulas: ["误差计算", "不确定度评估", "卡方检验", "显著性水平"]
+                ),
+                ConcreteTopic(
+                    id: "biosafety_ethics",
+                    title: "生物安全与伦理",
+                    subtitle: "生物",
+                    icon: "⚠️",
+                    description: "生物安全与伦理、人类受试者保护、动物福利、环境与转基因安全",
+                    difficulty: "高级",
+                    concepts: ["生物安全", "伦理原则", "人类受试者保护", "动物福利", "环境安全", "转基因安全", "风险评估"],
+                    formulas: ["安全等级", "风险评估", "伦理审查"]
+                )
+            ]
+        
+        // 数学知识点
+        case "numbers_expressions":
+            return [
+                ConcreteTopic(
+                    id: "integer_fraction_operations",
+                    title: "整数与分数运算",
+                    subtitle: "数学",
+                    icon: "🔢",
+                    description: "整数与分数的运算、约分通分、幂与开方（平方/立方入门）",
+                    difficulty: "基础",
+                    concepts: ["整数运算", "分数运算", "约分", "通分", "幂运算", "开方"],
+                    formulas: ["a + b = b + a", "a × b = b × a", "a² = a × a", "√a² = |a|"]
+                ),
+                ConcreteTopic(
+                    id: "factors_multiples",
+                    title: "因数与倍数",
+                    subtitle: "数学",
+                    icon: "🔢",
+                    description: "因数与倍数（质因数分解、最大公因数/最小公倍数）",
+                    difficulty: "基础",
+                    concepts: ["因数", "倍数", "质因数分解", "最大公因数", "最小公倍数", "质数"],
+                    formulas: ["质因数分解", "最大公因数", "最小公倍数", "质数判断"]
+                ),
+                ConcreteTopic(
+                    id: "ratio_percentage",
+                    title: "比、比例与百分数",
+                    subtitle: "数学",
+                    icon: "📊",
+                    description: "比、比例与百分数（折扣、增长率、利息入门）",
+                    difficulty: "基础",
+                    concepts: ["比", "比例", "百分数", "折扣", "增长率", "利息"],
+                    formulas: ["比例 = a:b", "百分数 = 部分/整体 × 100%", "折扣 = 原价 × 折扣率"]
+                ),
+                ConcreteTopic(
+                    id: "algebraic_expressions",
+                    title: "简单代数式与整式运算",
+                    subtitle: "数学",
+                    icon: "🔢",
+                    description: "简单代数式与整式运算（合并同类项、去括号）",
+                    difficulty: "基础",
+                    concepts: ["代数式", "整式", "同类项", "合并同类项", "去括号", "整式运算"],
+                    formulas: ["合并同类项", "去括号法则", "整式加减法"]
+                )
+            ]
+        case "equations_inequalities":
+            return [
+                ConcreteTopic(
+                    id: "linear_equations",
+                    title: "一元一次方程",
+                    subtitle: "数学",
+                    icon: "⚖️",
+                    description: "一元一次方程与应用题建模",
+                    difficulty: "基础",
+                    concepts: ["一元一次方程", "解方程", "应用题建模", "等量关系", "未知数"],
+                    formulas: ["ax + b = 0", "x = -b/a", "解方程步骤"]
+                ),
+                ConcreteTopic(
+                    id: "linear_inequalities",
+                    title: "一元一次不等式",
+                    subtitle: "数学",
+                    icon: "⚖️",
+                    description: "一元一次不等式（解集表示与数轴）",
+                    difficulty: "基础",
+                    concepts: ["一元一次不等式", "解不等式", "解集", "数轴表示", "不等式性质"],
+                    formulas: ["ax + b > 0", "ax + b < 0", "解集表示"]
+                ),
+                ConcreteTopic(
+                    id: "functions_images_basic",
+                    title: "函数与图像（入门）",
+                    subtitle: "数学",
+                    icon: "📈",
+                    description: "变量、函数的基本概念、表格—图像—解析式的对应、直角坐标系与点的表示、象限",
+                    difficulty: "基础",
+                    concepts: ["变量", "函数", "表格", "图像", "解析式", "直角坐标系", "象限"],
+                    formulas: ["函数关系", "坐标表示", "象限判断"]
+                )
+            ]
+        case "geometry_graphics":
+            return [
+                ConcreteTopic(
+                    id: "basic_geometric_concepts",
+                    title: "基本几何概念与作图",
+                    subtitle: "数学",
+                    icon: "📐",
+                    description: "基本几何概念与作图：点、线、角，垂线与平行线",
+                    difficulty: "基础",
+                    concepts: ["点", "线", "角", "垂线", "平行线", "几何作图", "基本概念"],
+                    formulas: ["角的大小", "垂线性质", "平行线性质"]
+                ),
+                ConcreteTopic(
+                    id: "triangles_quadrilaterals",
+                    title: "三角形与四边形",
+                    subtitle: "数学",
+                    icon: "📐",
+                    description: "三角形与四边形的基本性质（内角和、分类）",
+                    difficulty: "基础",
+                    concepts: ["三角形", "四边形", "内角和", "分类", "基本性质", "边角关系"],
+                    formulas: ["三角形内角和 = 180°", "四边形内角和 = 360°", "分类方法"]
+                ),
+                ConcreteTopic(
+                    id: "circle_basic",
+                    title: "圆的认识",
+                    subtitle: "数学",
+                    icon: "⭕",
+                    description: "圆的认识（半径、直径、周长、面积入门）",
+                    difficulty: "基础",
+                    concepts: ["圆", "半径", "直径", "周长", "面积", "圆心", "圆周"],
+                    formulas: ["直径 = 2 × 半径", "周长 = 2πr", "面积 = πr²"]
+                ),
+                ConcreteTopic(
+                    id: "geometric_transformations",
+                    title: "图形的变换",
+                    subtitle: "数学",
+                    icon: "🔄",
+                    description: "图形的平移、旋转、对称（轴对称/中心对称）",
+                    difficulty: "基础",
+                    concepts: ["平移", "旋转", "对称", "轴对称", "中心对称", "变换性质"],
+                    formulas: ["平移向量", "旋转角度", "对称轴", "对称中心"]
+                )
+            ]
+        case "statistics_probability_basic":
+            return [
+                ConcreteTopic(
+                    id: "statistical_charts",
+                    title: "统计图表",
+                    subtitle: "数学",
+                    icon: "📊",
+                    description: "统计图表：条形图、折线图、扇形图",
+                    difficulty: "基础",
+                    concepts: ["条形图", "折线图", "扇形图", "统计图表", "数据表示", "图表分析"],
+                    formulas: ["图表制作", "数据读取", "图表分析"]
+                ),
+                ConcreteTopic(
+                    id: "central_tendency_measures",
+                    title: "集中趋势量数",
+                    subtitle: "数学",
+                    icon: "📊",
+                    description: "平均数、众数、中位数的含义与求法",
+                    difficulty: "基础",
+                    concepts: ["平均数", "众数", "中位数", "集中趋势", "数据特征", "计算方法"],
+                    formulas: ["平均数 = 总和/个数", "众数 = 出现次数最多的数", "中位数 = 中间位置的数"]
+                ),
+                ConcreteTopic(
+                    id: "simple_random_events",
+                    title: "简单随机事件",
+                    subtitle: "数学",
+                    icon: "🎲",
+                    description: "简单随机事件与频率",
+                    difficulty: "基础",
+                    concepts: ["随机事件", "频率", "概率", "事件类型", "频率计算"],
+                    formulas: ["频率 = 事件发生次数/总次数", "概率 = 有利事件数/总事件数"]
+                )
+            ]
+        case "algebra_equations":
+            return [
+                ConcreteTopic(
+                    id: "systems_of_linear_equations",
+                    title: "二元一次方程组",
+                    subtitle: "数学",
+                    icon: "🔢",
+                    description: "二元一次方程组的解法（代入/加减）与应用",
+                    difficulty: "基础",
+                    concepts: ["二元一次方程组", "代入法", "加减法", "解方程组", "应用问题"],
+                    formulas: ["代入法", "加减法", "解的唯一性", "应用建模"]
+                ),
+                ConcreteTopic(
+                    id: "polynomial_multiplication",
+                    title: "整式的乘法",
+                    subtitle: "数学",
+                    icon: "🔢",
+                    description: "整式的乘法与平方公式、分式的基本性质与运算",
+                    difficulty: "基础",
+                    concepts: ["整式乘法", "平方公式", "分式", "基本性质", "分式运算"],
+                    formulas: ["(a+b)² = a²+2ab+b²", "(a-b)² = a²-2ab+b²", "分式加减乘除"]
+                ),
+                ConcreteTopic(
+                    id: "linear_functions",
+                    title: "一次函数",
+                    subtitle: "数学",
+                    icon: "📈",
+                    description: "一次函数：概念、斜率、图像与应用",
+                    difficulty: "基础",
+                    concepts: ["一次函数", "斜率", "图像", "函数性质", "应用问题"],
+                    formulas: ["y = kx + b", "斜率k", "截距b", "图像特征"]
+                )
+            ]
+        case "geometry_advanced":
+            return [
+                ConcreteTopic(
+                    id: "parallel_lines",
+                    title: "平行线性质与判定",
+                    subtitle: "数学",
+                    icon: "📐",
+                    description: "平行线性质与判定、内错角、同位角、同旁内角",
+                    difficulty: "基础",
+                    concepts: ["平行线", "性质", "判定", "内错角", "同位角", "同旁内角"],
+                    formulas: ["平行线性质", "判定条件", "角度关系"]
+                ),
+                ConcreteTopic(
+                    id: "triangle_congruence",
+                    title: "三角形全等",
+                    subtitle: "数学",
+                    icon: "📐",
+                    description: "三角形全等（SAS/ASA/SSS/AAS）及判定应用",
+                    difficulty: "基础",
+                    concepts: ["三角形全等", "SAS", "ASA", "SSS", "AAS", "判定应用"],
+                    formulas: ["全等条件", "判定方法", "应用证明"]
+                ),
+                ConcreteTopic(
+                    id: "pythagorean_theorem",
+                    title: "勾股定理",
+                    subtitle: "数学",
+                    icon: "📐",
+                    description: "勾股定理与逆定理，直角三角形应用",
+                    difficulty: "基础",
+                    concepts: ["勾股定理", "逆定理", "直角三角形", "应用", "证明"],
+                    formulas: ["a² + b² = c²", "逆定理", "应用计算"]
+                )
+            ]
+        case "algebra_functions_advanced":
+            return [
+                ConcreteTopic(
+                    id: "quadratic_functions",
+                    title: "二次函数",
+                    subtitle: "数学",
+                    icon: "📈",
+                    description: "二次函数：开口、顶点、对称轴、与一次函数/反比例函数综合",
+                    difficulty: "中等",
+                    concepts: ["二次函数", "开口方向", "顶点", "对称轴", "图像特征", "综合应用"],
+                    formulas: ["y = ax² + bx + c", "顶点坐标", "对称轴方程", "开口判断"]
+                ),
+                ConcreteTopic(
+                    id: "factoring_methods",
+                    title: "因式分解系统法",
+                    subtitle: "数学",
+                    icon: "🔢",
+                    description: "因式分解系统法（提公因式、公式法、十字相乘等）",
+                    difficulty: "中等",
+                    concepts: ["因式分解", "提公因式", "公式法", "十字相乘", "分组分解"],
+                    formulas: ["提公因式", "平方差公式", "完全平方公式", "十字相乘"]
+                ),
+                ConcreteTopic(
+                    id: "quadratic_equations",
+                    title: "一元二次方程",
+                    subtitle: "数学",
+                    icon: "⚖️",
+                    description: "一元二次方程：求根公式与判别式、二次不等式的解法",
+                    difficulty: "中等",
+                    concepts: ["一元二次方程", "求根公式", "判别式", "二次不等式", "解法"],
+                    formulas: ["x = (-b ± √(b²-4ac))/2a", "Δ = b²-4ac", "不等式解法"]
+                )
+            ]
+        case "geometry_trigonometry":
+            return [
+                ConcreteTopic(
+                    id: "similar_triangles",
+                    title: "相似三角形",
+                    subtitle: "数学",
+                    icon: "📐",
+                    description: "相似三角形的判定与性质、放缩与比例线段",
+                    difficulty: "中等",
+                    concepts: ["相似三角形", "判定", "性质", "放缩", "比例线段", "相似比"],
+                    formulas: ["相似条件", "相似比", "面积比", "比例关系"]
+                ),
+                ConcreteTopic(
+                    id: "circle_properties",
+                    title: "圆的性质",
+                    subtitle: "数学",
+                    icon: "⭕",
+                    description: "圆的性质与切线、弦、圆周角、圆心角、弧长与扇形面积",
+                    difficulty: "中等",
+                    concepts: ["切线", "弦", "圆周角", "圆心角", "弧长", "扇形面积"],
+                    formulas: ["切线性质", "圆周角定理", "弧长公式", "扇形面积公式"]
+                ),
+                ConcreteTopic(
+                    id: "right_triangle_trigonometry",
+                    title: "解直角三角形",
+                    subtitle: "数学",
+                    icon: "📐",
+                    description: "解直角三角形：sin、cos、tan的定义与简单应用",
+                    difficulty: "中等",
+                    concepts: ["正弦", "余弦", "正切", "解直角三角形", "三角函数", "应用"],
+                    formulas: ["sin A = 对边/斜边", "cos A = 邻边/斜边", "tan A = 对边/邻边"]
+                )
+            ]
+        case "sets_logic_basic":
+            return [
+                ConcreteTopic(
+                    id: "set_operations",
+                    title: "集合表示与运算",
+                    subtitle: "数学",
+                    icon: "🔗",
+                    description: "集合表示与运算（并、交、补）、子集与真子集",
+                    difficulty: "中等",
+                    concepts: ["集合", "表示方法", "并集", "交集", "补集", "子集", "真子集"],
+                    formulas: ["A ∪ B", "A ∩ B", "A'", "A ⊆ B", "A ⊂ B"]
+                ),
+                ConcreteTopic(
+                    id: "propositions_logic",
+                    title: "命题与逻辑",
+                    subtitle: "数学",
+                    icon: "🧠",
+                    description: "命题、充分必要条件、简单逻辑推理",
+                    difficulty: "中等",
+                    concepts: ["命题", "充分条件", "必要条件", "充要条件", "逻辑推理", "真值"],
+                    formulas: ["p → q", "p ↔ q", "逻辑运算", "推理规则"]
+                )
+            ]
+        case "functions_equations":
+            return [
+                ConcreteTopic(
+                    id: "function_properties",
+                    title: "函数的性质",
+                    subtitle: "数学",
+                    icon: "📈",
+                    description: "函数的性质：定义域、值域、奇偶性、单调性与对称性",
+                    difficulty: "中等",
+                    concepts: ["定义域", "值域", "奇偶性", "单调性", "对称性", "函数性质"],
+                    formulas: ["奇函数: f(-x) = -f(x)", "偶函数: f(-x) = f(x)", "单调性判断"]
+                ),
+                ConcreteTopic(
+                    id: "elementary_functions",
+                    title: "基本初等函数",
+                    subtitle: "数学",
+                    icon: "📈",
+                    description: "基本初等函数：幂函数、指数函数、对数函数（运算与图像）",
+                    difficulty: "中等",
+                    concepts: ["幂函数", "指数函数", "对数函数", "运算", "图像", "性质"],
+                    formulas: ["幂函数: y = x^n", "指数函数: y = a^x", "对数函数: y = log_a(x)"]
+                )
+            ]
+        case "trigonometry_basic":
+            return [
+                ConcreteTopic(
+                    id: "angles_radians",
+                    title: "任意角与弧度制",
+                    subtitle: "数学",
+                    icon: "📐",
+                    description: "任意角与弧度制、正弦、余弦、正切的定义与图像",
+                    difficulty: "中等",
+                    concepts: ["任意角", "弧度制", "正弦", "余弦", "正切", "定义", "图像"],
+                    formulas: ["弧度 = 角度 × π/180", "sin θ", "cos θ", "tan θ"]
+                ),
+                ConcreteTopic(
+                    id: "trigonometric_identities",
+                    title: "三角恒等式",
+                    subtitle: "数学",
+                    icon: "📐",
+                    description: "三角恒等式（同角三角函数关系、诱导公式）、两角和差公式（入门）",
+                    difficulty: "中等",
+                    concepts: ["三角恒等式", "同角关系", "诱导公式", "和差公式", "证明"],
+                    formulas: ["sin²θ + cos²θ = 1", "诱导公式", "sin(A+B) = sinAcosB + cosAsinB"]
+                )
+            ]
+        case "vectors_analytic_geometry":
+            return [
+                ConcreteTopic(
+                    id: "plane_vectors",
+                    title: "平面向量",
+                    subtitle: "数学",
+                    icon: "➡️",
+                    description: "平面向量的加减与数乘、基底表示与坐标表示",
+                    difficulty: "中等",
+                    concepts: ["平面向量", "加减法", "数乘", "基底", "坐标表示", "向量运算"],
+                    formulas: ["向量加法", "向量减法", "数乘", "坐标表示"]
+                ),
+                ConcreteTopic(
+                    id: "line_equations",
+                    title: "直线方程",
+                    subtitle: "数学",
+                    icon: "📐",
+                    description: "线段的向量表示、点到点/点到直线的距离、直线的方程与位置关系",
+                    difficulty: "中等",
+                    concepts: ["线段", "向量表示", "距离", "直线方程", "位置关系"],
+                    formulas: ["点斜式", "斜截式", "一般式", "距离公式"]
+                )
+            ]
+        case "sequences":
+            return [
+                ConcreteTopic(
+                    id: "arithmetic_geometric_sequences",
+                    title: "等差等比数列",
+                    subtitle: "数学",
+                    icon: "📊",
+                    description: "等差、等比数列的通项与前n项和、递推关系入门",
+                    difficulty: "中等",
+                    concepts: ["等差数列", "等比数列", "通项公式", "前n项和", "递推关系"],
+                    formulas: ["等差数列: an = a1 + (n-1)d", "等比数列: an = a1 × q^(n-1)", "求和公式"]
+                )
+            ]
+        case "trigonometry_triangle_solving":
+            return [
+                ConcreteTopic(
+                    id: "advanced_trigonometric_formulas",
+                    title: "高级三角公式",
+                    subtitle: "数学",
+                    icon: "📐",
+                    description: "倍角/半角、积化和差与和差化积公式",
+                    difficulty: "高级",
+                    concepts: ["倍角公式", "半角公式", "积化和差", "和差化积", "公式推导"],
+                    formulas: ["sin(2θ) = 2sinθcosθ", "cos(2θ) = cos²θ - sin²θ", "积化和差公式"]
+                ),
+                ConcreteTopic(
+                    id: "sine_cosine_theorems",
+                    title: "正弦定理与余弦定理",
+                    subtitle: "数学",
+                    icon: "📐",
+                    description: "正弦定理、余弦定理、面积公式与解三角形综合",
+                    difficulty: "高级",
+                    concepts: ["正弦定理", "余弦定理", "面积公式", "解三角形", "综合应用"],
+                    formulas: ["正弦定理: a/sinA = b/sinB = c/sinC", "余弦定理: c² = a² + b² - 2abcosC"]
+                )
+            ]
+        case "solid_geometry_spatial_concepts":
+            return [
+                ConcreteTopic(
+                    id: "spatial_position_relations",
+                    title: "空间位置关系",
+                    subtitle: "数学",
+                    icon: "🔲",
+                    description: "空间点、线、面的位置关系（平行/垂直判定与性质）",
+                    difficulty: "高级",
+                    concepts: ["空间点", "空间线", "空间面", "平行", "垂直", "判定", "性质"],
+                    formulas: ["平行判定", "垂直判定", "位置关系判断"]
+                ),
+                ConcreteTopic(
+                    id: "polyhedra_rotation_bodies",
+                    title: "多面体与旋转体",
+                    subtitle: "数学",
+                    icon: "🔲",
+                    description: "多面体与旋转体（棱柱、棱锥、台体、柱体、锥体、球）的表面积与体积",
+                    difficulty: "高级",
+                    concepts: ["多面体", "旋转体", "棱柱", "棱锥", "台体", "表面积", "体积"],
+                    formulas: ["表面积公式", "体积公式", "计算应用"]
+                )
+            ]
+        case "analytic_geometry_conic_sections":
+            return [
+                ConcreteTopic(
+                    id: "conic_sections_equations",
+                    title: "圆锥曲线方程",
+                    subtitle: "数学",
+                    icon: "📐",
+                    description: "椭圆、双曲线、抛物线的标准方程、几何性质与参数",
+                    difficulty: "高级",
+                    concepts: ["椭圆", "双曲线", "抛物线", "标准方程", "几何性质", "参数"],
+                    formulas: ["椭圆: x²/a² + y²/b² = 1", "双曲线: x²/a² - y²/b² = 1", "抛物线: y² = 2px"]
+                ),
+                ConcreteTopic(
+                    id: "conic_sections_applications",
+                    title: "圆锥曲线应用",
+                    subtitle: "数学",
+                    icon: "📐",
+                    description: "曲线与直线/圆的交点、切线、最值与范围问题",
+                    difficulty: "高级",
+                    concepts: ["交点", "切线", "最值", "范围", "应用问题", "综合计算"],
+                    formulas: ["交点计算", "切线方程", "最值求法"]
+                )
+            ]
+        case "derivatives_calculus_basic":
+            return [
+                ConcreteTopic(
+                    id: "derivative_concepts",
+                    title: "导数概念",
+                    subtitle: "数学",
+                    icon: "📈",
+                    description: "导数的概念与几何意义、基本求导法则与复合函数求导",
+                    difficulty: "高级",
+                    concepts: ["导数", "概念", "几何意义", "求导法则", "复合函数", "链式法则"],
+                    formulas: ["f'(x) = lim(h→0)[f(x+h) - f(x)]/h", "基本求导公式", "链式法则"]
+                ),
+                ConcreteTopic(
+                    id: "derivative_applications",
+                    title: "导数应用",
+                    subtitle: "数学",
+                    icon: "📈",
+                    description: "利用导数研究函数的单调性、极值、最值与凹凸性、切线法线、相关变化率",
+                    difficulty: "高级",
+                    concepts: ["单调性", "极值", "最值", "凹凸性", "切线", "法线", "变化率"],
+                    formulas: ["单调性判断", "极值条件", "凹凸性判断", "切线方程"]
+                )
+            ]
+        case "complex_numbers":
+            return [
+                ConcreteTopic(
+                    id: "complex_number_forms",
+                    title: "复数形式",
+                    subtitle: "数学",
+                    icon: "🔢",
+                    description: "复数的代数形式与几何表示、模与辐角",
+                    difficulty: "高级",
+                    concepts: ["复数", "代数形式", "几何表示", "模", "辐角", "复平面"],
+                    formulas: ["z = a + bi", "|z| = √(a² + b²)", "arg(z) = arctan(b/a)"]
+                ),
+                ConcreteTopic(
+                    id: "complex_number_operations",
+                    title: "复数运算",
+                    subtitle: "数学",
+                    icon: "🔢",
+                    description: "共轭、乘除与极形式的运算（棣莫弗定理入门）",
+                    difficulty: "高级",
+                    concepts: ["共轭复数", "乘法", "除法", "极形式", "棣莫弗定理"],
+                    formulas: ["共轭: z̄ = a - bi", "极形式: z = r(cosθ + isinθ)", "棣莫弗定理"]
+                )
+            ]
+        case "calculus_applications":
+            return [
+                ConcreteTopic(
+                    id: "indefinite_integration",
+                    title: "不定积分",
+                    subtitle: "数学",
+                    icon: "📈",
+                    description: "不定积分与基本积分公式、换元与分部积分（基础）",
+                    difficulty: "高级",
+                    concepts: ["不定积分", "基本公式", "换元积分", "分部积分", "积分技巧"],
+                    formulas: ["基本积分公式", "换元法", "分部积分法", "积分常数"]
+                ),
+                ConcreteTopic(
+                    id: "definite_integration",
+                    title: "定积分",
+                    subtitle: "数学",
+                    icon: "📈",
+                    description: "定积分的概念、性质与几何意义（曲边梯形面积）、定积分的应用",
+                    difficulty: "高级",
+                    concepts: ["定积分", "概念", "性质", "几何意义", "曲边梯形", "应用"],
+                    formulas: ["定积分定义", "几何意义", "面积计算", "体积计算"]
+                )
+            ]
+        case "vectors_spatial_analytic_geometry":
+            return [
+                ConcreteTopic(
+                    id: "spatial_vectors",
+                    title: "空间向量",
+                    subtitle: "数学",
+                    icon: "➡️",
+                    description: "空间向量运算与夹角、距离公式",
+                    difficulty: "高级",
+                    concepts: ["空间向量", "运算", "夹角", "距离", "空间几何", "向量关系"],
+                    formulas: ["向量夹角", "距离公式", "空间向量运算"]
+                ),
+                ConcreteTopic(
+                    id: "spatial_lines_planes",
+                    title: "空间直线与平面",
+                    subtitle: "数学",
+                    icon: "🔲",
+                    description: "空间直线与平面方程、相对位置（平行/相交/垂直）、线面角、二面角与投影",
+                    difficulty: "高级",
+                    concepts: ["空间直线", "空间平面", "方程", "相对位置", "线面角", "二面角", "投影"],
+                    formulas: ["直线方程", "平面方程", "位置关系", "角度计算"]
+                )
+            ]
+        case "conic_sections_comprehensive":
+            return [
+                ConcreteTopic(
+                    id: "conic_sections_optimization",
+                    title: "圆锥曲线优化",
+                    subtitle: "数学",
+                    icon: "📐",
+                    description: "圆锥曲线与导数不等式向量的综合优化问题",
+                    difficulty: "高级",
+                    concepts: ["圆锥曲线", "导数", "不等式", "向量", "综合优化", "最值问题"],
+                    formulas: ["优化条件", "约束方程", "目标函数", "最值求解"]
+                ),
+                ConcreteTopic(
+                    id: "parametric_polar_coordinates",
+                    title: "参数方程与极坐标",
+                    subtitle: "数学",
+                    icon: "📐",
+                    description: "参数方程与极坐标描点（入门）、极坐标下的对称与面积",
+                    difficulty: "高级",
+                    concepts: ["参数方程", "极坐标", "描点", "对称性", "面积计算", "坐标变换"],
+                    formulas: ["参数方程", "极坐标方程", "面积公式", "对称条件"]
+                )
+            ]
+        case "sequences_limits_advanced":
+            return [
+                ConcreteTopic(
+                    id: "limits_intuition",
+                    title: "极限直观",
+                    subtitle: "数学",
+                    icon: "📊",
+                    description: "单调有界与极限直观、错位相减法与裂项相消",
+                    difficulty: "高级",
+                    concepts: ["极限", "单调性", "有界性", "错位相减", "裂项相消", "收敛性"],
+                    formulas: ["极限定义", "单调有界定理", "错位相减法", "裂项相消法"]
+                ),
+                ConcreteTopic(
+                    id: "recurrence_relations",
+                    title: "递推关系",
+                    subtitle: "数学",
+                    icon: "📊",
+                    description: "递推关系的求解与应用、数学归纳法",
+                    difficulty: "高级",
+                    concepts: ["递推关系", "求解", "应用", "数学归纳法", "证明", "通项公式"],
+                    formulas: ["递推公式", "通项求解", "归纳法步骤", "证明技巧"]
+                )
+            ]
+        case "probability_statistics_comprehensive":
+            return [
+                ConcreteTopic(
+                    id: "random_variables",
+                    title: "随机变量",
+                    subtitle: "数学",
+                    icon: "📊",
+                    description: "离散连续随机变量的期望与方差、正态分布入门",
+                    difficulty: "高级",
+                    concepts: ["随机变量", "离散", "连续", "期望", "方差", "正态分布"],
+                    formulas: ["期望公式", "方差公式", "正态分布密度函数", "标准化"]
+                ),
+                ConcreteTopic(
+                    id: "sampling_inference",
+                    title: "抽样与推断",
+                    subtitle: "数学",
+                    icon: "📊",
+                    description: "抽样分布、区间估计与显著性检验、概率模型建模与模拟",
+                    difficulty: "高级",
+                    concepts: ["抽样分布", "区间估计", "显著性检验", "概率模型", "建模", "模拟"],
+                    formulas: ["置信区间", "假设检验", "p值", "显著性水平"]
+                )
+            ]
+        case "mathematical_thinking_methods":
+            return [
+                ConcreteTopic(
+                    id: "mathematical_ideas",
+                    title: "数学思想",
+                    subtitle: "数学",
+                    icon: "🧠",
+                    description: "函数与方程思想、数形结合、分类讨论、化归与递推",
+                    difficulty: "高级",
+                    concepts: ["函数思想", "方程思想", "数形结合", "分类讨论", "化归", "递推"],
+                    formulas: ["思想方法", "解题策略", "思维模式", "方法总结"]
+                ),
+                ConcreteTopic(
+                    id: "mathematical_methods",
+                    title: "数学方法",
+                    subtitle: "数学",
+                    icon: "🧠",
+                    description: "极值与估算、构造与转化、整体与局部、守恒与不变性、算法初步与流程图",
+                    difficulty: "高级",
+                    concepts: ["极值", "估算", "构造", "转化", "整体", "局部", "守恒", "算法"],
+                    formulas: ["方法总结", "技巧归纳", "算法描述", "流程图"]
+                )
+            ]
+        
         default:
             return [
                 ConcreteTopic(
                     id: "default_topic",
                     title: "知识点详情",
-                    subtitle: "物理",
+                    subtitle: mainTopic.subtitle,
                     icon: "📚",
                     description: "该知识点的详细内容正在开发中...",
                     difficulty: "待定",
