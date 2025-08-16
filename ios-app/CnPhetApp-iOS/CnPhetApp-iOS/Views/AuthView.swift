@@ -24,7 +24,7 @@ struct AuthView: View {
                 VStack(spacing: 0) {
                     // 标题区域
                     VStack(spacing: 8) {
-                        Text("理科学习助手")
+                        Text("理科实验室")
                             .font(.largeTitle)
                             .fontWeight(.bold)
                             .foregroundColor(.primary)
@@ -235,70 +235,6 @@ struct AuthView: View {
                 .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: -5)
                 
                 Spacer()
-                
-                // 底部评论区域（模拟）
-                VStack(spacing: 0) {
-                    // 评论内容
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Text("吕同学: 有的活真的可以交给ai")
-                                .font(.subheadline)
-                                .foregroundColor(.white)
-                            Spacer()
-                        }
-                        
-                        // 回复栏
-                        HStack {
-                            Text("回复@吕同学")
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.8))
-                            
-                            Spacer()
-                            
-                            // 功能图标
-                            HStack(spacing: 16) {
-                                Button(action: {}) {
-                                    Image(systemName: "at")
-                                        .foregroundColor(.white.opacity(0.8))
-                                }
-                                
-                                Button(action: {}) {
-                                    Image(systemName: "face.smiling")
-                                        .foregroundColor(.white.opacity(0.8))
-                                }
-                                
-                                Button(action: {}) {
-                                    ZStack {
-                                        Image(systemName: "photo")
-                                            .foregroundColor(.white.opacity(0.8))
-                                        
-                                        // 红色通知点
-                                        Circle()
-                                            .fill(Color.red)
-                                            .frame(width: 8, height: 8)
-                                            .offset(x: 8, y: -8)
-                                    }
-                                }
-                                
-                                // 点赞
-                                HStack(spacing: 4) {
-                                    Button(action: {}) {
-                                        Image(systemName: "heart")
-                                            .foregroundColor(.white.opacity(0.8))
-                                    }
-                                    
-                                    Text("20")
-                                        .font(.caption)
-                                        .foregroundColor(.white.opacity(0.8))
-                                }
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 16)
-                }
-                .background(Color(.systemGray6))
-                .cornerRadius(20, corners: [.topLeft, .topRight])
             }
         }
         .alert("忘记密码", isPresented: $showForgotPasswordAlert) {

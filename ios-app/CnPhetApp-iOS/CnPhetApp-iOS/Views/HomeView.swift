@@ -170,7 +170,7 @@ extension Subject {
         switch self {
         case .physics: return .blue
         case .chemistry: return .green
-        case .math: return .orange
+        case .math: return .yellow
         case .biology: return .purple
         }
     }

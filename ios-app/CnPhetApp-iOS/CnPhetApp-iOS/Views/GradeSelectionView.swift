@@ -30,7 +30,7 @@ struct GradeSelectionView: View {
             // 年级选择网格
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: 2), spacing: 16) {
                 ForEach(Grade.allCases) { grade in
-                    GradeCard(grade: grade) {
+                    GradeCard(grade: grade, subject: subject) {
                         selectedGrade = grade
                         showGradeTopics = true
                     }
@@ -52,7 +52,22 @@ struct GradeSelectionView: View {
 
 struct GradeCard: View {
     let grade: Grade
+    let subject: Subject
     let action: () -> Void
+    
+    // 根据学科获取主题色
+    private var subjectColor: Color {
+        switch subject {
+        case .physics:
+            return .blue
+        case .chemistry:
+            return .green
+        case .math:
+            return .yellow
+        case .biology:
+            return .purple
+        }
+    }
     
     var body: some View {
         Button(action: action) {
@@ -60,13 +75,13 @@ struct GradeCard: View {
                 // 顶部图标
                 ZStack {
                     Circle()
-                        .fill(Color.blue.opacity(0.2))
+                        .fill(subjectColor.opacity(0.2))
                         .frame(width: 60, height: 60)
                     
                     Text(grade.title.prefix(1))
                         .font(.title)
                         .fontWeight(.bold)
-                        .foregroundColor(.blue)
+                        .foregroundColor(subjectColor)
                 }
                 
                 // 年级名称
