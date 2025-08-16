@@ -24,7 +24,7 @@ struct ConcreteTopicsListView: View {
             
             // 具体知识点列表
             List(concreteTopics) { topic in
-                NavigationLink(value: topic) {
+                NavigationLink(destination: ConcreteTopicDetailView(topic: topic)) {
                     HStack(spacing: 16) {
                         // 左侧图标
                         ZStack {
@@ -71,183 +71,29 @@ struct ConcreteTopicsListView: View {
         }
         .navigationTitle(mainTopic.title)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(for: ConcreteTopic.self) { topic in
-            ScrollView {
-                VStack(spacing: 20) {
-                    // 顶部信息卡片
-                    VStack(spacing: 16) {
-                        // 知识点图标和标题
-                        HStack(spacing: 16) {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.blue.opacity(0.1))
-                                    .frame(width: 60, height: 60)
-                                
-                                Text(topic.icon)
-                                    .font(.title)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.blue)
-                            }
-                            
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(topic.title)
-                                    .font(.title2)
-                                    .fontWeight(.bold)
-                                
-                                HStack(spacing: 8) {
-                                    Text(topic.subtitle)
-                                        .font(.caption)
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 4)
-                                        .background(Color.blue.opacity(0.2))
-                                        .foregroundColor(.blue)
-                                        .cornerRadius(8)
-                                    
-                                    Text(topic.difficulty)
-                                        .font(.caption)
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 4)
-                                        .background(difficultyColor(for: topic.difficulty).opacity(0.2))
-                                        .foregroundColor(difficultyColor(for: topic.difficulty))
-                                        .cornerRadius(8)
-                                }
-                            }
-                            
-                            Spacer()
-                        }
-                        
-                        // 描述
-                        if !topic.description.isEmpty {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("知识点描述")
-                                    .font(.headline)
-                                    .foregroundColor(.primary)
-                                
-                                Text(topic.description)
-                                    .font(.body)
-                                    .foregroundColor(.secondary)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-                    .padding()
-                    .background(Color(.systemBackground))
-                    .cornerRadius(16)
-                    .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
-                    
-                    // 核心概念
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("核心概念")
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            ForEach(topic.concepts, id: \.self) { concept in
-                                HStack(spacing: 12) {
-                                    Image(systemName: "circle.fill")
-                                        .font(.caption)
-                                        .foregroundColor(.blue)
-                                    
-                                    Text(concept)
-                                        .font(.body)
-                                        .foregroundColor(.primary)
-                                    
-                                    Spacer()
-                                }
-                            }
-                        }
-                    }
-                    .padding()
-                    .background(Color(.systemBackground))
-                    .cornerRadius(16)
-                    .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
-                    
-                    // 重要公式
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("重要公式")
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            ForEach(topic.formulas, id: \.self) { formula in
-                                HStack(spacing: 12) {
-                                    Image(systemName: "function")
-                                        .font(.caption)
-                                        .foregroundColor(.green)
-                                    
-                                    Text(formula)
-                                        .font(.body)
-                                        .foregroundColor(.primary)
-                                        .font(.system(.body, design: .monospaced))
-                                    
-                                    Spacer()
-                                }
-                            }
-                        }
-                    }
-                    .padding()
-                    .background(Color(.systemBackground))
-                    .cornerRadius(16)
-                    .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
-                    
-                    // 学习建议
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("学习建议")
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            ConcreteLearningTipRow(
-                                icon: "lightbulb.fill",
-                                color: .yellow,
-                                title: "理解概念",
-                                description: "先理解基本概念和定义，建立知识框架"
-                            )
-                            
-                            ConcreteLearningTipRow(
-                                icon: "flask.fill",
-                                color: .green,
-                                title: "实验验证",
-                                description: "通过实验验证理论，加深理解"
-                            )
-                            
-                            ConcreteLearningTipRow(
-                                icon: "pencil.circle.fill",
-                                color: .blue,
-                                title: "练习应用",
-                                description: "多做练习题，掌握应用方法"
-                            )
-                            
-                            ConcreteLearningTipRow(
-                                icon: "book.fill",
-                                color: .purple,
-                                title: "拓展阅读",
-                                description: "阅读相关材料，拓展知识面"
-                            )
-                        }
-                    }
-                    .padding()
-                    .background(Color(.systemBackground))
-                    .cornerRadius(16)
-                    .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
-                }
-                .padding()
-            }
-            .navigationTitle(topic.title)
-            .navigationBarTitleDisplayMode(.inline)
-        }
         .onAppear {
             loadConcreteTopics()
         }
     }
     
     private func loadConcreteTopics() {
+        print("🔍 开始加载具体知识点...")
+        print("📚 主知识点ID: \(mainTopic.id)")
+        print("📚 主知识点标题: \(mainTopic.title)")
+        print("📚 主知识点描述: \(mainTopic.description)")
+        
         concreteTopics = getConcreteTopicsForMainTopic(mainTopic)
-        print("🔍 加载具体知识点...")
-        print("📚 主知识点: \(mainTopic.title)")
+        
         print("📊 找到 \(concreteTopics.count) 个具体知识点")
         for (index, topic) in concreteTopics.enumerated() {
             print("  \(index + 1). \(topic.title) - \(topic.description)")
+        }
+        
+        if concreteTopics.isEmpty {
+            print("⚠️ 警告：没有找到具体知识点，可能的原因：")
+            print("   - mainTopic.id 不匹配任何 case")
+            print("   - 当前 mainTopic.id: '\(mainTopic.id)'")
+            print("   - 支持的 case: kinematics, force_motion, work_energy, momentum_impulse, electrostatics_basic")
         }
     }
     
@@ -443,6 +289,185 @@ struct ConcreteTopicsListView: View {
                 )
             ]
         }
+    }
+    
+    private func difficultyColor(for difficulty: String) -> Color {
+        switch difficulty {
+        case "基础": return .green
+        case "中等": return .orange
+        case "高级": return .red
+        default: return .blue
+        }
+    }
+}
+
+struct ConcreteTopicDetailView: View {
+    let topic: ConcreteTopic
+    
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 20) {
+                // 顶部信息卡片
+                VStack(spacing: 16) {
+                    // 知识点图标和标题
+                    HStack(spacing: 16) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.blue.opacity(0.1))
+                                .frame(width: 60, height: 60)
+                            
+                            Text(topic.icon)
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .foregroundColor(.blue)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(topic.title)
+                                .font(.title2)
+                                .fontWeight(.bold)
+                            
+                            HStack(spacing: 8) {
+                                Text(topic.subtitle)
+                                    .font(.caption)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(Color.blue.opacity(0.2))
+                                    .foregroundColor(.blue)
+                                    .cornerRadius(8)
+                                
+                                Text(topic.difficulty)
+                                    .font(.caption)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(difficultyColor(for: topic.difficulty).opacity(0.2))
+                                    .foregroundColor(difficultyColor(for: topic.difficulty))
+                                    .cornerRadius(8)
+                            }
+                        }
+                        
+                        Spacer()
+                    }
+                    
+                    // 描述
+                    if !topic.description.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("知识点描述")
+                                .font(.headline)
+                                .foregroundColor(.primary)
+                            
+                            Text(topic.description)
+                                .font(.body)
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .padding()
+                .background(Color(.systemBackground))
+                .cornerRadius(16)
+                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+                
+                // 核心概念
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("核心概念")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(topic.concepts, id: \.self) { concept in
+                            HStack(spacing: 12) {
+                                Image(systemName: "circle.fill")
+                                    .font(.caption)
+                                    .foregroundColor(.blue)
+                                
+                                Text(concept)
+                                    .font(.body)
+                                    .foregroundColor(.primary)
+                                
+                                Spacer()
+                            }
+                        }
+                    }
+                }
+                .padding()
+                .background(Color(.systemBackground))
+                .cornerRadius(16)
+                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+                
+                // 重要公式
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("重要公式")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(topic.formulas, id: \.self) { formula in
+                            HStack(spacing: 12) {
+                                Image(systemName: "function")
+                                    .font(.caption)
+                                    .foregroundColor(.green)
+                                
+                                Text(formula)
+                                    .font(.body)
+                                    .foregroundColor(.primary)
+                                    .font(.system(.body, design: .monospaced))
+                                
+                                Spacer()
+                            }
+                        }
+                    }
+                }
+                .padding()
+                .background(Color(.systemBackground))
+                .cornerRadius(16)
+                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+                
+                // 学习建议
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("学习建议")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        ConcreteLearningTipRow(
+                            icon: "lightbulb.fill",
+                            color: .yellow,
+                            title: "理解概念",
+                            description: "先理解基本概念和定义，建立知识框架"
+                        )
+                        
+                        ConcreteLearningTipRow(
+                            icon: "flask.fill",
+                            color: .green,
+                            title: "实验验证",
+                            description: "通过实验验证理论，加深理解"
+                        )
+                        
+                        ConcreteLearningTipRow(
+                            icon: "pencil.circle.fill",
+                            color: .blue,
+                            title: "练习应用",
+                            description: "多做练习题，掌握应用方法"
+                        )
+                        
+                        ConcreteLearningTipRow(
+                            icon: "book.fill",
+                            color: .purple,
+                            title: "拓展阅读",
+                            description: "阅读相关材料，拓展知识面"
+                        )
+                    }
+                }
+                .padding()
+                .background(Color(.systemBackground))
+                .cornerRadius(16)
+                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+            }
+            .padding()
+        }
+        .navigationTitle(topic.title)
+        .navigationBarTitleDisplayMode(.inline)
     }
     
     private func difficultyColor(for difficulty: String) -> Color {

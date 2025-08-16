@@ -11,11 +11,15 @@ struct GradeSelectionView: View {
     let subject: Subject
     @State private var selectedGrade: Grade?
     @State private var showGradeTopics = false
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         VStack(spacing: 0) {
-            // 顶部标题
+            
+            
+            // 学科标题 - 居中
             HStack {
+                Spacer()
                 Text(subject.title)
                     .font(.largeTitle)
                     .fontWeight(.bold)
@@ -38,11 +42,9 @@ struct GradeSelectionView: View {
         }
         .navigationTitle("年级选择")
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $showGradeTopics) {
+        .navigationDestination(isPresented: $showGradeTopics) {
             if let grade = selectedGrade {
-                NavigationStack {
-                    GradeTopicsView(subject: subject, grade: grade)
-                }
+                GradeTopicsView(subject: subject, grade: grade)
             }
         }
     }

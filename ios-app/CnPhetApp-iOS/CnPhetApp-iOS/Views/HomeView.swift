@@ -91,11 +91,9 @@ struct HomeView: View {
             }
             .navigationTitle("学科选择")
             .navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $showGradeSelection) {
+            .navigationDestination(isPresented: $showGradeSelection) {
                 if let subject = selectedSubject {
-                    NavigationStack {
-                        GradeSelectionView(subject: subject)
-                    }
+                    GradeSelectionView(subject: subject)
                 }
             }
             .alert("确认注销？", isPresented: $showDeleteAlert) {
