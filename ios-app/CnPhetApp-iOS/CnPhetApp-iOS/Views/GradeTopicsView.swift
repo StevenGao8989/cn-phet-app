@@ -327,162 +327,242 @@ struct GradeTopicsView: View {
         case .grade7: // 初一
             return [
                 GradeTopic(
-                    id: "basic_arithmetic",
-                    title: "基础运算",
+                    id: "numbers_expressions",
+                    title: "数与式",
                     subtitle: "数学",
-                    icon: "数",
-                    description: "整数运算、分数运算、小数运算、混合运算",
+                    icon: "🔢",
+                    description: "整数与分数的运算、约分通分、幂与开方、因数与倍数、比比例与百分数、简单代数式与整式运算",
                     difficulty: "基础"
                 ),
                 GradeTopic(
-                    id: "algebra_basic",
-                    title: "代数基础",
+                    id: "equations_inequalities",
+                    title: "方程与不等式",
                     subtitle: "数学",
-                    icon: "数",
-                    description: "代数式、一元一次方程、不等式",
+                    icon: "⚖️",
+                    description: "一元一次方程与应用题建模、一元一次不等式、函数与图像入门",
                     difficulty: "基础"
                 ),
                 GradeTopic(
-                    id: "geometry_basic",
-                    title: "几何基础",
+                    id: "geometry_graphics",
+                    title: "几何与图形",
                     subtitle: "数学",
-                    icon: "数",
-                    description: "平面图形、周长面积、立体图形、表面积体积",
+                    icon: "📐",
+                    description: "基本几何概念与作图、三角形与四边形的基本性质、圆的认识、图形的平移旋转对称",
+                    difficulty: "基础"
+                ),
+                GradeTopic(
+                    id: "statistics_probability_basic",
+                    title: "统计与概率（入门）",
+                    subtitle: "数学",
+                    icon: "📊",
+                    description: "统计图表、平均数众数中位数、简单随机事件与频率",
                     difficulty: "基础"
                 )
             ]
         case .grade8: // 初二
             return [
                 GradeTopic(
-                    id: "quadratic_equation",
-                    title: "一元二次方程",
+                    id: "algebra_equations",
+                    title: "代数与方程",
                     subtitle: "数学",
-                    icon: "数",
-                    description: "配方法、公式法、因式分解法、根的判别式",
-                    difficulty: "中等"
+                    icon: "🔢",
+                    description: "二元一次方程组的解法与应用、整式的乘法与平方公式、分式的基本性质与运算、一次函数",
+                    difficulty: "基础"
                 ),
                 GradeTopic(
-                    id: "function_basic",
-                    title: "函数基础",
+                    id: "geometry_advanced",
+                    title: "几何",
                     subtitle: "数学",
-                    icon: "数",
-                    description: "函数概念、函数图像、函数性质",
-                    difficulty: "中等"
+                    icon: "📐",
+                    description: "平行线性质与判定、三角形全等及判定应用、勾股定理与逆定理、轴对称中心对称与图形变换",
+                    difficulty: "基础"
                 ),
                 GradeTopic(
-                    id: "similarity",
-                    title: "相似形",
+                    id: "statistics_probability_intermediate",
+                    title: "统计与概率",
                     subtitle: "数学",
-                    icon: "数",
-                    description: "相似三角形、相似多边形、相似比",
-                    difficulty: "中等"
+                    icon: "📊",
+                    description: "组距频数与频率分布表直方图、简单概率模型、古典概型入门",
+                    difficulty: "基础"
                 )
             ]
         case .grade9: // 初三
             return [
                 GradeTopic(
-                    id: "trigonometry_basic",
-                    title: "三角函数基础",
+                    id: "algebra_functions_advanced",
+                    title: "代数与函数深化",
                     subtitle: "数学",
-                    icon: "数",
-                    description: "正弦、余弦、正切、特殊角值",
+                    icon: "🔢",
+                    description: "二次函数、因式分解系统法、一元二次方程、反比例函数与应用",
                     difficulty: "中等"
                 ),
                 GradeTopic(
-                    id: "circle_properties",
-                    title: "圆的性质",
+                    id: "geometry_trigonometry",
+                    title: "几何与三角",
                     subtitle: "数学",
-                    icon: "数",
-                    description: "圆心角、圆周角、切线、弦切角",
+                    icon: "📐",
+                    description: "相似三角形的判定与性质、圆的性质与切线弦圆周角圆心角、解直角三角形、坐标几何综合",
                     difficulty: "中等"
                 ),
                 GradeTopic(
-                    id: "statistics_basic",
-                    title: "统计基础",
+                    id: "statistics_probability_advanced",
+                    title: "统计与概率",
                     subtitle: "数学",
-                    icon: "数",
-                    description: "平均数、中位数、众数、方差",
+                    icon: "📊",
+                    description: "抽样方法、用频率估计概率、简单独立事件与互斥事件",
                     difficulty: "中等"
                 )
             ]
-        case .grade10: // 高一 - 完全按照截图配置
+        case .grade10: // 高一
             return [
                 GradeTopic(
-                    id: "linear_function",
-                    title: "一次函数 y=kx+b",
+                    id: "sets_logic_basic",
+                    title: "集合与逻辑初步",
                     subtitle: "数学",
-                    icon: "数",
-                    description: "线性函数的基本性质和图像",
-                    difficulty: "基础"
-                ),
-                GradeTopic(
-                    id: "quadratic_function",
-                    title: "二次函数 y=ax²+bx+c",
-                    subtitle: "数学",
-                    icon: "数",
-                    description: "二次函数的图像和性质",
+                    icon: "🔗",
+                    description: "集合表示与运算、子集与真子集、命题充分必要条件、简单逻辑推理",
                     difficulty: "中等"
                 ),
                 GradeTopic(
-                    id: "trigonometric_function",
-                    title: "三角函数 y=A·sin(ωx+φ)",
+                    id: "functions_equations",
+                    title: "函数与方程",
                     subtitle: "数学",
-                    icon: "数",
-                    description: "正弦函数的图像和变换",
+                    icon: "📈",
+                    description: "函数的性质、基本初等函数、函数与方程的关系、方程不等式的图像法",
+                    difficulty: "中等"
+                ),
+                GradeTopic(
+                    id: "trigonometry_basic",
+                    title: "三角函数",
+                    subtitle: "数学",
+                    icon: "📐",
+                    description: "任意角与弧度制、正弦余弦正切的定义与图像、三角恒等式、两角和差公式入门",
+                    difficulty: "中等"
+                ),
+                GradeTopic(
+                    id: "vectors_analytic_geometry",
+                    title: "向量与解析几何（平面）",
+                    subtitle: "数学",
+                    icon: "➡️",
+                    description: "平面向量的加减与数乘、基底表示与坐标表示、线段的向量表示、点到点直线的距离、直线的方程与位置关系",
+                    difficulty: "中等"
+                ),
+                GradeTopic(
+                    id: "sequences",
+                    title: "数列",
+                    subtitle: "数学",
+                    icon: "📊",
+                    description: "等差等比数列的通项与前n项和、递推关系入门",
+                    difficulty: "中等"
+                ),
+                GradeTopic(
+                    id: "statistics_probability_foundation",
+                    title: "统计与概率（基础）",
+                    subtitle: "数学",
+                    icon: "📊",
+                    description: "随机抽样、数据的离散程度、古典概率与几何概型入门",
                     difficulty: "中等"
                 )
             ]
         case .grade11: // 高二
             return [
                 GradeTopic(
-                    id: "exponential_function",
-                    title: "指数函数 y=a^x",
+                    id: "trigonometry_triangle_solving",
+                    title: "三角与解三角形（深化）",
                     subtitle: "数学",
-                    icon: "数",
-                    description: "指数函数的图像和性质、对数函数",
+                    icon: "📐",
+                    description: "倍角半角、积化和差与和差化积公式、正弦定理余弦定理、面积公式与解三角形综合",
                     difficulty: "高级"
                 ),
                 GradeTopic(
-                    id: "derivative_basic",
-                    title: "导数基础",
+                    id: "solid_geometry_spatial_concepts",
+                    title: "立体几何与空间观念",
                     subtitle: "数学",
-                    icon: "数",
-                    description: "导数的定义、求导法则、导数的应用",
+                    icon: "🔲",
+                    description: "空间点线面的位置关系、多面体与旋转体的表面积与体积、截面投影与三视图、空间向量入门",
                     difficulty: "高级"
                 ),
                 GradeTopic(
-                    id: "probability",
-                    title: "概率论",
+                    id: "analytic_geometry_conic_sections",
+                    title: "解析几何（圆锥曲线）",
                     subtitle: "数学",
-                    icon: "数",
-                    description: "随机事件、概率计算、条件概率",
+                    icon: "📐",
+                    description: "椭圆双曲线抛物线的标准方程几何性质与参数、曲线与直线圆的交点切线、最值与范围问题",
+                    difficulty: "高级"
+                ),
+                GradeTopic(
+                    id: "derivatives_calculus_basic",
+                    title: "导数与微积分初步",
+                    subtitle: "数学",
+                    icon: "📈",
+                    description: "导数的概念与几何意义、基本求导法则与复合函数求导、利用导数研究函数的单调性极值最值与凹凸性、切线法线、相关变化率",
+                    difficulty: "高级"
+                ),
+                GradeTopic(
+                    id: "complex_numbers",
+                    title: "复数（平面代数）",
+                    subtitle: "数学",
+                    icon: "🔢",
+                    description: "复数的代数形式与几何表示、模与辐角、共轭乘除与极形式的运算、棣莫弗定理入门",
+                    difficulty: "高级"
+                ),
+                GradeTopic(
+                    id: "probability_statistics_advanced",
+                    title: "概率与统计（提升）",
+                    subtitle: "数学",
+                    icon: "📊",
+                    description: "条件概率与全概率公式、贝叶斯公式、随机变量及其分布、二项分布、抽样分布直观、区间估计假设检验入门",
                     difficulty: "高级"
                 )
             ]
         case .grade12: // 高三
             return [
                 GradeTopic(
-                    id: "integral_basic",
-                    title: "积分基础",
+                    id: "calculus_applications",
+                    title: "微积分与应用（综合）",
                     subtitle: "数学",
-                    icon: "数",
-                    description: "定积分、不定积分、积分的应用",
+                    icon: "📈",
+                    description: "不定积分与基本积分公式、换元与分部积分、定积分的概念性质与几何意义、定积分的应用、简单微分方程模型",
                     difficulty: "高级"
                 ),
                 GradeTopic(
-                    id: "complex_number",
-                    title: "复数",
+                    id: "vectors_spatial_analytic_geometry",
+                    title: "向量与空间解析几何（进阶）",
                     subtitle: "数学",
-                    icon: "数",
-                    description: "复数的运算、复平面、欧拉公式",
+                    icon: "➡️",
+                    description: "空间向量运算与夹角距离公式、空间直线与平面方程、相对位置、线面角二面角与投影",
                     difficulty: "高级"
                 ),
                 GradeTopic(
-                    id: "vector_basic",
-                    title: "向量基础",
+                    id: "conic_sections_comprehensive",
+                    title: "圆锥曲线综合与参数极坐标",
                     subtitle: "数学",
-                    icon: "数",
-                    description: "向量的运算、向量的几何意义",
+                    icon: "📐",
+                    description: "圆锥曲线与导数不等式向量的综合优化问题、参数方程与极坐标描点、极坐标下的对称与面积",
+                    difficulty: "高级"
+                ),
+                GradeTopic(
+                    id: "sequences_limits_advanced",
+                    title: "数列与极限（进阶）",
+                    subtitle: "数学",
+                    icon: "📊",
+                    description: "单调有界与极限直观、错位相减法与裂项相消、递推关系的求解与应用、数学归纳法",
+                    difficulty: "高级"
+                ),
+                GradeTopic(
+                    id: "probability_statistics_comprehensive",
+                    title: "概率统计（综合）",
+                    subtitle: "数学",
+                    icon: "📊",
+                    description: "离散连续随机变量的期望与方差、正态分布入门、抽样分布、区间估计与显著性检验、概率模型建模与模拟",
+                    difficulty: "高级"
+                ),
+                GradeTopic(
+                    id: "mathematical_thinking_methods",
+                    title: "数学思想与方法",
+                    subtitle: "数学",
+                    icon: "🧠",
+                    description: "函数与方程思想、数形结合、分类讨论、化归与递推、极值与估算、构造与转化、整体与局部、守恒与不变性、算法初步与流程图",
                     difficulty: "高级"
                 )
             ]
@@ -494,154 +574,250 @@ struct GradeTopicsView: View {
         case .grade7: // 初一
             return [
                 GradeTopic(
-                    id: "matter_basic",
-                    title: "物质基础",
+                    id: "chemical_concepts_experiment",
+                    title: "化学观念与实验启蒙",
                     subtitle: "化学",
-                    icon: "化",
-                    description: "物质的三态变化、纯净物与混合物",
+                    icon: "🧪",
+                    description: "化学研究对象与物理/化学变化的区分、基本实验仪器与实验安全",
                     difficulty: "基础"
                 ),
                 GradeTopic(
-                    id: "air_composition",
-                    title: "空气组成",
+                    id: "matter_properties",
+                    title: "物质及其性质",
                     subtitle: "化学",
-                    icon: "化",
-                    description: "空气的成分、氧气的性质、燃烧",
+                    icon: "🔬",
+                    description: "纯净物/混合物、物理性质/化学性质、常见分离与提纯方法",
                     difficulty: "基础"
                 ),
                 GradeTopic(
-                    id: "water_properties",
-                    title: "水的性质",
+                    id: "solution_basics",
+                    title: "溶液基础",
                     subtitle: "化学",
-                    icon: "化",
-                    description: "水的物理性质、水的净化、水污染",
+                    icon: "💧",
+                    description: "溶解/溶解度、饱和/不饱和溶液、影响因素（温度、搅拌、粒度）",
                     difficulty: "基础"
                 )
             ]
         case .grade8: // 初二
             return [
                 GradeTopic(
-                    id: "element_compound",
-                    title: "元素与化合物",
+                    id: "particle_view_formula",
+                    title: "微粒观与化学式",
                     subtitle: "化学",
-                    icon: "化",
-                    description: "元素符号、化学式、化合价",
-                    difficulty: "中等"
+                    icon: "⚛️",
+                    description: "原子、分子、离子概念、元素与同位素、化学符号、化学式与式量",
+                    difficulty: "基础"
                 ),
                 GradeTopic(
-                    id: "chemical_reaction_basic",
-                    title: "化学反应基础",
+                    id: "solution_concentration",
+                    title: "溶液与浓度",
                     subtitle: "化学",
-                    icon: "化",
-                    description: "化学方程式、质量守恒定律",
-                    difficulty: "中等"
+                    icon: "📊",
+                    description: "溶解度曲线阅读与应用、浓度表示、质量分数、稀释计算",
+                    difficulty: "基础"
                 ),
                 GradeTopic(
-                    id: "acid_base_basic",
-                    title: "酸碱基础",
+                    id: "gas_introduction",
+                    title: "气体初识",
                     subtitle: "化学",
-                    icon: "化",
-                    description: "酸碱指示剂、pH值、中和反应",
-                    difficulty: "中等"
+                    icon: "💨",
+                    description: "常见气体性质与制取/检验、气体收集方法（排水/向上、向下排空气法）",
+                    difficulty: "基础"
                 )
             ]
         case .grade9: // 初三
             return [
                 GradeTopic(
-                    id: "solution_concentration",
-                    title: "溶液浓度",
+                    id: "chemical_reactions_equations",
+                    title: "化学反应与方程式",
                     subtitle: "化学",
-                    icon: "化",
-                    description: "质量分数、体积分数、物质的量浓度",
+                    icon: "⚡",
+                    description: "质量守恒定律、化学方程式的书写与配平、反应类型、氧化还原反应入门",
                     difficulty: "中等"
                 ),
                 GradeTopic(
-                    id: "redox_reaction",
-                    title: "氧化还原反应",
+                    id: "acid_base_salt",
+                    title: "酸碱盐与溶液",
                     subtitle: "化学",
-                    icon: "化",
-                    description: "氧化剂、还原剂、电子转移",
+                    icon: "🧪",
+                    description: "酸、碱、盐的性质与相互转化、中和反应、酸碱强弱与指示剂、滴定基本操作",
                     difficulty: "中等"
                 ),
                 GradeTopic(
-                    id: "organic_basic",
-                    title: "有机化学基础",
+                    id: "metals_nonmetals",
+                    title: "金属与非金属",
                     subtitle: "化学",
-                    icon: "化",
-                    description: "烃类、醇类、羧酸类",
+                    icon: "🔩",
+                    description: "活泼性顺序与置换反应、金属的腐蚀与防护、重要非金属单质与化合物",
+                    difficulty: "中等"
+                ),
+                GradeTopic(
+                    id: "chemistry_life_environment",
+                    title: "化学与生活/环境",
+                    subtitle: "化学",
+                    icon: "🌍",
+                    description: "燃料与燃烧、空气与水的污染和治理基本思路",
                     difficulty: "中等"
                 )
             ]
-        case .grade10: // 高一 - 完全按照截图配置
+        case .grade10: // 高一
             return [
                 GradeTopic(
-                    id: "ideal_gas",
-                    title: "理想气体 pV=nRT",
+                    id: "atomic_structure_periodic",
+                    title: "原子结构与元素周期律",
                     subtitle: "化学",
-                    icon: "化",
-                    description: "理想气体状态方程",
+                    icon: "🔬",
+                    description: "电子排布、核外电子层与副层、价电子与化学性质、周期律与周期性",
                     difficulty: "中等"
                 ),
                 GradeTopic(
-                    id: "chemical_reaction",
-                    title: "化学反应方程式",
+                    id: "chemical_bonds_structure",
+                    title: "化学键与物质结构",
                     subtitle: "化学",
-                    icon: "化",
-                    description: "化学反应的平衡和计算",
+                    icon: "🔗",
+                    description: "离子键、共价键、金属键、价键理论与八隅体规则、分子间作用力、晶体类型",
+                    difficulty: "中等"
+                ),
+                GradeTopic(
+                    id: "gas_state_equation",
+                    title: "气体与状态方程",
+                    subtitle: "化学",
+                    icon: "📈",
+                    description: "理想气体方程pV=nRT的应用、等温/等压/等容变化定性分析",
+                    difficulty: "中等"
+                ),
+                GradeTopic(
+                    id: "thermochemistry_basic",
+                    title: "热化学基础",
+                    subtitle: "化学",
+                    icon: "🔥",
+                    description: "反应热与焓变、量热法、亥斯定律的应用",
+                    difficulty: "中等"
+                ),
+                GradeTopic(
+                    id: "reaction_rate",
+                    title: "反应速率与影响因素",
+                    subtitle: "化学",
+                    icon: "⚡",
+                    description: "速率的定义与测定方式、温度、浓度、催化剂、表面积的影响、碰撞理论与活化能",
+                    difficulty: "中等"
+                ),
+                GradeTopic(
+                    id: "chemical_equilibrium_basic",
+                    title: "化学平衡基础",
+                    subtitle: "化学",
+                    icon: "⚖️",
+                    description: "可逆反应与平衡常数、勒沙特列原理、温度、压强、浓度变化对平衡的影响",
+                    difficulty: "中等"
+                ),
+                GradeTopic(
+                    id: "electrolyte_acid_base",
+                    title: "电解质溶液与酸碱",
+                    subtitle: "化学",
+                    icon: "🧪",
+                    description: "强/弱电解质、电离平衡与电导概念、酸碱理论、pH与指示剂、简单缓冲体系概念",
                     difficulty: "中等"
                 )
             ]
         case .grade11: // 高二
             return [
                 GradeTopic(
-                    id: "chemical_equilibrium",
-                    title: "化学平衡",
+                    id: "solubility_equilibrium",
+                    title: "溶解平衡与溶度积",
                     subtitle: "化学",
-                    icon: "化",
-                    description: "平衡常数、勒夏特列原理、平衡移动",
+                    icon: "💧",
+                    description: "溶度积Ksp、共离子效应、沉淀溶解判据、选择性沉淀与分离的设计思路",
+                    difficulty: "高级"
+                ),
+                GradeTopic(
+                    id: "acid_base_equilibrium",
+                    title: "酸碱平衡深化",
+                    subtitle: "化学",
+                    icon: "🧪",
+                    description: "弱酸/弱碱的电离常数、pKa/pKb、Henderson–Hasselbalch公式与缓冲溶液配制",
+                    difficulty: "高级"
+                ),
+                GradeTopic(
+                    id: "chemical_kinetics_advanced",
+                    title: "化学动力学进阶",
+                    subtitle: "化学",
+                    icon: "⚡",
+                    description: "速率方程、反应级数与半衰期、阿伦尼乌斯方程、活化能的实验求取",
                     difficulty: "高级"
                 ),
                 GradeTopic(
                     id: "electrochemistry",
                     title: "电化学",
                     subtitle: "化学",
-                    icon: "化",
-                    description: "原电池、电解池、电极电势",
+                    icon: "🔋",
+                    description: "原电池/电解池、电极反应、标准电极电势、能斯特方程、电解与法拉第定律",
                     difficulty: "高级"
                 ),
                 GradeTopic(
-                    id: "reaction_kinetics",
-                    title: "反应动力学",
+                    id: "organic_chemistry_basic",
+                    title: "有机化学基础",
                     subtitle: "化学",
-                    icon: "化",
-                    description: "反应速率、活化能、催化剂",
+                    icon: "⚛️",
+                    description: "命名与同分异构、烷烃、烯烃、炔烃、芳香烃、卤代烃、醇、醛酮、羧酸及其衍生物",
+                    difficulty: "高级"
+                ),
+                GradeTopic(
+                    id: "polymers_materials",
+                    title: "高分子与材料",
+                    subtitle: "化学",
+                    icon: "🔬",
+                    description: "加聚/缩聚反应、常见聚合物性质与应用、材料化学：陶瓷、半导体、复合材料",
                     difficulty: "高级"
                 )
             ]
         case .grade12: // 高三
             return [
                 GradeTopic(
-                    id: "coordination_chemistry",
-                    title: "配位化学",
+                    id: "organic_chemistry_advanced",
+                    title: "有机化学深化与合成",
                     subtitle: "化学",
-                    icon: "化",
-                    description: "配位键、配位数、配位化合物",
-                    difficulty: "高级"
-                ),
-                GradeTopic(
-                    id: "polymer_chemistry",
-                    title: "高分子化学",
-                    subtitle: "化学",
-                    icon: "化",
-                    description: "聚合反应、高分子材料、生物高分子",
+                    icon: "⚛️",
+                    description: "反应机理与选择性、芳香性与取代定位规则、多步合成与官能团互变策略",
                     difficulty: "高级"
                 ),
                 GradeTopic(
                     id: "analytical_chemistry",
-                    title: "分析化学",
+                    title: "分析化学与仪器分析",
                     subtitle: "化学",
-                    icon: "化",
-                    description: "滴定分析、仪器分析、误差分析",
+                    icon: "🔬",
+                    description: "容量分析、基本光谱、IR识别官能团、NMR化学位移与裂分、MS分子峰",
+                    difficulty: "高级"
+                ),
+                GradeTopic(
+                    id: "chemical_thermodynamics",
+                    title: "化学热力学与自发性",
+                    subtitle: "化学",
+                    icon: "🔥",
+                    description: "ΔH、ΔS、ΔG与反应自发性判据、ΔG°与平衡常数的关系、温度对K的影响",
+                    difficulty: "高级"
+                ),
+                GradeTopic(
+                    id: "electrochemistry_energy",
+                    title: "电化学与能源材料",
+                    subtitle: "化学",
+                    icon: "🔋",
+                    description: "二次电池工作原理与比较、燃料电池与电极催化、超级电容、腐蚀机理与防护",
+                    difficulty: "高级"
+                ),
+                GradeTopic(
+                    id: "green_sustainable_chemistry",
+                    title: "绿色与可持续化学",
+                    subtitle: "化学",
+                    icon: "🌱",
+                    description: "原子经济性、危害最小化、可再生原料、能效、可降解材料、环境化学与治理",
+                    difficulty: "高级"
+                ),
+                GradeTopic(
+                    id: "comprehensive_experiment",
+                    title: "综合实验与探究",
+                    subtitle: "化学",
+                    icon: "🧪",
+                    description: "实验设计、变量控制、数据处理、有效数字、不确定度评估、常见操作要点、安全文化",
                     difficulty: "高级"
                 )
             ]
@@ -653,154 +829,122 @@ struct GradeTopicsView: View {
         case .grade7: // 初一
             return [
                 GradeTopic(
-                    id: "living_organisms",
-                    title: "生物的特征",
+                    id: "life_characteristics_scientific_method",
+                    title: "生命的特征与科学方法",
                     subtitle: "生物",
-                    icon: "生",
-                    description: "生物的基本特征、生物的分类",
+                    icon: "🔬",
+                    description: "生命体共同特征、科学探究、显微镜结构与使用、放大倍数计算与切片制备",
                     difficulty: "基础"
                 ),
                 GradeTopic(
-                    id: "cell_basic",
-                    title: "细胞基础",
+                    id: "cells_biomolecules",
+                    title: "细胞与生物分子",
                     subtitle: "生物",
-                    icon: "生",
-                    description: "细胞的结构、细胞的分裂",
-                    difficulty: "基础"
-                ),
-                GradeTopic(
-                    id: "plant_basic",
-                    title: "植物基础",
-                    subtitle: "生物",
-                    icon: "生",
-                    description: "植物的结构、光合作用",
+                    icon: "🧬",
+                    description: "细胞学说、原核/真核差异、细胞器功能、生物大分子组成与功能、物质跨膜运输",
                     difficulty: "基础"
                 )
             ]
         case .grade8: // 初二
             return [
                 GradeTopic(
-                    id: "animal_basic",
-                    title: "动物基础",
+                    id: "tissue_organ_system",
+                    title: "组织—器官—系统",
                     subtitle: "生物",
-                    icon: "生",
-                    description: "动物的分类、动物的行为",
-                    difficulty: "中等"
+                    icon: "🫀",
+                    description: "植物组织与器官、动物组织与系统、稳态概念与体内环境",
+                    difficulty: "基础"
                 ),
                 GradeTopic(
-                    id: "human_body_basic",
-                    title: "人体基础",
+                    id: "ecology_basics",
+                    title: "生态学基础",
                     subtitle: "生物",
-                    icon: "生",
-                    description: "人体的系统、血液循环",
-                    difficulty: "中等"
-                ),
-                GradeTopic(
-                    id: "ecosystem_basic",
-                    title: "生态系统基础",
-                    subtitle: "生物",
-                    icon: "生",
-                    description: "食物链、食物网、生态平衡",
-                    difficulty: "中等"
+                    icon: "🌿",
+                    description: "生态系统组成、能量流动与物质循环、食物链/食物网、种群特征与群落演替",
+                    difficulty: "基础"
                 )
             ]
         case .grade9: // 初三
             return [
                 GradeTopic(
-                    id: "genetics_basic",
-                    title: "遗传学基础",
+                    id: "genetics_variation",
+                    title: "遗传与变异",
                     subtitle: "生物",
-                    icon: "生",
-                    description: "基因、染色体、遗传规律",
+                    icon: "🧬",
+                    description: "基因与等位基因、孟德尔遗传定律、减数分裂、变异来源",
                     difficulty: "中等"
                 ),
                 GradeTopic(
-                    id: "evolution_basic",
-                    title: "进化基础",
+                    id: "metabolism_photosynthesis_respiration",
+                    title: "代谢：光合作用与呼吸作用",
                     subtitle: "生物",
-                    icon: "生",
-                    description: "自然选择、适者生存、物种形成",
-                    difficulty: "中等"
-                ),
-                GradeTopic(
-                    id: "biotechnology_basic",
-                    title: "生物技术基础",
-                    subtitle: "生物",
-                    icon: "生",
-                    description: "基因工程、克隆技术、转基因",
+                    icon: "🌱",
+                    description: "光合作用光反应与碳反应、细胞呼吸、酶的本质与作用特点",
                     difficulty: "中等"
                 )
             ]
-        case .grade10: // 高一 - 完全按照截图配置
+        case .grade10: // 高一
             return [
                 GradeTopic(
-                    id: "cell_structure",
-                    title: "细胞结构",
+                    id: "cell_structure_function_advanced",
+                    title: "细胞结构与功能深化",
                     subtitle: "生物",
-                    icon: "生",
-                    description: "细胞的基本结构和功能",
-                    difficulty: "基础"
+                    icon: "🔬",
+                    description: "生物膜系统与跨膜运输、细胞骨架、细胞周期与有丝分裂、表面积/体积比影响",
+                    difficulty: "中等"
                 ),
                 GradeTopic(
-                    id: "genetics",
-                    title: "遗传学基础",
+                    id: "physiology_homeostasis",
+                    title: "生理与稳态（植物/动物）",
                     subtitle: "生物",
-                    icon: "生",
-                    description: "基因的传递和表达",
+                    icon: "🫀",
+                    description: "植物生理、动物生理、体液与内环境、神经调节与体液调节、渗透调节与排泄",
                     difficulty: "中等"
                 )
             ]
         case .grade11: // 高二
             return [
                 GradeTopic(
-                    id: "molecular_biology",
-                    title: "分子生物学",
+                    id: "molecular_genetics_biotechnology",
+                    title: "分子遗传学与生物技术",
                     subtitle: "生物",
-                    icon: "生",
-                    description: "DNA复制、转录、翻译",
+                    icon: "🧬",
+                    description: "DNA双螺旋与染色质、复制转录翻译、基因表达调控、生物技术原理与伦理",
                     difficulty: "高级"
                 ),
                 GradeTopic(
-                    id: "immunology",
-                    title: "免疫学",
+                    id: "ecosystem_behavior",
+                    title: "生态系统与行为",
                     subtitle: "生物",
-                    icon: "生",
-                    description: "免疫系统、抗体、疫苗",
-                    difficulty: "高级"
-                ),
-                GradeTopic(
-                    id: "neurobiology",
-                    title: "神经生物学",
-                    subtitle: "生物",
-                    icon: "生",
-                    description: "神经元、神经递质、大脑功能",
+                    icon: "🌍",
+                    description: "群落多样性、种群动力学、行为生态学、先天行为与学习行为、社会行为",
                     difficulty: "高级"
                 )
             ]
         case .grade12: // 高三
             return [
                 GradeTopic(
-                    id: "developmental_biology",
-                    title: "发育生物学",
+                    id: "evolution_speciation",
+                    title: "进化与物种形成",
                     subtitle: "生物",
-                    icon: "生",
-                    description: "胚胎发育、器官形成、干细胞",
+                    icon: "🦕",
+                    description: "进化驱动力、物种概念与生殖隔离、适应与趋同/分歧进化、系统发生与分子钟",
                     difficulty: "高级"
                 ),
                 GradeTopic(
-                    id: "ecology_advanced",
-                    title: "生态学高级",
+                    id: "human_physiology_special",
+                    title: "人体生理专题",
                     subtitle: "生物",
-                    icon: "生",
-                    description: "种群生态学、群落生态学、生态系统",
+                    icon: "👤",
+                    description: "循环系统、呼吸系统、消化系统、泌尿系统、神经-内分泌整合、免疫系统",
                     difficulty: "高级"
                 ),
                 GradeTopic(
-                    id: "conservation_biology",
-                    title: "保护生物学",
+                    id: "scientific_inquiry_biosafety",
+                    title: "科学探究与生物安全",
                     subtitle: "生物",
-                    icon: "生",
-                    description: "生物多样性、濒危物种、环境保护",
+                    icon: "🔬",
+                    description: "实验设计、数据处理、生物安全与伦理、人类受试者保护、动物福利",
                     difficulty: "高级"
                 )
             ]
