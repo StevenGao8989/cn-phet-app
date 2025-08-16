@@ -5,6 +5,11 @@
 //  Created by 高秉嵩 on 2025/1/27.
 //
 
+import Foundation
+import SwiftUI
+
+// 导入重新组织的模拟器文件
+import Foundation
 import SwiftUI
 
 struct ConcreteTopicsListView: View {
@@ -24,7 +29,7 @@ struct ConcreteTopicsListView: View {
             
             // 具体知识点列表
             List(concreteTopics) { topic in
-                NavigationLink(destination: ConcreteTopicDetailView(topic: topic)) {
+                NavigationLink(destination: getSimulatorDestination(for: topic)) {
                     HStack(spacing: 16) {
                         // 左侧图标
                         ZStack {
@@ -66,6 +71,7 @@ struct ConcreteTopicsListView: View {
                     }
                     .padding(.vertical, 8)
                 }
+                .buttonStyle(PlainButtonStyle())
             }
             .listStyle(.plain)
         }
@@ -288,6 +294,43 @@ struct ConcreteTopicsListView: View {
                     formulas: ["基本公式", "计算方法", "应用公式"]
                 )
             ]
+        }
+    }
+    
+    private func getSimulatorDestination(for topic: ConcreteTopic) -> some View {
+        switch topic.id {
+        case "projectile_motion":
+            return AnyView(ProjectileSimView(title: topic.title))
+        case "free_fall":
+            return AnyView(FreefallSimView(title: topic.title))
+        case "uniform_motion", "uniformly_accelerated_motion":
+            return AnyView(SimpleMotionSimView(title: topic.title, motionType: topic.id))
+        case "force_analysis", "newton_third_law", "friction_constraint":
+            return AnyView(ForceMotionSimView(title: topic.title, forceType: topic.id))
+        case "lens_imaging", "refraction_reflection":
+            return AnyView(LensSimView(title: topic.title))
+        default:
+            // 如果没有对应的模拟器，显示一个默认的详情页面
+            return AnyView(
+                VStack(spacing: 20) {
+                    Image(systemName: "flask.fill")
+                        .font(.system(size: 60))
+                        .foregroundColor(.blue)
+                    
+                    Text(topic.title)
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                    
+                    Text("该知识点的模拟器正在开发中...")
+                        .font(.title3)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                    
+                    Spacer()
+                }
+                .padding()
+                .navigationTitle(topic.title)
+            )
         }
     }
     

@@ -11,6 +11,11 @@ import SwiftUI
 struct FreefallSimView: View {
     let title: String
 
+    // 添加明确的公共初始化器
+    init(title: String) {
+        self.title = title
+    }
+
     @State private var H: Double = 20.0     // 初始高度 m
     @State private var g: Double = 9.8      // m/s²
     @State private var playing = false

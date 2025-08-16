@@ -11,6 +11,11 @@ import SwiftUI
 struct LensSimView: View {
     let title: String
 
+    // 添加明确的公共初始化器
+    init(title: String) {
+        self.title = title
+    }
+
     // 单位：cm（画布内做线性比例缩放）
     @State private var f: Double = 8       // 焦距，凸透镜 f>0（可改负值看凹透镜）
     @State private var u: Double = 20      // 物距（物在左侧）

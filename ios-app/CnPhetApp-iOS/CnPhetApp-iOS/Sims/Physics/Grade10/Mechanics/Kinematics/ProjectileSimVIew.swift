@@ -11,6 +11,11 @@ import SwiftUI
 struct ProjectileSimView: View {
     let title: String
 
+    // 添加明确的公共初始化器
+    init(title: String) {
+        self.title = title
+    }
+
     @State private var v0: Double = 20     // 初速度 m/s
     @State private var theta: Double = 45  // 角度 °
     @State private var g: Double = 9.8     // 重力 m/s²
