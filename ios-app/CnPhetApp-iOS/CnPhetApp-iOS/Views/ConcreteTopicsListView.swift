@@ -105,6 +105,838 @@ struct ConcreteTopicsListView: View {
     
     private func getConcreteTopicsForMainTopic(_ mainTopic: GradeTopic) -> [ConcreteTopic] {
         switch mainTopic.id {
+        // 初二年级物理知识点
+        case "motion_force":
+            return [
+                ConcreteTopic(
+                    id: "particle_reference_frame",
+                    title: "质点与参考系",
+                    subtitle: "物理",
+                    icon: "🎯",
+                    description: "质点的概念、参考系的选择、相对运动",
+                    difficulty: "基础",
+                    concepts: ["质点", "参考系", "相对运动", "运动描述", "坐标系"],
+                    formulas: ["相对速度", "位移计算", "运动方程"]
+                ),
+                ConcreteTopic(
+                    id: "displacement_distance",
+                    title: "位移与路程",
+                    subtitle: "物理",
+                    icon: "📏",
+                    description: "位移的矢量性、路程的标量性、位移与路程的区别",
+                    difficulty: "基础",
+                    concepts: ["位移", "路程", "矢量", "标量", "方向性"],
+                    formulas: ["位移 = 终点位置 - 起点位置", "路程 = 路径长度"]
+                ),
+                ConcreteTopic(
+                    id: "scalar_vector",
+                    title: "标量与矢量",
+                    subtitle: "物理",
+                    icon: "➡️",
+                    description: "标量的特点、矢量的特点、矢量的合成与分解",
+                    difficulty: "基础",
+                    concepts: ["标量", "矢量", "大小", "方向", "合成", "分解"],
+                    formulas: ["矢量合成", "矢量分解", "平行四边形法则"]
+                ),
+                ConcreteTopic(
+                    id: "velocity_acceleration",
+                    title: "速度与加速度",
+                    subtitle: "物理",
+                    icon: "📈",
+                    description: "平均速度、瞬时速度、加速度的定义与计算",
+                    difficulty: "基础",
+                    concepts: ["平均速度", "瞬时速度", "加速度", "速度变化", "时间"],
+                    formulas: ["v = s/t", "a = Δv/Δt", "v = v₀ + at"]
+                ),
+                ConcreteTopic(
+                    id: "uniform_acceleration_formulas",
+                    title: "匀变速直线运动三公式",
+                    subtitle: "物理",
+                    icon: "📊",
+                    description: "速度公式、位移公式、速度位移关系式",
+                    difficulty: "基础",
+                    concepts: ["匀变速运动", "初速度", "末速度", "加速度", "位移"],
+                    formulas: ["v = v₀ + at", "s = v₀t + ½at²", "v² = v₀² + 2as"]
+                )
+            ]
+        case "pressure_buoyancy":
+            return [
+                ConcreteTopic(
+                    id: "pressure_area_relation",
+                    title: "压强与面积关系",
+                    subtitle: "物理",
+                    icon: "⚖️",
+                    description: "压强的定义、压强与受力面积的关系",
+                    difficulty: "基础",
+                    concepts: ["压强", "压力", "面积", "压强公式", "单位"],
+                    formulas: ["p = F/S", "压强单位: Pa", "1 Pa = 1 N/m²"]
+                ),
+                ConcreteTopic(
+                    id: "liquid_pressure",
+                    title: "液体压强",
+                    subtitle: "物理",
+                    icon: "💧",
+                    description: "液体压强的特点、p=ρgh公式的应用",
+                    difficulty: "基础",
+                    concepts: ["液体压强", "密度", "重力加速度", "深度", "压强分布"],
+                    formulas: ["p = ρgh", "液体压强与深度成正比", "与液体密度成正比"]
+                ),
+                ConcreteTopic(
+                    id: "atmospheric_pressure",
+                    title: "气压与连通器",
+                    subtitle: "物理",
+                    icon: "🌬️",
+                    description: "大气压强的概念、连通器原理、气压计",
+                    difficulty: "基础",
+                    concepts: ["大气压", "连通器", "气压计", "标准大气压", "气压变化"],
+                    formulas: ["标准大气压 = 1.013×10⁵ Pa", "连通器液面等高"]
+                ),
+                ConcreteTopic(
+                    id: "archimedes_principle",
+                    title: "阿基米德原理",
+                    subtitle: "物理",
+                    icon: "🏊",
+                    description: "浮力的概念、阿基米德原理、浮沉条件",
+                    difficulty: "基础",
+                    concepts: ["浮力", "阿基米德原理", "排开液体", "浮沉条件", "密度比较"],
+                    formulas: ["F浮 = ρ液gV排", "浮沉条件: ρ物与ρ液比较"]
+                )
+            ]
+        case "acoustics":
+            return [
+                ConcreteTopic(
+                    id: "sound_production_propagation",
+                    title: "声音的产生与传播",
+                    subtitle: "物理",
+                    icon: "🔊",
+                    description: "声音的产生条件、传播介质、声速",
+                    difficulty: "基础",
+                    concepts: ["声源", "振动", "传播介质", "声速", "传播条件"],
+                    formulas: ["声速 = 距离/时间", "不同介质中声速不同"]
+                ),
+                ConcreteTopic(
+                    id: "sound_characteristics",
+                    title: "声音的特性",
+                    subtitle: "物理",
+                    icon: "🎵",
+                    description: "音调、响度、音色的概念与影响因素",
+                    difficulty: "基础",
+                    concepts: ["音调", "响度", "音色", "频率", "振幅", "波形"],
+                    formulas: ["音调与频率关系", "响度与振幅关系"]
+                ),
+                ConcreteTopic(
+                    id: "echo_doppler",
+                    title: "回声与多普勒现象",
+                    subtitle: "物理",
+                    icon: "🔄",
+                    description: "回声的形成条件、多普勒效应的应用",
+                    difficulty: "基础",
+                    concepts: ["回声", "反射", "时间间隔", "多普勒效应", "相对运动"],
+                    formulas: ["回声距离 = 声速×时间/2", "多普勒频率变化"]
+                ),
+                ConcreteTopic(
+                    id: "noise_reduction",
+                    title: "噪声与降噪",
+                    subtitle: "物理",
+                    icon: "🔇",
+                    description: "噪声的危害、降噪的方法与原理",
+                    difficulty: "基础",
+                    concepts: ["噪声", "危害", "降噪方法", "隔音", "吸音"],
+                    formulas: ["分贝计算", "噪声叠加"]
+                )
+            ]
+        case "geometric_optics_basic":
+            return [
+                ConcreteTopic(
+                    id: "light_rectilinear_propagation",
+                    title: "光的直线传播",
+                    subtitle: "物理",
+                    icon: "💡",
+                    description: "光的直线传播特性、小孔成像原理",
+                    difficulty: "基础",
+                    concepts: ["直线传播", "小孔成像", "倒像", "成像大小", "成像距离"],
+                    formulas: ["成像比例", "小孔成像规律"]
+                ),
+                ConcreteTopic(
+                    id: "reflection_law",
+                    title: "反射定律",
+                    subtitle: "物理",
+                    icon: "🪞",
+                    description: "反射定律、平面镜成像规律、虚像特点",
+                    difficulty: "基础",
+                    concepts: ["入射角", "反射角", "法线", "平面镜", "虚像"],
+                    formulas: ["入射角 = 反射角", "像距 = 物距", "像高 = 物高"]
+                ),
+                ConcreteTopic(
+                    id: "refraction_total_reflection",
+                    title: "折射与全反射",
+                    subtitle: "物理",
+                    icon: "🔍",
+                    description: "折射现象、折射定律、全反射条件",
+                    difficulty: "基础",
+                    concepts: ["折射", "折射角", "折射率", "全反射", "临界角"],
+                    formulas: ["n₁sinθ₁ = n₂sinθ₂", "临界角计算"]
+                ),
+                ConcreteTopic(
+                    id: "shadow_formation",
+                    title: "阴影形成",
+                    subtitle: "物理",
+                    icon: "🌑",
+                    description: "本影、半影的形成、日食月食原理",
+                    difficulty: "基础",
+                    concepts: ["本影", "半影", "光源大小", "障碍物大小", "日食月食"],
+                    formulas: ["阴影大小计算", "日食月食条件"]
+                )
+            ]
+        case "simple_circuit":
+            return [
+                ConcreteTopic(
+                    id: "circuit_components",
+                    title: "电路元件",
+                    subtitle: "物理",
+                    icon: "⚡",
+                    description: "电源、开关、导线、用电器等基本元件",
+                    difficulty: "基础",
+                    concepts: ["电源", "开关", "导线", "用电器", "电路符号"],
+                    formulas: ["电路图绘制", "元件连接"]
+                ),
+                ConcreteTopic(
+                    id: "series_parallel",
+                    title: "串并联电路",
+                    subtitle: "物理",
+                    icon: "🔗",
+                    description: "串联电路特点、并联电路特点、基本规律",
+                    difficulty: "基础",
+                    concepts: ["串联", "并联", "电流", "电压", "电阻"],
+                    formulas: ["串联: I=I₁=I₂, U=U₁+U₂, R=R₁+R₂", "并联: I=I₁+I₂, U=U₁=U₂, 1/R=1/R₁+1/R₂"]
+                ),
+                ConcreteTopic(
+                    id: "current_voltage_resistance",
+                    title: "电流电压电阻",
+                    subtitle: "物理",
+                    icon: "📊",
+                    description: "电流的概念、电压的概念、电阻的概念与测量",
+                    difficulty: "基础",
+                    concepts: ["电流", "电压", "电阻", "欧姆表", "测量方法"],
+                    formulas: ["I = Q/t", "U = W/Q", "R = U/I"]
+                ),
+                ConcreteTopic(
+                    id: "electrical_safety",
+                    title: "安全用电",
+                    subtitle: "物理",
+                    icon: "⚠️",
+                    description: "安全电压、触电原因、安全用电常识",
+                    difficulty: "基础",
+                    concepts: ["安全电压", "触电", "绝缘", "接地", "保护措施"],
+                    formulas: ["安全电压标准", "触电电流计算"]
+                )
+            ]
+        // 初一年级物理知识点
+        case "scientific_method":
+            return [
+                ConcreteTopic(
+                    id: "idealization",
+                    title: "理想化方法",
+                    subtitle: "物理",
+                    icon: "🎯",
+                    description: "理想化模型、理想化条件、简化问题的方法",
+                    difficulty: "基础",
+                    concepts: ["理想化", "模型", "简化", "抽象", "科学方法"],
+                    formulas: ["无具体公式", "思维方法", "建模过程"]
+                ),
+                ConcreteTopic(
+                    id: "control_variables",
+                    title: "控制变量法",
+                    subtitle: "物理",
+                    icon: "🔬",
+                    description: "控制变量实验设计、单一变量原则",
+                    difficulty: "基础",
+                    concepts: ["控制变量", "单一变量", "实验设计", "对比实验", "科学探究"],
+                    formulas: ["实验设计原则", "变量控制方法"]
+                ),
+                ConcreteTopic(
+                    id: "comparison_experiment",
+                    title: "对照实验",
+                    subtitle: "物理",
+                    icon: "⚖️",
+                    description: "对照组的设置、实验结果的对比分析",
+                    difficulty: "基础",
+                    concepts: ["对照组", "实验组", "对比分析", "实验设计", "结果验证"],
+                    formulas: ["实验设计", "对比方法"]
+                ),
+                ConcreteTopic(
+                    id: "data_recording_processing",
+                    title: "数据记录与处理",
+                    subtitle: "物理",
+                    icon: "📊",
+                    description: "实验数据的记录、整理、分析和处理",
+                    difficulty: "基础",
+                    concepts: ["数据记录", "数据整理", "数据分析", "数据处理", "科学记录"],
+                    formulas: ["数据处理方法", "误差分析"]
+                )
+            ]
+        case "physical_quantities":
+            return [
+                ConcreteTopic(
+                    id: "si_basic_units",
+                    title: "SI基本单位",
+                    subtitle: "物理",
+                    icon: "📏",
+                    description: "国际单位制基本单位、常用物理量单位",
+                    difficulty: "基础",
+                    concepts: ["SI单位", "基本单位", "导出单位", "单位换算", "国际标准"],
+                    formulas: ["长度: m", "质量: kg", "时间: s", "电流: A", "温度: K"]
+                ),
+                ConcreteTopic(
+                    id: "unit_conversion",
+                    title: "常用单位换算",
+                    subtitle: "物理",
+                    icon: "🔄",
+                    description: "常用物理量单位之间的换算关系",
+                    difficulty: "基础",
+                    concepts: ["单位换算", "换算关系", "换算方法", "常用单位", "换算公式"],
+                    formulas: ["1 km = 1000 m", "1 h = 3600 s", "1 kg = 1000 g"]
+                ),
+                ConcreteTopic(
+                    id: "dimensional_analysis",
+                    title: "量纲分析",
+                    subtitle: "物理",
+                    icon: "🔍",
+                    description: "物理量的量纲、量纲一致性检查",
+                    difficulty: "基础",
+                    concepts: ["量纲", "量纲分析", "量纲一致性", "物理意义", "单位检查"],
+                    formulas: ["量纲公式", "量纲检查方法"]
+                )
+            ]
+        case "measurement_error":
+            return [
+                ConcreteTopic(
+                    id: "reading_rules",
+                    title: "读数规则",
+                    subtitle: "物理",
+                    icon: "📖",
+                    description: "各种测量仪器的读数方法和规则",
+                    difficulty: "基础",
+                    concepts: ["读数规则", "估读", "最小刻度", "测量精度", "仪器使用"],
+                    formulas: ["读数 = 整刻度 + 估读值", "估读值 ≤ 最小刻度/2"]
+                ),
+                ConcreteTopic(
+                    id: "significant_figures",
+                    title: "有效数字",
+                    subtitle: "物理",
+                    icon: "🔢",
+                    description: "有效数字的概念、有效数字的运算规则",
+                    difficulty: "基础",
+                    concepts: ["有效数字", "可靠数字", "可疑数字", "运算规则", "精度保持"],
+                    formulas: ["有效数字运算", "精度确定方法"]
+                ),
+                ConcreteTopic(
+                    id: "absolute_relative_error",
+                    title: "绝对误差与相对误差",
+                    subtitle: "物理",
+                    icon: "📊",
+                    description: "绝对误差、相对误差的定义与计算",
+                    difficulty: "基础",
+                    concepts: ["绝对误差", "相对误差", "误差计算", "误差分析", "测量精度"],
+                    formulas: ["绝对误差 = |测量值 - 真值|", "相对误差 = 绝对误差/真值 × 100%"]
+                ),
+                ConcreteTopic(
+                    id: "repeated_measurement_average",
+                    title: "重复测量与平均值",
+                    subtitle: "物理",
+                    icon: "🔄",
+                    description: "多次测量的意义、平均值的计算、误差的减小",
+                    difficulty: "基础",
+                    concepts: ["重复测量", "平均值", "误差减小", "测量可靠性", "统计方法"],
+                    formulas: ["平均值 = (x₁ + x₂ + ... + xₙ)/n", "误差减小方法"]
+                )
+            ]
+        // 初三年级物理知识点
+        case "electricity_deep":
+            return [
+                ConcreteTopic(
+                    id: "ohm_law",
+                    title: "欧姆定律",
+                    subtitle: "物理",
+                    icon: "⚡",
+                    description: "欧姆定律的表述、适用条件、电阻的计算",
+                    difficulty: "中等",
+                    concepts: ["欧姆定律", "电流", "电压", "电阻", "线性关系", "适用条件"],
+                    formulas: ["I = U/R", "R = U/I", "U = IR", "电阻单位: Ω"]
+                ),
+                ConcreteTopic(
+                    id: "series_parallel_calculation",
+                    title: "串并联电路定量计算",
+                    subtitle: "物理",
+                    icon: "🔗",
+                    description: "串联并联电路的电流、电压、电阻的定量计算",
+                    difficulty: "中等",
+                    concepts: ["串联电路", "并联电路", "电流分配", "电压分配", "等效电阻"],
+                    formulas: ["串联: R总 = R₁ + R₂ + R₃", "并联: 1/R总 = 1/R₁ + 1/R₂ + 1/R₃"]
+                ),
+                ConcreteTopic(
+                    id: "electrical_work_power",
+                    title: "电功与电功率",
+                    subtitle: "物理",
+                    icon: "🔋",
+                    description: "电功的计算、电功率的定义与计算、单位换算",
+                    difficulty: "中等",
+                    concepts: ["电功", "电功率", "能量转化", "时间", "效率"],
+                    formulas: ["W = UIt", "P = UI", "P = W/t", "1 kW·h = 3.6×10⁶ J"]
+                ),
+                ConcreteTopic(
+                    id: "joule_law",
+                    title: "焦耳定律",
+                    subtitle: "物理",
+                    icon: "🔥",
+                    description: "焦耳定律的表述、电流热效应的应用",
+                    difficulty: "中等",
+                    concepts: ["焦耳定律", "电流热效应", "电阻", "时间", "热量"],
+                    formulas: ["Q = I²Rt", "热量单位: J", "热功率: P = I²R"]
+                ),
+                ConcreteTopic(
+                    id: "home_circuit_safety",
+                    title: "家庭电路与安全",
+                    subtitle: "物理",
+                    icon: "🏠",
+                    description: "家庭电路的组成、安全用电常识、保险丝的作用",
+                    difficulty: "中等",
+                    concepts: ["家庭电路", "火线", "零线", "地线", "保险丝", "安全用电"],
+                    formulas: ["家庭电压: 220V", "安全电流: ≤30mA"]
+                )
+            ]
+        case "work_mechanical_energy":
+            return [
+                ConcreteTopic(
+                    id: "work_power",
+                    title: "功与功率",
+                    subtitle: "物理",
+                    icon: "⚙️",
+                    description: "功的定义、功率的计算、机械效率",
+                    difficulty: "中等",
+                    concepts: ["功", "功率", "机械效率", "有用功", "总功", "时间"],
+                    formulas: ["W = Fs", "P = W/t", "P = Fv", "η = W有用/W总"]
+                ),
+                ConcreteTopic(
+                    id: "lever_pulley",
+                    title: "杠杆与滑轮",
+                    subtitle: "物理",
+                    icon: "🔧",
+                    description: "杠杆平衡条件、滑轮的特点、机械优势",
+                    difficulty: "中等",
+                    concepts: ["杠杆", "支点", "动力", "阻力", "滑轮", "机械优势"],
+                    formulas: ["F₁L₁ = F₂L₂", "定滑轮: F = G", "动滑轮: F = G/2"]
+                ),
+                ConcreteTopic(
+                    id: "kinetic_potential_energy",
+                    title: "动能与势能",
+                    subtitle: "物理",
+                    icon: "🎯",
+                    description: "动能的定义、重力势能、弹性势能的计算",
+                    difficulty: "中等",
+                    concepts: ["动能", "重力势能", "弹性势能", "质量", "高度", "弹性系数"],
+                    formulas: ["E动 = ½mv²", "E重 = mgh", "E弹 = ½kx²"]
+                ),
+                ConcreteTopic(
+                    id: "mechanical_energy_conservation",
+                    title: "机械能守恒",
+                    subtitle: "物理",
+                    icon: "⚖️",
+                    description: "机械能守恒的条件、动能定理的应用",
+                    difficulty: "中等",
+                    concepts: ["机械能守恒", "动能定理", "能量转化", "保守力", "非保守力"],
+                    formulas: ["E₁ = E₂", "W = ΔE", "E = E动 + E重 + E弹"]
+                )
+            ]
+        case "thermodynamics_phase":
+            return [
+                ConcreteTopic(
+                    id: "temperature_heat",
+                    title: "温度与热量",
+                    subtitle: "物理",
+                    icon: "🌡️",
+                    description: "温度的概念、热量的定义、热传递的方式",
+                    difficulty: "中等",
+                    concepts: ["温度", "热量", "热传递", "热传导", "热对流", "热辐射"],
+                    formulas: ["温度单位: ℃, K", "热量单位: J", "1 cal = 4.2 J"]
+                ),
+                ConcreteTopic(
+                    id: "specific_heat_capacity",
+                    title: "比热容与热量计算",
+                    subtitle: "物理",
+                    icon: "🔥",
+                    description: "比热容的概念、热量计算公式、比热容的测量",
+                    difficulty: "中等",
+                    concepts: ["比热容", "质量", "温度变化", "热量计算", "比热容测量"],
+                    formulas: ["Q = cmΔt", "c = Q/(mΔt)", "比热容单位: J/(kg·℃)"]
+                ),
+                ConcreteTopic(
+                    id: "phase_change_latent_heat",
+                    title: "物态变化与潜热",
+                    subtitle: "物理",
+                    icon: "💧",
+                    description: "物态变化过程、潜热的概念、物态变化图",
+                    difficulty: "中等",
+                    concepts: ["物态变化", "潜热", "熔化", "凝固", "汽化", "液化"],
+                    formulas: ["Q = mL", "L = Q/m", "潜热单位: J/kg"]
+                ),
+                ConcreteTopic(
+                    id: "heat_transfer_application",
+                    title: "热传递与生活应用",
+                    subtitle: "物理",
+                    icon: "🏠",
+                    description: "热传递在生活中的应用、保温材料、散热设计",
+                    difficulty: "中等",
+                    concepts: ["热传递应用", "保温", "散热", "材料选择", "设计原理"],
+                    formulas: ["热传导: Q = kAΔt/d", "热对流", "热辐射"]
+                )
+            ]
+        // 高二年级物理知识点
+        case "magnetic_field_particles":
+            return [
+                ConcreteTopic(
+                    id: "magnetic_field_lines",
+                    title: "磁感线与右手定则",
+                    subtitle: "物理",
+                    icon: "🧲",
+                    description: "磁感线的概念、右手定则的应用、磁场方向的判断",
+                    difficulty: "高级",
+                    concepts: ["磁感线", "右手定则", "磁场方向", "磁感应强度", "磁场分布"],
+                    formulas: ["右手定则", "磁感线密度", "磁场强度"]
+                ),
+                ConcreteTopic(
+                    id: "current_carrying_conductor",
+                    title: "通电导线的磁场",
+                    subtitle: "物理",
+                    icon: "⚡",
+                    description: "通电直导线、通电线圈的磁场、安培定则",
+                    difficulty: "高级",
+                    concepts: ["通电导线", "通电线圈", "安培定则", "磁场强度", "磁感应强度"],
+                    formulas: ["B = μ₀I/(2πr)", "B = μ₀nI", "μ₀ = 4π×10⁻⁷ T·m/A"]
+                ),
+                ConcreteTopic(
+                    id: "lorentz_force",
+                    title: "洛伦兹力",
+                    subtitle: "物理",
+                    icon: "🎯",
+                    description: "洛伦兹力的定义、带电粒子在磁场中的运动",
+                    difficulty: "高级",
+                    concepts: ["洛伦兹力", "带电粒子", "磁场", "速度", "电荷", "运动轨迹"],
+                    formulas: ["F = qvBsinθ", "F = qvB (垂直)", "r = mv/(qB)"]
+                ),
+                ConcreteTopic(
+                    id: "circular_spiral_motion",
+                    title: "圆周运动与螺旋运动",
+                    subtitle: "物理",
+                    icon: "🌀",
+                    description: "带电粒子在匀强磁场中的圆周运动、螺旋运动",
+                    difficulty: "高级",
+                    concepts: ["圆周运动", "螺旋运动", "周期", "半径", "螺距", "运动分析"],
+                    formulas: ["T = 2πm/(qB)", "r = mv/(qB)", "h = v∥T"]
+                )
+            ]
+        case "electromagnetic_induction_ac":
+            return [
+                ConcreteTopic(
+                    id: "magnetic_flux",
+                    title: "磁通量",
+                    subtitle: "物理",
+                    icon: "🔗",
+                    description: "磁通量的定义、磁通量的计算、磁通量的变化",
+                    difficulty: "高级",
+                    concepts: ["磁通量", "磁感应强度", "面积", "夹角", "磁通量变化"],
+                    formulas: ["Φ = BScosθ", "ΔΦ = Φ₂ - Φ₁", "磁通量单位: Wb"]
+                ),
+                ConcreteTopic(
+                    id: "faraday_law",
+                    title: "法拉第电磁感应定律",
+                    subtitle: "物理",
+                    icon: "⚡",
+                    description: "法拉第定律的表述、感应电动势的计算",
+                    difficulty: "高级",
+                    concepts: ["法拉第定律", "感应电动势", "磁通量变化率", "线圈匝数", "楞次定律"],
+                    formulas: ["ε = -NΔΦ/Δt", "ε = -NBSωsinωt", "电动势单位: V"]
+                ),
+                ConcreteTopic(
+                    id: "lenz_law",
+                    title: "楞次定律",
+                    subtitle: "物理",
+                    icon: "🔄",
+                    description: "楞次定律的表述、感应电流方向的判断",
+                    difficulty: "高级",
+                    concepts: ["楞次定律", "感应电流", "磁通量变化", "阻碍作用", "能量守恒"],
+                    formulas: ["感应电流方向", "阻碍磁通量变化", "能量转化"]
+                ),
+                ConcreteTopic(
+                    id: "ac_circuit_analysis",
+                    title: "交流电路分析",
+                    subtitle: "物理",
+                    icon: "🌊",
+                    description: "正弦交流电、有效值、相位、阻抗RLC电路",
+                    difficulty: "高级",
+                    concepts: ["正弦交流", "有效值", "相位", "阻抗", "RLC电路", "谐振"],
+                    formulas: ["I有效 = Iₘ/√2", "U有效 = Uₘ/√2", "Z = √(R² + (XL - XC)²)"]
+                )
+            ]
+        case "vibration_waves":
+            return [
+                ConcreteTopic(
+                    id: "simple_harmonic_motion",
+                    title: "简谐振动",
+                    subtitle: "物理",
+                    icon: "🎵",
+                    description: "简谐振动的特征、振动方程、振动图像",
+                    difficulty: "高级",
+                    concepts: ["简谐振动", "振幅", "周期", "频率", "相位", "振动方程"],
+                    formulas: ["x = Acos(ωt + φ)", "ω = 2πf", "T = 1/f", "f = 1/T"]
+                ),
+                ConcreteTopic(
+                    id: "pendulum_spring_oscillator",
+                    title: "单摆与弹簧振子",
+                    subtitle: "物理",
+                    icon: "🔗",
+                    description: "单摆的周期、弹簧振子的周期、振动规律",
+                    difficulty: "高级",
+                    concepts: ["单摆", "弹簧振子", "周期", "重力加速度", "弹性系数", "质量"],
+                    formulas: ["单摆: T = 2π√(L/g)", "弹簧: T = 2π√(m/k)"]
+                ),
+                ConcreteTopic(
+                    id: "wave_properties",
+                    title: "波的性质",
+                    subtitle: "物理",
+                    icon: "🌊",
+                    description: "机械波、波速、波长、频率、波的能量传递",
+                    difficulty: "高级",
+                    concepts: ["机械波", "波速", "波长", "频率", "波的能量", "波的传播"],
+                    formulas: ["v = λf", "v = λ/T", "λ = vT", "波速与介质有关"]
+                ),
+                ConcreteTopic(
+                    id: "wave_phenomena",
+                    title: "波动现象",
+                    subtitle: "物理",
+                    icon: "🔍",
+                    description: "波的反射、干涉、衍射、共振现象",
+                    difficulty: "高级",
+                    concepts: ["反射", "干涉", "衍射", "共振", "驻波", "多普勒效应"],
+                    formulas: ["干涉条件", "衍射条件", "共振条件", "驻波方程"]
+                )
+            ]
+        // 高三年级物理知识点
+        case "optics_advanced":
+            return [
+                ConcreteTopic(
+                    id: "thin_lens_imaging",
+                    title: "薄透镜成像",
+                    subtitle: "物理",
+                    icon: "🔬",
+                    description: "薄透镜成像规律、作图法、放大率计算",
+                    difficulty: "高级",
+                    concepts: ["薄透镜", "成像规律", "作图法", "放大率", "物距", "像距"],
+                    formulas: ["1/u + 1/v = 1/f", "m = v/u", "m = h'/h", "f = R/2"]
+                ),
+                ConcreteTopic(
+                    id: "optical_instruments",
+                    title: "光学仪器",
+                    subtitle: "物理",
+                    icon: "🔭",
+                    description: "显微镜、望远镜、照相机等光学仪器的原理",
+                    difficulty: "高级",
+                    concepts: ["显微镜", "望远镜", "照相机", "放大率", "分辨率", "光学系统"],
+                    formulas: ["显微镜: M = M₁M₂", "望远镜: M = f₁/f₂", "照相机: 1/u + 1/v = 1/f"]
+                ),
+                ConcreteTopic(
+                    id: "interference_diffraction",
+                    title: "干涉与衍射",
+                    subtitle: "物理",
+                    icon: "🌈",
+                    description: "杨氏双缝干涉、薄膜干涉、单缝衍射现象",
+                    difficulty: "高级",
+                    concepts: ["干涉", "衍射", "双缝", "薄膜", "光程差", "条纹"],
+                    formulas: ["双缝: dsinθ = mλ", "薄膜: 2nd = mλ", "单缝: asinθ = mλ"]
+                ),
+                ConcreteTopic(
+                    id: "diffraction_conditions",
+                    title: "衍射条件",
+                    subtitle: "物理",
+                    icon: "🔍",
+                    description: "衍射角条件、衍射极限、分辨率",
+                    difficulty: "高级",
+                    concepts: ["衍射角", "衍射极限", "分辨率", "瑞利判据", "光学仪器"],
+                    formulas: ["衍射角: θ ≈ λ/a", "分辨率: θ = 1.22λ/D", "瑞利判据"]
+                )
+            ]
+        case "thermodynamics_gas":
+            return [
+                ConcreteTopic(
+                    id: "ideal_gas_equation",
+                    title: "理想气体状态方程",
+                    subtitle: "物理",
+                    icon: "🌡️",
+                    description: "理想气体状态方程、各种过程的分析",
+                    difficulty: "高级",
+                    concepts: ["理想气体", "状态方程", "等温过程", "等压过程", "等容过程", "绝热过程"],
+                    formulas: ["PV = nRT", "PV = 常数(等温)", "V/T = 常数(等压)", "P/T = 常数(等容)"]
+                ),
+                ConcreteTopic(
+                    id: "kinetic_theory",
+                    title: "气体分子运动论",
+                    subtitle: "物理",
+                    icon: "⚛️",
+                    description: "气体分子运动论要点、压强微观解释",
+                    difficulty: "高级",
+                    concepts: ["分子运动", "压强", "温度", "平均动能", "分子速度", "碰撞"],
+                    formulas: ["P = (1/3)nmv²", "E = (3/2)kT", "v = √(3kT/m)", "平均动能与温度成正比"]
+                ),
+                ConcreteTopic(
+                    id: "thermodynamics_first_law",
+                    title: "热力学第一定律",
+                    subtitle: "物理",
+                    icon: "⚖️",
+                    description: "热力学第一定律、内能变化、功与热量的关系",
+                    difficulty: "高级",
+                    concepts: ["热力学第一定律", "内能", "功", "热量", "能量守恒", "状态函数"],
+                    formulas: ["ΔU = Q + W", "Q > 0 (吸热)", "W > 0 (对外做功)", "内能是状态函数"]
+                ),
+                ConcreteTopic(
+                    id: "gas_processes",
+                    title: "气体过程分析",
+                    subtitle: "物理",
+                    icon: "📊",
+                    description: "各种气体过程的分析、P-V图、T-S图",
+                    difficulty: "高级",
+                    concepts: ["等温过程", "等压过程", "等容过程", "绝热过程", "循环过程", "效率"],
+                    formulas: ["等温: W = nRTln(V₂/V₁)", "等压: W = PΔV", "等容: W = 0", "绝热: PV^γ = 常数"]
+                )
+            ]
+        case "modern_physics_advanced":
+            return [
+                ConcreteTopic(
+                    id: "photoelectric_effect",
+                    title: "光电效应",
+                    subtitle: "物理",
+                    icon: "💡",
+                    description: "光量子假说、光电效应方程、截止频率",
+                    difficulty: "高级",
+                    concepts: ["光电效应", "光子", "普朗克常数", "截止频率", "逸出功", "爱因斯坦方程"],
+                    formulas: ["E = hf", "hf = W + ½mv²", "h = 6.63×10⁻³⁴ J·s", "截止频率: f₀ = W/h"]
+                ),
+                ConcreteTopic(
+                    id: "atomic_models",
+                    title: "原子模型",
+                    subtitle: "物理",
+                    icon: "⚛️",
+                    description: "原子结构模型、能级跃迁、谱线分析",
+                    difficulty: "高级",
+                    concepts: ["原子模型", "能级", "跃迁", "谱线", "玻尔模型", "量子数"],
+                    formulas: ["E = -13.6/n² eV", "hf = E₂ - E₁", "里德伯常数", "巴尔末公式"]
+                ),
+                ConcreteTopic(
+                    id: "hydrogen_bohr_model",
+                    title: "氢原子玻尔模型",
+                    subtitle: "物理",
+                    icon: "🔬",
+                    description: "玻尔模型的假设、能级公式、轨道半径",
+                    difficulty: "高级",
+                    concepts: ["玻尔模型", "量子化", "轨道半径", "能级", "角动量", "氢原子"],
+                    formulas: ["r = n²a₀", "a₀ = 0.53×10⁻¹⁰ m", "E = -13.6/n² eV", "L = nh/(2π)"]
+                ),
+                ConcreteTopic(
+                    id: "matter_waves",
+                    title: "物质波",
+                    subtitle: "物理",
+                    icon: "🌊",
+                    description: "德布罗意波长、波粒二象性、不确定性原理",
+                    difficulty: "高级",
+                    concepts: ["物质波", "德布罗意波长", "波粒二象性", "不确定性原理", "量子力学"],
+                    formulas: ["λ = h/p", "λ = h/(mv)", "ΔxΔp ≥ h/(4π)", "德布罗意波长"]
+                )
+            ]
+        case "nuclear_radioactivity":
+            return [
+                ConcreteTopic(
+                    id: "radioactive_decay",
+                    title: "放射性衰变",
+                    subtitle: "物理",
+                    icon: "☢️",
+                    description: "衰变规律、半衰期、衰变常数",
+                    difficulty: "高级",
+                    concepts: ["放射性衰变", "半衰期", "衰变常数", "衰变方程", "衰变链", "统计规律"],
+                    formulas: ["N = N₀e^(-λt)", "T₁/₂ = ln2/λ", "λ = ln2/T₁/₂", "衰变率: dN/dt = -λN"]
+                ),
+                ConcreteTopic(
+                    id: "nuclear_reactions",
+                    title: "核反应方程",
+                    subtitle: "物理",
+                    icon: "⚛️",
+                    description: "核反应方程配平、质量数守恒、电荷数守恒",
+                    difficulty: "高级",
+                    concepts: ["核反应", "质量数", "电荷数", "守恒定律", "配平", "核素"],
+                    formulas: ["质量数守恒: A₁ + A₂ = A₃ + A₄", "电荷数守恒: Z₁ + Z₂ = Z₃ + Z₄"]
+                ),
+                ConcreteTopic(
+                    id: "mass_defect_binding_energy",
+                    title: "质量亏损与结合能",
+                    subtitle: "物理",
+                    icon: "⚖️",
+                    description: "质量亏损、结合能、比结合能",
+                    difficulty: "高级",
+                    concepts: ["质量亏损", "结合能", "比结合能", "核力", "稳定性", "核素"],
+                    formulas: ["Δm = Zm_p + Nm_n - M", "E = Δmc²", "比结合能 = E/A", "E = 931.5Δm MeV"]
+                ),
+                ConcreteTopic(
+                    id: "nuclear_fission_fusion",
+                    title: "核裂变与核聚变",
+                    subtitle: "物理",
+                    icon: "💥",
+                    description: "核裂变、核聚变原理、核能利用的利弊",
+                    difficulty: "高级",
+                    concepts: ["核裂变", "核聚变", "链式反应", "可控核聚变", "核能", "核废料"],
+                    formulas: ["裂变: ²³⁵U + ¹n → 产物 + 能量", "聚变: ²H + ³H → ⁴He + ¹n + 能量"]
+                )
+            ]
+        case "comprehensive_practice":
+            return [
+                ConcreteTopic(
+                    id: "multi_topic_integration",
+                    title: "多主题综合题",
+                    subtitle: "物理",
+                    icon: "🎯",
+                    description: "多主题综合题的分析方法、解题策略",
+                    difficulty: "高级",
+                    concepts: ["综合题", "多主题", "分析方法", "解题策略", "知识整合", "思维方法"],
+                    formulas: ["综合运用各章节公式", "建立物理模型", "分析物理过程"]
+                ),
+                ConcreteTopic(
+                    id: "graphical_methods",
+                    title: "图像法",
+                    subtitle: "物理",
+                    icon: "📊",
+                    description: "图像法的应用、图像分析技巧",
+                    difficulty: "高级",
+                    concepts: ["图像法", "图像分析", "斜率", "面积", "截距", "图像变换"],
+                    formulas: ["斜率 = Δy/Δx", "面积 = ∫ydx", "图像特征分析"]
+                ),
+                ConcreteTopic(
+                    id: "extreme_critical_values",
+                    title: "极值与临界",
+                    subtitle: "物理",
+                    icon: "🔍",
+                    description: "极值问题、临界条件、边界分析",
+                    difficulty: "高级",
+                    concepts: ["极值", "临界条件", "边界分析", "导数", "不等式", "约束条件"],
+                    formulas: ["极值条件: df/dx = 0", "临界条件", "边界条件分析"]
+                ),
+                ConcreteTopic(
+                    id: "experiment_design_evaluation",
+                    title: "实验设计与评估",
+                    subtitle: "物理",
+                    icon: "🧪",
+                    description: "实验设计原则、控制变量、重复性、灵敏度",
+                    difficulty: "高级",
+                    concepts: ["实验设计", "控制变量", "重复性", "灵敏度", "误差分析", "实验评估"],
+                    formulas: ["实验设计原则", "误差分析", "不确定度评估", "实验验证"]
+                )
+            ]
         // 物理知识点
         case "kinematics":
             return [
@@ -1840,7 +2672,7 @@ struct ConcreteTopicsListView: View {
             return AnyView(SimpleMotionSimView(title: topic.title, motionType: topic.id))
         case "force_analysis", "newton_third_law", "friction_constraint":
             return AnyView(ForceMotionSimView(title: topic.title, forceType: topic.id))
-        case "lens_imaging", "refraction_reflection":
+        case "lens_imaging", "refraction_reflection", "reflection_law":
             return AnyView(LensSimView(title: topic.title))
         default:
             // 如果没有对应的模拟器，显示一个默认的详情页面
