@@ -466,16 +466,18 @@ struct ProjectileSimView: View {
         let xAxisLabel = "距离 (m)"
         let yAxisLabel = "高度 h (m)"
         
-        // x 轴标签 - 移到最右端，确保完全可见
+        // x轴单位标签固定在最右端上方
         let xLabelAttr = AttributedString(xAxisLabel)
-        context.draw(Text(xLabelAttr).font(.caption).foregroundColor(.secondary), 
-                   at: CGPoint(x: size.width - 12, y: size.height - 45), 
-                   anchor: .topTrailing)
+        let xAxisRight = CGPoint(x: size.width - margin, y: size.height - margin)
+        context.draw(Text(xLabelAttr).font(.caption).foregroundColor(.secondary),
+                   at: CGPoint(x: xAxisRight.x - 4, y: xAxisRight.y - 6),
+                   anchor: .bottomTrailing)
         
-        // y 轴标签 - 移到更上方，避免与返回按钮重叠
+        // y轴单位标签固定在最上端右侧
         let yLabelAttr = AttributedString(yAxisLabel)
-        context.draw(Text(yLabelAttr).font(.caption).foregroundColor(.secondary), 
-                   at: CGPoint(x: margin + 8, y: margin + 25), 
+        let yAxisTop = CGPoint(x: margin, y: margin)
+        context.draw(Text(yLabelAttr).font(.caption).foregroundColor(.secondary),
+                   at: CGPoint(x: yAxisTop.x + 6, y: yAxisTop.y + 2),
                    anchor: .topLeading)
     }
     
