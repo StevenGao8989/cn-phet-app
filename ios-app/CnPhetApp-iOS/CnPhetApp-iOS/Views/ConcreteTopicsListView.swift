@@ -75,8 +75,6 @@ struct ConcreteTopicsListView: View {
             }
             .listStyle(.plain)
         }
-        .navigationTitle(mainTopic.title)
-        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             loadConcreteTopics()
         }

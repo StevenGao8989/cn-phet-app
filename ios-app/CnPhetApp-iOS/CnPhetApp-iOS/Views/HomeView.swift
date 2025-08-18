@@ -318,37 +318,18 @@ struct HomeTabView: View {
     @Binding var showDeleteAlert: Bool
     @Binding var confirmPwdForDelete: String
     @EnvironmentObject var auth: AuthViewModel
+    @State private var showSignOutAlert = false  // 添加退出登录确认状态
     
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 // 顶部标题
                 HStack {
+                    Spacer()
                     Text("理科实验室")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                     Spacer()
-                    Menu {
-                        Button("查看个人信息") { showProfileSheet = true }
-                        Button("修改密码")   { showChangePwdSheet = true }
-                        Divider()
-                        Button("退出登录", role: .destructive) {
-                            auth.signOutFromUI()
-                        }
-                        Button("注销账号", role: .destructive) {
-                            showDeleteAlert = true
-                        }
-                    } label: {
-                        Button("S") {
-                            // 设置按钮
-                        }
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .frame(width: 40, height: 40)
-                        .background(Color.blue)
-                        .clipShape(Circle())
-                    }
                 }
                 .padding()
                 
@@ -378,12 +359,16 @@ struct HomeTabView: View {
                 
                 Spacer()
             }
-            .navigationTitle("学科选择")
-            .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(isPresented: $showGradeSelection) {
                 if let subject = selectedSubject {
                     GradeSelectionView(subject: subject)
                 }
+            }
+        }
+        .alert("确认退出登录？", isPresented: $showSignOutAlert) {
+            Button("取消", role: .cancel) { }
+            Button("确认退出", role: .destructive) {
+                auth.signOutFromUI()
             }
         }
     }
@@ -429,6 +414,7 @@ struct ProfileView: View {
     @Binding var showDeleteAlert: Bool
     @Binding var confirmPwdForDelete: String
     @EnvironmentObject var auth: AuthViewModel
+    @State private var showSignOutAlert = false  // 添加退出登录确认状态
     
     // 先用昵称，其次邮箱，再兜底"我"
     private var displayText: String {
@@ -501,7 +487,7 @@ struct ProfileView: View {
                     Divider()
                         .padding(.leading, 50)
                     
-                    Button(action: { auth.signOutFromUI() }) {
+                    Button(action: { showSignOutAlert = true }) {
                         HStack {
                             Image(systemName: "rectangle.portrait.and.arrow.right")
                                 .foregroundColor(.orange)
@@ -536,6 +522,12 @@ struct ProfileView: View {
             }
             .navigationTitle("我的")
             .navigationBarTitleDisplayMode(.inline)
+        }
+        .alert("确认退出登录？", isPresented: $showSignOutAlert) {
+            Button("取消", role: .cancel) { }
+            Button("确认退出", role: .destructive) {
+                auth.signOutFromUI()
+            }
         }
     }
 }

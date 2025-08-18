@@ -58,8 +58,6 @@ struct GradeTopicsView: View {
                 .listStyle(.plain)
             }
         }
-        .navigationTitle(grade.title)
-        .navigationBarTitleDisplayMode(.inline)
 
         .onAppear {
             loadTopics()
