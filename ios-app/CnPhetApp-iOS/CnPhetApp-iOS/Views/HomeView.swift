@@ -31,94 +31,62 @@ struct HomeView: View {
     private var avatarInitials: String { String(displayText.prefix(1)) }
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                // 顶部标题
-                HStack {
-                    Text("理科实验室")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                    Spacer()
-                    Menu {
-                        Button("查看个人信息") { showProfileSheet = true }
-                        Button("修改密码")   { showChangePwdSheet = true }
-                        Divider()
-                        Button("退出登录", role: .destructive) {
-                            auth.signOutFromUI()
-                        }
-                        Button("注销账号", role: .destructive) {
-                            showDeleteAlert = true
-                        }
-                    } label: {
-                        Button("S") {
-                            // 设置按钮
-                        }
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .frame(width: 40, height: 40)
-                        .background(Color.blue)
-                        .clipShape(Circle())
-                    }
-                }
-                .padding()
-                
-                // 学科选择按钮
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: 2), spacing: 16) {
-                    SubjectCard(subject: .physics) {
-                        selectedSubject = .physics
-                        showGradeSelection = true
-                    }
-                    
-                    SubjectCard(subject: .chemistry) {
-                        selectedSubject = .chemistry
-                        showGradeSelection = true
-                    }
-                    
-                    SubjectCard(subject: .math) {
-                        selectedSubject = .math
-                        showGradeSelection = true
-                    }
-                    
-                    SubjectCard(subject: .biology) {
-                        selectedSubject = .biology
-                        showGradeSelection = true
-                    }
-                }
-                .padding(.horizontal)
-                
-                Spacer()
+        TabView {
+            // 首页 Tab
+            HomeTabView(
+                selectedSubject: $selectedSubject,
+                showGradeSelection: $showGradeSelection,
+                showProfileSheet: $showProfileSheet,
+                showChangePwdSheet: $showChangePwdSheet,
+                showDeleteAlert: $showDeleteAlert,
+                confirmPwdForDelete: $confirmPwdForDelete
+            )
+            .tabItem {
+                Image(systemName: "house.fill")
+                Text("首页")
             }
-            .navigationTitle("学科选择")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(isPresented: $showGradeSelection) {
-                if let subject = selectedSubject {
-                    GradeSelectionView(subject: subject)
+            
+            // AI助手 Tab
+            AIAssistantView()
+                .tabItem {
+                    Image(systemName: "brain.head.profile")
+                    Text("AI助手")
                 }
+            
+            // 我的 Tab
+            ProfileView(
+                showProfileSheet: $showProfileSheet,
+                showChangePwdSheet: $showChangePwdSheet,
+                showDeleteAlert: $showDeleteAlert,
+                confirmPwdForDelete: $confirmPwdForDelete
+            )
+            .tabItem {
+                Image(systemName: "person.fill")
+                Text("我的")
             }
-            .alert("确认注销？", isPresented: $showDeleteAlert) {
-                SecureField("请输入当前密码以确认", text: $confirmPwdForDelete)
-                    .textContentType(.password)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
-                    .privacySensitive()
-                Button("取消", role: .cancel) { }
-                // 注销确认里
-                Button("确认注销", role: .destructive) {
-                    auth.deleteAccountFromUI(confirmPassword: confirmPwdForDelete)
-                }
-            } message: {
-                Text("此操作不可恢复，将删除你的登录账户与资料。")
-            }
-            .overlay(alignment: .top) {
-                if let msg = auth.banner {
-                    BannerView(text: msg).padding(.top, 8)
-                }
-            }
-            // 这两个 Sheet 不再额外传 environmentObject，避免类型推断开销
-            .sheet(isPresented: $showProfileSheet) { ProfileSheetView() }
-            .sheet(isPresented: $showChangePwdSheet) { ChangePasswordSheetView() }
         }
+        .alert("确认注销？", isPresented: $showDeleteAlert) {
+            SecureField("请输入当前密码以确认", text: $confirmPwdForDelete)
+                .textContentType(.password)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+                .privacySensitive()
+            Button("取消", role: .cancel) { }
+            // 注销确认里
+            Button("确认注销", role: .destructive) {
+                auth.deleteAccountFromUI(confirmPassword: confirmPwdForDelete)
+            }
+        } message: {
+            Text("此操作不可恢复，将删除你的登录账户与资料。")
+        }
+        .overlay(alignment: .top) {
+            if let msg = auth.banner {
+                BannerView(text: msg).padding(.top, 8)
+            }
+        }
+        // 这两个 Sheet 不再额外传 environmentObject，避免类型推断开销
+        .sheet(isPresented: $showProfileSheet) { ProfileSheetView() }
+        .sheet(isPresented: $showChangePwdSheet) { ChangePasswordSheetView() }
     }
 }
 
@@ -339,4 +307,235 @@ struct ChangePasswordSheetView: View {
 
     
 
+}
+
+// MARK: - 首页Tab视图
+struct HomeTabView: View {
+    @Binding var selectedSubject: Subject?
+    @Binding var showGradeSelection: Bool
+    @Binding var showProfileSheet: Bool
+    @Binding var showChangePwdSheet: Bool
+    @Binding var showDeleteAlert: Bool
+    @Binding var confirmPwdForDelete: String
+    @EnvironmentObject var auth: AuthViewModel
+    
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                // 顶部标题
+                HStack {
+                    Text("理科实验室")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                    Spacer()
+                    Menu {
+                        Button("查看个人信息") { showProfileSheet = true }
+                        Button("修改密码")   { showChangePwdSheet = true }
+                        Divider()
+                        Button("退出登录", role: .destructive) {
+                            auth.signOutFromUI()
+                        }
+                        Button("注销账号", role: .destructive) {
+                            showDeleteAlert = true
+                        }
+                    } label: {
+                        Button("S") {
+                            // 设置按钮
+                        }
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .frame(width: 40, height: 40)
+                        .background(Color.blue)
+                        .clipShape(Circle())
+                    }
+                }
+                .padding()
+                
+                // 学科选择按钮
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: 2), spacing: 16) {
+                    SubjectCard(subject: .physics) {
+                        selectedSubject = .physics
+                        showGradeSelection = true
+                    }
+                    
+                    SubjectCard(subject: .chemistry) {
+                        selectedSubject = .chemistry
+                        showGradeSelection = true
+                    }
+                    
+                    SubjectCard(subject: .math) {
+                        selectedSubject = .math
+                        showGradeSelection = true
+                    }
+                    
+                    SubjectCard(subject: .biology) {
+                        selectedSubject = .biology
+                        showGradeSelection = true
+                    }
+                }
+                .padding(.horizontal)
+                
+                Spacer()
+            }
+            .navigationTitle("学科选择")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(isPresented: $showGradeSelection) {
+                if let subject = selectedSubject {
+                    GradeSelectionView(subject: subject)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - AI助手视图
+struct AIAssistantView: View {
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                Image(systemName: "brain.head.profile")
+                    .font(.system(size: 80))
+                    .foregroundColor(.blue)
+                
+                Text("AI助手")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                
+                Text("智能学习伙伴，随时为你解答问题")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                
+                Button("开始对话") {
+                    // TODO: 实现AI对话功能
+                }
+                .buttonStyle(.borderedProminent)
+                .padding()
+                
+                Spacer()
+            }
+            .navigationTitle("AI助手")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
+
+// MARK: - 个人资料视图
+struct ProfileView: View {
+    @Binding var showProfileSheet: Bool
+    @Binding var showChangePwdSheet: Bool
+    @Binding var showDeleteAlert: Bool
+    @Binding var confirmPwdForDelete: String
+    @EnvironmentObject var auth: AuthViewModel
+    
+    // 先用昵称，其次邮箱，再兜底"我"
+    private var displayText: String {
+        if let n = auth.profile?.display_name, !n.isEmpty { return n }
+        if let e = auth.user?.email, !e.isEmpty { return e }
+        return "我"
+    }
+    private var avatarInitials: String { String(displayText.prefix(1)) }
+    
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                // 头像和用户信息
+                VStack(spacing: 16) {
+                    ZStack {
+                        Circle()
+                            .fill(Color.blue)
+                            .frame(width: 100, height: 100)
+                        
+                        Text(avatarInitials)
+                            .font(.system(size: 40, weight: .bold))
+                            .foregroundColor(.white)
+                    }
+                    
+                    Text(displayText)
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                    
+                    if let email = auth.user?.email {
+                        Text(email)
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .padding(.top, 20)
+                
+                // 功能按钮列表
+                VStack(spacing: 0) {
+                    Button(action: { showProfileSheet = true }) {
+                        HStack {
+                            Image(systemName: "person.circle")
+                                .foregroundColor(.blue)
+                            Text("个人信息")
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.secondary)
+                        }
+                        .padding()
+                        .background(Color(.systemBackground))
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    Divider()
+                        .padding(.leading, 50)
+                    
+                    Button(action: { showChangePwdSheet = true }) {
+                        HStack {
+                            Image(systemName: "lock.circle")
+                                .foregroundColor(.green)
+                            Text("修改密码")
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.secondary)
+                        }
+                        .padding()
+                        .background(Color(.systemBackground))
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    Divider()
+                        .padding(.leading, 50)
+                    
+                    Button(action: { auth.signOutFromUI() }) {
+                        HStack {
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                                .foregroundColor(.orange)
+                            Text("退出登录")
+                            Spacer()
+                        }
+                        .padding()
+                        .background(Color(.systemBackground))
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    Divider()
+                        .padding(.leading, 50)
+                    
+                    Button(action: { showDeleteAlert = true }) {
+                        HStack {
+                            Image(systemName: "trash.circle")
+                                .foregroundColor(.red)
+                            Text("注销账号")
+                            Spacer()
+                        }
+                        .padding()
+                        .background(Color(.systemBackground))
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+                .padding(.horizontal)
+                
+                Spacer()
+            }
+            .navigationTitle("我的")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
 }
