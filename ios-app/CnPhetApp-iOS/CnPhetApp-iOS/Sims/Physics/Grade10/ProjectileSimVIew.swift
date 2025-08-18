@@ -24,6 +24,7 @@ struct ProjectileSimView: View {
     @State private var playing = false
     @State private var t: Double = 0       // 已播放时间 s
     @State private var timer: Timer?
+    @State private var showVelocityComponents = true  // 控制是否显示速度分量
 
     private var vx: Double { v0 * cos(deg2rad(theta)) }
     private var vy: Double { v0 * sin(deg2rad(theta)) }
@@ -55,13 +56,14 @@ struct ProjectileSimView: View {
                         return CGPoint(x: px, y: py)
                     }
 
-                    // 轨迹（到当前时间）
-                    let currentT = playing ? min(t, tFlight) : tFlight
+                    // 轨迹（只显示已运动过的部分）
+                    let currentT = playing ? t : t  // 使用当前时间，而不是tFlight
                     var path = Path()
                     var first = true
                     let steps = 240
                     for i in 0...steps {
                         let tt = currentT * Double(i) / Double(steps)
+                        if tt > currentT { break }  // 只绘制到当前时间
                         let x = vx * tt
                         let y = max(0, h0 + vy * tt - 0.5 * g * tt * tt)
                         let p = toPoint(x: x, y: y)
@@ -69,39 +71,250 @@ struct ProjectileSimView: View {
                     }
                     context.stroke(path, with: .color(.accentColor), lineWidth: 2)
 
-                    // 标注：最高点与射程
-                    let apex = toPoint(x: range/2, y: hMax)
+                    // 当前运动点（红色圆点）
+                    let currentX = vx * t
+                    let currentY = max(0, h0 + vy * t - 0.5 * g * t * t)
+                    let currentPoint = toPoint(x: currentX, y: currentY)
+                    
+                    // 绘制红色圆点
+                    context.fill(Path(ellipseIn: CGRect(x: currentPoint.x-4, y: currentPoint.y-4, width: 8, height: 8)), with: .color(.red))
+                    
+                    // 绘制速度分量箭头（受状态变量控制）
+                    if showVelocityComponents {
+                        let arrowLength: CGFloat = 20
+                        let vxCurrent = vx
+                        let vyCurrent = playing ? vy - g * t : vy
+                        
+                        // Vx 箭头（水平）
+                        let vxEnd = CGPoint(x: currentPoint.x + arrowLength, y: currentPoint.y)
+                        let vxArrow = Path { path in
+                            path.move(to: currentPoint)
+                            path.addLine(to: vxEnd)
+                            // 箭头头部
+                            path.move(to: vxEnd)
+                            path.addLine(to: CGPoint(x: vxEnd.x - 6, y: vxEnd.y - 3))
+                            path.move(to: vxEnd)
+                            path.addLine(to: CGPoint(x: vxEnd.x - 6, y: vxEnd.y + 3))
+                        }
+                        context.stroke(vxArrow, with: .color(.black), lineWidth: 2)
+                        
+                        // Vy 箭头（垂直）
+                        let vyEnd: CGPoint
+                        let vyArrowHead1: CGPoint
+                        let vyArrowHead2: CGPoint
+                        
+                        if vyCurrent >= 0 {
+                            // 向上运动：箭头向上
+                            vyEnd = CGPoint(x: currentPoint.x, y: currentPoint.y - arrowLength)
+                            vyArrowHead1 = CGPoint(x: vyEnd.x - 3, y: vyEnd.y + 6)
+                            vyArrowHead2 = CGPoint(x: vyEnd.x + 3, y: vyEnd.y + 6)
+                        } else {
+                            // 向下运动：箭头向下
+                            vyEnd = CGPoint(x: currentPoint.x, y: currentPoint.y + arrowLength)
+                            vyArrowHead1 = CGPoint(x: vyEnd.x - 3, y: vyEnd.y - 6)
+                            vyArrowHead2 = CGPoint(x: vyEnd.x + 3, y: vyEnd.y - 6)
+                        }
+                        
+                        let vyArrow = Path { path in
+                            path.move(to: currentPoint)
+                            path.addLine(to: vyEnd)
+                            // 箭头头部
+                            path.move(to: vyEnd)
+                            path.addLine(to: vyArrowHead1)
+                            path.move(to: vyEnd)
+                            path.addLine(to: vyArrowHead2)
+                        }
+                        context.stroke(vyArrow, with: .color(.black), lineWidth: 2)
+                        
+                        // 速度分量标签
+                        let vxLabel = "Vx=\(String(format: "%.1f", vxCurrent))"
+                        let vyLabel = "Vy=\(String(format: "%.1f", vyCurrent))"
+                        
+                        let vxLabelAttr = AttributedString(vxLabel)
+                        let vyLabelAttr = AttributedString(vyLabel)
+                        
+                        context.draw(Text(vxLabelAttr).font(.caption2).foregroundColor(.black), 
+                                   at: CGPoint(x: vxEnd.x + 5, y: vxEnd.y), 
+                                   anchor: .leading)
+                        context.draw(Text(vyLabelAttr).font(.caption2).foregroundColor(.black), 
+                                   at: CGPoint(x: vyEnd.x, y: vyEnd.y - 5), 
+                                   anchor: .bottom)
+                    }
+
+                    // 标注：射程
                     let groundEnd = toPoint(x: range, y: 0)
-                    context.fill(Path(ellipseIn: CGRect(x: apex.x-3, y: apex.y-3, width: 6, height: 6)), with: .color(.orange))
                     context.stroke(Path { p in
                         p.move(to: CGPoint(x: groundEnd.x, y: groundEnd.y))
                         p.addLine(to: CGPoint(x: groundEnd.x, y: size.height - margin))
                     }, with: .color(.gray.opacity(0.6)), style: StrokeStyle(dash: [4,4]))
 
-                    // 文本信息（简）
-                    let info = "时间≈\(String(format: "%.2f", tFlight))s 水平距离≈\(String(format: "%.2f", range))m  最高点≈\(String(format: "%.2f", hMax))m"
-                    let attr = AttributedString(info)
-                    context.draw(Text(attr).font(.footnote), at: CGPoint(x: margin + 6, y: margin + 30), anchor: .topLeading)
+                    
                 }
                 .background(Color(UIColor.systemBackground))
             }
             .frame(height: 360)
             .padding(.bottom, 8)
 
-            // 参数控制
+            // 实时参数数值表格
+            VStack(spacing: 8) {
+                Text("实时参数数值 (随动画更新)")
+                    .font(.headline)
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                
+                // 参数表格 - 两列布局
+                HStack(spacing: 16) {
+                    // 左列 - 不可编辑的变量
+                    VStack(spacing: 0) {
+                        // 第一行
+                        HStack {
+                            Text("t (s)")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Text(String(format: "%.2f", min(t, tFlight)))
+                                .font(.system(.body, design: .monospaced))
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        
+                        Divider()
+                        
+                        // 第二行
+                        HStack {
+                            Text("x (m)")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Text(String(format: "%.2f", min(vx * min(t, tFlight), range)))
+                                .font(.system(.body, design: .monospaced))
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        
+                        Divider()
+                        
+                        // 第三行
+                        HStack {
+                            Text("y (m)")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Text(String(format: "%.2f", max(0, h0 + vy * min(t, tFlight) - 0.5 * g * min(t, tFlight) * min(t, tFlight))))
+                                .font(.system(.body, design: .monospaced))
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        
+                        Divider()
+                        
+                        // 第四行
+                        HStack {
+                            Text("Vx (m/s)")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Text(String(format: "%.2f", vx))
+                                .font(.system(.body, design: .monospaced))
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        
+                        Divider()
+                        
+                        // 第五行
+                        HStack {
+                            Text("Vy (m/s)")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Text(String(format: "%.2f", vy - g * min(t, tFlight)))
+                                .font(.system(.body, design: .monospaced))
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .background(RoundedRectangle(cornerRadius: 12).fill(Color(UIColor.systemBackground)))
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.secondary.opacity(0.3), lineWidth: 1))
+                    
+                    // 右列 - 可编辑的变量
+                    VStack(spacing: 0) {
+                        // 第一行
+                        HStack {
+                            Text("v₀ (m/s)")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            TextField("20.0", value: $v0, format: .number.precision(.fractionLength(1)))
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .frame(width: 80)
+                                .keyboardType(.decimalPad)
+                                .onChange(of: v0) { restartIfNeeded() }
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        
+                        Divider()
+                        
+                        // 第二行
+                        HStack {
+                            Text("θ (°)")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            TextField("45.0", value: $theta, format: .number.precision(.fractionLength(1)))
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .frame(width: 80)
+                                .keyboardType(.decimalPad)
+                                .onChange(of: theta) { restartIfNeeded() }
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        
+                        Divider()
+                        
+                        // 第三行
+                        HStack {
+                            Text("g (m/s²)")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            TextField("9.8", value: $g, format: .number.precision(.fractionLength(1)))
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .frame(width: 80)
+                                .keyboardType(.decimalPad)
+                                .onChange(of: g) { restartIfNeeded() }
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        
+                        Divider()
+                        
+                        // 第四行
+                        HStack {
+                            Text("h₀ (m)")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            TextField("0.0", value: $h0, format: .number.precision(.fractionLength(1)))
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .frame(width: 80)
+                                .keyboardType(.decimalPad)
+                                .onChange(of: h0) { restartIfNeeded() }
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        
+                        Divider()
+                        
+                        // 第五行 - 占位符保持对齐
+                        HStack {
+                            Text("")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Text("")
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .background(RoundedRectangle(cornerRadius: 12).fill(Color(UIColor.systemBackground)))
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.secondary.opacity(0.3), lineWidth: 1))
+                }
+            }
+            .padding(.horizontal)
+            .padding(.bottom, 12)
+
+            // 控制按钮
             VStack(spacing: 12) {
-                HStack { Text("v₀ 初速度"); Spacer(); Text("\(Int(v0)) m/s") }
-                Slider(value: $v0, in: 5...60, step: 1) { _ in restartIfNeeded() }
-
-                HStack { Text("θ 发射角"); Spacer(); Text("\(Int(theta)) °") }
-                Slider(value: $theta, in: 5...85, step: 1) { _ in restartIfNeeded() }
-
-                HStack { Text("g 重力加速度"); Spacer(); Text(String(format: "%.1f m/s²", g)) }
-                Slider(value: $g, in: 3.0...19.6, step: 0.1) { _ in restartIfNeeded() }
-
-                HStack { Text("h₀ 初始高度"); Spacer(); Text(String(format: "%.1f m", h0)) }
-                Slider(value: $h0, in: 0...20, step: 0.1) { _ in restartIfNeeded() }
-
                 HStack(spacing: 12) {
                     Button(playing ? "暂停" : "播放") {
                         playing.toggle()
@@ -116,7 +329,10 @@ struct ProjectileSimView: View {
                     }
                     .buttonStyle(.bordered)
 
-                    Spacer()
+                    Button(showVelocityComponents ? "隐藏分速度" : "显示分速度") {
+                        showVelocityComponents.toggle()
+                    }
+                    .buttonStyle(.bordered)
                 }
                 .padding(.top, 4)
             }
@@ -201,7 +417,7 @@ struct ProjectileSimView: View {
         // x 轴标签 - 移到最右端，确保完全可见
         let xLabelAttr = AttributedString(xAxisLabel)
         context.draw(Text(xLabelAttr).font(.caption).foregroundColor(.secondary), 
-                   at: CGPoint(x: size.width - 12, y: size.height - 8), 
+                   at: CGPoint(x: size.width - 12, y: size.height - 45), 
                    anchor: .topTrailing)
         
         // y 轴标签 - 移到最上端
@@ -244,6 +460,12 @@ struct ProjectileSimView: View {
     }
 
     private func restartIfNeeded() {
+        // 参数验证和限制
+        v0 = max(1.0, min(100.0, v0))        // 初速度限制在1-100 m/s
+        theta = max(0.0, min(90.0, theta))   // 角度限制在0-90度
+        g = max(0.1, min(50.0, g))           // 重力加速度限制在0.1-50 m/s²
+        h0 = max(0.0, min(100.0, h0))        // 初始高度限制在0-100 m
+        
         if playing {
             t = 0
         }
