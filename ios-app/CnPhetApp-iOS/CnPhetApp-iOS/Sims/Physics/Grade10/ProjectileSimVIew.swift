@@ -171,6 +171,41 @@ struct ProjectileSimView: View {
                 .frame(height: 360)
                 .padding(.bottom, 8)
 
+                // 控制按钮
+                VStack(spacing: 12) {
+                    HStack(spacing: 12) {
+                        Button(playing ? "暂停" : "播放") {
+                            if playing {
+                                // 即将从播放切换到暂停：记录当前Vy
+                                vySnapshot = vy - g * min(t, tFlight)
+                                playing = false
+                                stopTimer()
+                            } else {
+                                // 从暂停切回播放：清除快照并继续计时
+                                vySnapshot = nil
+                                playing = true
+                                startTimer()
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+
+                        Button("重置") {
+                            stopTimer()
+                            t = 0
+                            playing = false
+                        }
+                        .buttonStyle(.bordered)
+
+                        Button(showVelocityComponents ? "隐藏分速度" : "显示分速度") {
+                            showVelocityComponents.toggle()
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    .padding(.top, 4)
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 12)
+
                 // 实时参数数值表格
                 VStack(spacing: 8) {
                     Text("实时参数数值 (随动画更新)")
@@ -317,53 +352,37 @@ struct ProjectileSimView: View {
                         Divider()
                         
                         // 第五行 - Vy跨两列
-                        HStack {
-                            Text("Vy (m/s)")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            Text(String(format: "%.2f", vySnapshot ?? (vy - g * min(t, tFlight))))
-                                .font(.system(.body, design: .monospaced))
-                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        HStack(spacing: 0) {
+                            // 左列 - Vy
+                            HStack {
+                                Text("Vy (m/s)")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                Text(String(format: "%.2f", vySnapshot ?? (vy - g * min(t, tFlight))))
+                                    .font(.system(.body, design: .monospaced))
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                            }
+                            .padding(.vertical, 12)
+                            .padding(.horizontal, 16)
+                            .frame(maxWidth: .infinity)
+                            
+                            Divider()
+                                .frame(height: 40)
+                            
+                            // 右列 - 最高点
+                            HStack {
+                                Text("最高点 (m)")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                Text(String(format: "%.2f", hMax))
+                                    .font(.system(.body, design: .monospaced))
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                            }
+                            .padding(.vertical, 12)
+                            .padding(.horizontal, 16)
+                            .frame(maxWidth: .infinity)
                         }
-                        .padding(.vertical, 12)
-                        .padding(.horizontal, 16)
                     }
                     .background(RoundedRectangle(cornerRadius: 12).fill(Color(UIColor.systemBackground)))
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.secondary.opacity(0.3), lineWidth: 1))
-                }
-                .padding(.horizontal)
-                .padding(.bottom, 12)
-
-                // 控制按钮
-                VStack(spacing: 12) {
-                    HStack(spacing: 12) {
-                        Button(playing ? "暂停" : "播放") {
-                            if playing {
-                                // 即将从播放切换到暂停：记录当前Vy
-                                vySnapshot = vy - g * min(t, tFlight)
-                                playing = false
-                                stopTimer()
-                            } else {
-                                // 从暂停切回播放：清除快照并继续计时
-                                vySnapshot = nil
-                                playing = true
-                                startTimer()
-                            }
-                        }
-                        .buttonStyle(.borderedProminent)
-
-                        Button("重置") {
-                            stopTimer()
-                            t = 0
-                            playing = false
-                        }
-                        .buttonStyle(.bordered)
-
-                        Button(showVelocityComponents ? "隐藏分速度" : "显示分速度") {
-                            showVelocityComponents.toggle()
-                        }
-                        .buttonStyle(.bordered)
-                    }
-                    .padding(.top, 4)
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 80) // 为底部Tab栏预留空间
