@@ -162,11 +162,11 @@ struct ProjectileSimView: View {
                     .foregroundColor(.black)
                     .frame(maxWidth: .infinity, alignment: .center)
                 
-                // 参数表格 - 两列布局
-                HStack(spacing: 16) {
-                    // 左列 - 不可编辑的变量
-                    VStack(spacing: 0) {
-                        // 第一行
+                // 参数表格 - 一个大表格包含两列
+                VStack(spacing: 0) {
+                    // 第一行
+                    HStack(spacing: 0) {
+                        // 左列 - 不可编辑的变量
                         HStack {
                             Text("t (s)")
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -176,66 +176,12 @@ struct ProjectileSimView: View {
                         }
                         .padding(.vertical, 12)
                         .padding(.horizontal, 16)
+                        .frame(maxWidth: .infinity)
                         
                         Divider()
+                            .frame(height: 40)
                         
-                        // 第二行
-                        HStack {
-                            Text("x (m)")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            Text(String(format: "%.2f", min(vx * min(t, tFlight), range)))
-                                .font(.system(.body, design: .monospaced))
-                                .frame(maxWidth: .infinity, alignment: .trailing)
-                        }
-                        .padding(.vertical, 12)
-                        .padding(.horizontal, 16)
-                        
-                        Divider()
-                        
-                        // 第三行
-                        HStack {
-                            Text("y (m)")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            Text(String(format: "%.2f", max(0, h0 + vy * min(t, tFlight) - 0.5 * g * min(t, tFlight) * min(t, tFlight))))
-                                .font(.system(.body, design: .monospaced))
-                                .frame(maxWidth: .infinity, alignment: .trailing)
-                        }
-                        .padding(.vertical, 12)
-                        .padding(.horizontal, 16)
-                        
-                        Divider()
-                        
-                        // 第四行
-                        HStack {
-                            Text("Vx (m/s)")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            Text(String(format: "%.2f", vx))
-                                .font(.system(.body, design: .monospaced))
-                                .frame(maxWidth: .infinity, alignment: .trailing)
-                        }
-                        .padding(.vertical, 12)
-                        .padding(.horizontal, 16)
-                        
-                        Divider()
-                        
-                        // 第五行
-                        HStack {
-                            Text("Vy (m/s)")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            Text(String(format: "%.2f", vy - g * min(t, tFlight)))
-                                .font(.system(.body, design: .monospaced))
-                                .frame(maxWidth: .infinity, alignment: .trailing)
-                        }
-                        .padding(.vertical, 12)
-                        .padding(.horizontal, 16)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .background(RoundedRectangle(cornerRadius: 12).fill(Color(UIColor.systemBackground)))
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.secondary.opacity(0.3), lineWidth: 1))
-                    
-                    // 右列 - 可编辑的变量
-                    VStack(spacing: 0) {
-                        // 第一行
+                        // 右列 - 可编辑的变量
                         HStack {
                             Text("v₀ (m/s)")
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -247,10 +193,29 @@ struct ProjectileSimView: View {
                         }
                         .padding(.vertical, 12)
                         .padding(.horizontal, 16)
+                        .frame(maxWidth: .infinity)
+                    }
+                    
+                    Divider()
+                    
+                    // 第二行
+                    HStack(spacing: 0) {
+                        // 左列
+                        HStack {
+                            Text("x (m)")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Text(String(format: "%.2f", min(vx * min(t, tFlight), range)))
+                                .font(.system(.body, design: .monospaced))
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        .frame(maxWidth: .infinity)
                         
                         Divider()
+                            .frame(height: 40)
                         
-                        // 第二行
+                        // 右列
                         HStack {
                             Text("θ (°)")
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -262,10 +227,29 @@ struct ProjectileSimView: View {
                         }
                         .padding(.vertical, 12)
                         .padding(.horizontal, 16)
+                        .frame(maxWidth: .infinity)
+                    }
+                    
+                    Divider()
+                    
+                    // 第三行
+                    HStack(spacing: 0) {
+                        // 左列
+                        HStack {
+                            Text("y (m)")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Text(String(format: "%.2f", max(0, h0 + vy * min(t, tFlight) - 0.5 * g * min(t, tFlight) * min(t, tFlight))))
+                                .font(.system(.body, design: .monospaced))
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        .frame(maxWidth: .infinity)
                         
                         Divider()
+                            .frame(height: 40)
                         
-                        // 第三行
+                        // 右列
                         HStack {
                             Text("g (m/s²)")
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -277,10 +261,29 @@ struct ProjectileSimView: View {
                         }
                         .padding(.vertical, 12)
                         .padding(.horizontal, 16)
+                        .frame(maxWidth: .infinity)
+                    }
+                    
+                    Divider()
+                    
+                    // 第四行
+                    HStack(spacing: 0) {
+                        // 左列
+                        HStack {
+                            Text("Vx (m/s)")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Text(String(format: "%.2f", vx))
+                                .font(.system(.body, design: .monospaced))
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        .frame(maxWidth: .infinity)
                         
                         Divider()
+                            .frame(height: 40)
                         
-                        // 第四行
+                        // 右列
                         HStack {
                             Text("h₀ (m)")
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -292,23 +295,24 @@ struct ProjectileSimView: View {
                         }
                         .padding(.vertical, 12)
                         .padding(.horizontal, 16)
-                        
-                        Divider()
-                        
-                        // 第五行 - 占位符保持对齐
-                        HStack {
-                            Text("")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            Text("")
-                                .frame(maxWidth: .infinity, alignment: .trailing)
-                        }
-                        .padding(.vertical, 12)
-                        .padding(.horizontal, 16)
+                        .frame(maxWidth: .infinity)
                     }
-                    .frame(maxWidth: .infinity)
-                    .background(RoundedRectangle(cornerRadius: 12).fill(Color(UIColor.systemBackground)))
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.secondary.opacity(0.3), lineWidth: 1))
+                    
+                    Divider()
+                    
+                    // 第五行 - Vy跨两列
+                    HStack {
+                        Text("Vy (m/s)")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Text(String(format: "%.2f", vy - g * min(t, tFlight)))
+                            .font(.system(.body, design: .monospaced))
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 16)
                 }
+                .background(RoundedRectangle(cornerRadius: 12).fill(Color(UIColor.systemBackground)))
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.secondary.opacity(0.3), lineWidth: 1))
             }
             .padding(.horizontal)
             .padding(.bottom, 12)
