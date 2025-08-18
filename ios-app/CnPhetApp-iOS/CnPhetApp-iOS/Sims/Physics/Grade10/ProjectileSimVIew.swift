@@ -25,6 +25,7 @@ struct ProjectileSimView: View {
     @State private var t: Double = 0       // 已播放时间 s
     @State private var timer: Timer?
     @State private var showVelocityComponents = true  // 控制是否显示速度分量
+    @State private var vySnapshot: Double? = nil    // 暂停时的Vy快照，用于固定坐标轴中的分速度显示
 
     private var vx: Double { v0 * cos(deg2rad(theta)) }
     private var vy: Double { v0 * sin(deg2rad(theta)) }
@@ -83,7 +84,7 @@ struct ProjectileSimView: View {
                     if showVelocityComponents {
                         let arrowLength: CGFloat = 20
                         let vxCurrent = vx
-                        let vyCurrent = playing ? vy - g * t : vy
+                        let vyCurrent = vySnapshot ?? (vy - g * min(t, tFlight))
                         
                         // Vx 箭头（水平）
                         let vxEnd = CGPoint(x: currentPoint.x + arrowLength, y: currentPoint.y)
@@ -136,9 +137,23 @@ struct ProjectileSimView: View {
                         context.draw(Text(vxLabelAttr).font(.caption2).foregroundColor(.black), 
                                    at: CGPoint(x: vxEnd.x + 5, y: vxEnd.y), 
                                    anchor: .leading)
+                        
+                        // Vy标签位置根据箭头方向动态调整
+                        let vyLabelY: CGFloat
+                        let vyLabelAnchor: UnitPoint
+                        if vyCurrent >= 0 {
+                            // 向上运动：标签在箭头上方
+                            vyLabelY = vyEnd.y - 5
+                            vyLabelAnchor = .bottom
+                        } else {
+                            // 向下运动：标签在箭头下方
+                            vyLabelY = vyEnd.y + 5
+                            vyLabelAnchor = .top
+                        }
+                        
                         context.draw(Text(vyLabelAttr).font(.caption2).foregroundColor(.black), 
-                                   at: CGPoint(x: vyEnd.x, y: vyEnd.y - 5), 
-                                   anchor: .bottom)
+                                   at: CGPoint(x: vyEnd.x, y: vyLabelY), 
+                                   anchor: vyLabelAnchor)
                     }
 
                     // 标注：射程
@@ -304,7 +319,7 @@ struct ProjectileSimView: View {
                     HStack {
                         Text("Vy (m/s)")
                             .frame(maxWidth: .infinity, alignment: .leading)
-                        Text(String(format: "%.2f", vy - g * min(t, tFlight)))
+                        Text(String(format: "%.2f", vySnapshot ?? (vy - g * min(t, tFlight))))
                             .font(.system(.body, design: .monospaced))
                             .frame(maxWidth: .infinity, alignment: .trailing)
                     }
@@ -321,8 +336,17 @@ struct ProjectileSimView: View {
             VStack(spacing: 12) {
                 HStack(spacing: 12) {
                     Button(playing ? "暂停" : "播放") {
-                        playing.toggle()
-                        playing ? startTimer() : stopTimer()
+                        if playing {
+                            // 即将从播放切换到暂停：记录当前Vy
+                            vySnapshot = vy - g * min(t, tFlight)
+                            playing = false
+                            stopTimer()
+                        } else {
+                            // 从暂停切回播放：清除快照并继续计时
+                            vySnapshot = nil
+                            playing = true
+                            startTimer()
+                        }
                     }
                     .buttonStyle(.borderedProminent)
 
