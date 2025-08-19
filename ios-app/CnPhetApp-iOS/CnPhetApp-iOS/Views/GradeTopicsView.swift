@@ -27,7 +27,7 @@ struct GradeTopicsView: View {
             }
             .padding()
             
-            // 知识点列表
+            // 知识点树状目录
             if isLoading {
                 VStack(spacing: 16) {
                     ProgressView()
@@ -50,12 +50,14 @@ struct GradeTopicsView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                List(topics) { topic in
-                    NavigationLink(destination: ConcreteTopicsListView(mainTopic: topic)) {
-                        GradeTopicRow(topic: topic)
+                ScrollView {
+                    LazyVStack(spacing: 16) {
+                        ForEach(topics) { topic in
+                            TopicSectionView(topic: topic)
+                        }
                     }
+                    .padding(.horizontal)
                 }
-                .listStyle(.plain)
             }
         }
 
@@ -947,6 +949,597 @@ struct GradeTopicsView: View {
                 )
             ]
         }
+    }
+}
+
+// 新增：知识点单元视图
+struct TopicSectionView: View {
+    let topic: GradeTopic
+    @State private var isExpanded = false
+    @State private var concreteTopics: [ConcreteTopic] = []
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // 单元标题栏（可点击展开/折叠）
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    isExpanded.toggle()
+                }
+                if isExpanded && concreteTopics.isEmpty {
+                    loadConcreteTopics()
+                }
+            }) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(topic.title)
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.primary)
+                        
+                        Text(topic.description)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .lineLimit(2)
+                    }
+                    
+                    Spacer()
+                    
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+            }
+            .buttonStyle(PlainButtonStyle())
+            
+            // 展开的知识点列表
+            if isExpanded {
+                VStack(spacing: 8) {
+                    ForEach(concreteTopics) { concreteTopic in
+                        NavigationLink(destination: getSimulatorDestination(for: concreteTopic)) {
+                            ConcreteTopicRowView(topic: concreteTopic)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                }
+                .padding(.leading, 20)
+                .padding(.top, 8)
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+    }
+    
+    private func loadConcreteTopics() {
+        concreteTopics = getConcreteTopicsForMainTopic(topic)
+    }
+    
+    private func getConcreteTopicsForMainTopic(_ mainTopic: GradeTopic) -> [ConcreteTopic] {
+        switch mainTopic.id {
+        // 高一年级物理知识点
+        case "kinematics":
+            return [
+                ConcreteTopic(
+                    id: "projectile_motion",
+                    title: "抛体运动",
+                    subtitle: "物理",
+                    icon: "🚀",
+                    description: "斜抛运动、平抛运动、轨迹分析",
+                    difficulty: "中等",
+                    concepts: ["抛体运动", "轨迹", "射程", "最高点", "飞行时间"],
+                    formulas: ["x = v₀cosθ·t", "y = h₀ + v₀sinθ·t - ½gt²"]
+                ),
+                ConcreteTopic(
+                    id: "freefall",
+                    title: "自由落体",
+                    subtitle: "物理",
+                    icon: "⬇️",
+                    description: "自由落体运动、重力加速度、下落时间",
+                    difficulty: "基础",
+                    concepts: ["自由落体", "重力加速度", "下落时间", "下落距离"],
+                    formulas: ["h = ½gt²", "v = gt", "t = √(2h/g)"]
+                ),
+                ConcreteTopic(
+                    id: "uniform_motion",
+                    title: "匀速直线运动",
+                    subtitle: "物理",
+                    icon: "📏",
+                    description: "位移、速度、时间关系，x-t图像",
+                    difficulty: "基础",
+                    concepts: ["匀速运动", "位移", "速度", "x-t图像"],
+                    formulas: ["x = vt", "v = x/t"]
+                ),
+                ConcreteTopic(
+                    id: "uniform_acceleration",
+                    title: "匀变速直线运动",
+                    subtitle: "物理",
+                    icon: "📈",
+                    description: "加速度、三个基本公式、v-t图像",
+                    difficulty: "中等",
+                    concepts: ["加速度", "匀变速运动", "v-t图像", "运动学公式"],
+                    formulas: ["v = v₀ + at", "x = v₀t + ½at²", "v² = v₀² + 2ax"]
+                )
+            ]
+        case "force_motion_newton":
+            return [
+                ConcreteTopic(
+                    id: "newton_first_law",
+                    title: "牛顿第一定律",
+                    subtitle: "物理",
+                    icon: "🎯",
+                    description: "惯性定律、惯性的概念",
+                    difficulty: "基础",
+                    concepts: ["惯性", "惯性定律", "质量与惯性"],
+                    formulas: ["F合 = 0 时物体保持静止或匀速直线运动"]
+                ),
+                ConcreteTopic(
+                    id: "newton_second_law",
+                    title: "牛顿第二定律",
+                    subtitle: "物理",
+                    icon: "⚡",
+                    description: "F=ma、受力分析、运动状态分析",
+                    difficulty: "中等",
+                    concepts: ["加速度", "合力", "质量", "受力分析"],
+                    formulas: ["F = ma", "a = F/m"]
+                ),
+                ConcreteTopic(
+                    id: "newton_third_law",
+                    title: "牛顿第三定律",
+                    subtitle: "物理",
+                    icon: "↔️",
+                    description: "作用力与反作用力",
+                    difficulty: "基础",
+                    concepts: ["作用力", "反作用力", "相互作用"],
+                    formulas: ["F₁ = -F₂"]
+                ),
+                ConcreteTopic(
+                    id: "force_analysis",
+                    title: "力的分析与合成",
+                    subtitle: "物理",
+                    icon: "🔀",
+                    description: "力的合成、分解、平行四边形法则",
+                    difficulty: "中等",
+                    concepts: ["力的合成", "力的分解", "平行四边形法则", "正交分解"],
+                    formulas: ["F合 = √(Fx² + Fy²)", "tanθ = Fy/Fx"]
+                )
+            ]
+        case "work_energy_advanced":
+            return [
+                ConcreteTopic(
+                    id: "work_power",
+                    title: "功和功率",
+                    subtitle: "物理",
+                    icon: "⚡",
+                    description: "功的定义、正负功、功率计算",
+                    difficulty: "中等",
+                    concepts: ["功", "功率", "正功", "负功"],
+                    formulas: ["W = Fscosθ", "P = W/t", "P = Fv"]
+                ),
+                ConcreteTopic(
+                    id: "kinetic_energy",
+                    title: "动能定理",
+                    subtitle: "物理",
+                    icon: "🏃",
+                    description: "动能、动能定理的应用",
+                    difficulty: "中等",
+                    concepts: ["动能", "动能定理", "功能关系"],
+                    formulas: ["Ek = ½mv²", "W合 = ΔEk"]
+                ),
+                ConcreteTopic(
+                    id: "potential_energy",
+                    title: "势能",
+                    subtitle: "物理",
+                    icon: "⛰️",
+                    description: "重力势能、弹性势能",
+                    difficulty: "中等",
+                    concepts: ["重力势能", "弹性势能", "势能零点"],
+                    formulas: ["Ep = mgh", "Ep = ½kx²"]
+                ),
+                ConcreteTopic(
+                    id: "mechanical_energy_conservation",
+                    title: "机械能守恒",
+                    subtitle: "物理",
+                    icon: "🔄",
+                    description: "机械能守恒定律及其应用",
+                    difficulty: "中等",
+                    concepts: ["机械能", "守恒条件", "能量转化"],
+                    formulas: ["E = Ek + Ep = 常数"]
+                )
+            ]
+        case "momentum_impulse_advanced":
+            return [
+                ConcreteTopic(
+                    id: "impulse_momentum_theorem",
+                    title: "冲量动量定理",
+                    subtitle: "物理",
+                    icon: "💥",
+                    description: "冲量、动量、冲量动量定理",
+                    difficulty: "中等",
+                    concepts: ["冲量", "动量", "冲量动量定理"],
+                    formulas: ["I = Ft", "p = mv", "I = Δp"]
+                ),
+                ConcreteTopic(
+                    id: "momentum_conservation",
+                    title: "动量守恒定律",
+                    subtitle: "物理",
+                    icon: "⚖️",
+                    description: "动量守恒条件、碰撞问题",
+                    difficulty: "中等",
+                    concepts: ["动量守恒", "碰撞", "系统", "内力外力"],
+                    formulas: ["m₁v₁ + m₂v₂ = m₁v₁' + m₂v₂'"]
+                ),
+                ConcreteTopic(
+                    id: "collision_types",
+                    title: "碰撞类型",
+                    subtitle: "物理",
+                    icon: "🎱",
+                    description: "弹性碰撞、非弹性碰撞、完全非弹性碰撞",
+                    difficulty: "中等",
+                    concepts: ["弹性碰撞", "非弹性碰撞", "能量损失"],
+                    formulas: ["弹性碰撞时动能也守恒"]
+                )
+            ]
+        case "electrostatics":
+            return [
+                ConcreteTopic(
+                    id: "coulomb_law",
+                    title: "库仑定律",
+                    subtitle: "物理",
+                    icon: "⚡",
+                    description: "点电荷间的相互作用力",
+                    difficulty: "中等",
+                    concepts: ["库仑力", "点电荷", "电荷守恒"],
+                    formulas: ["F = kq₁q₂/r²"]
+                ),
+                ConcreteTopic(
+                    id: "electric_field",
+                    title: "电场强度",
+                    subtitle: "物理",
+                    icon: "⚡",
+                    description: "电场的概念、电场强度的定义",
+                    difficulty: "中等",
+                    concepts: ["电场", "电场强度", "电场线"],
+                    formulas: ["E = F/q", "E = kQ/r²"]
+                ),
+                ConcreteTopic(
+                    id: "electric_potential",
+                    title: "电势和电势能",
+                    subtitle: "物理",
+                    icon: "🔋",
+                    description: "电势能、电势、电势差",
+                    difficulty: "中等",
+                    concepts: ["电势能", "电势", "电势差", "等势面"],
+                    formulas: ["Ep = qφ", "U = φA - φB", "W = qU"]
+                ),
+                ConcreteTopic(
+                    id: "charged_particle_motion",
+                    title: "带电粒子在电场中的运动",
+                    subtitle: "物理",
+                    icon: "🎯",
+                    description: "带电粒子在匀强电场中的运动",
+                    difficulty: "中等",
+                    concepts: ["带电粒子", "匀强电场", "类抛体运动"],
+                    formulas: ["a = qE/m", "运动学公式"]
+                )
+            ]
+        // 初二年级物理知识点
+        case "motion_force":
+            return [
+                ConcreteTopic(
+                    id: "particle_reference_frame",
+                    title: "质点与参考系",
+                    subtitle: "物理",
+                    icon: "🎯",
+                    description: "质点的概念、参考系的选择、相对运动",
+                    difficulty: "基础",
+                    concepts: ["质点", "参考系", "相对运动", "运动描述", "坐标系"],
+                    formulas: ["相对速度", "位移计算", "运动方程"]
+                ),
+                ConcreteTopic(
+                    id: "displacement_distance",
+                    title: "位移与路程",
+                    subtitle: "物理",
+                    icon: "📏",
+                    description: "位移的矢量性、路程的标量性、位移与路程的区别",
+                    difficulty: "基础",
+                    concepts: ["位移", "路程", "矢量", "标量", "方向性"],
+                    formulas: ["位移 = 终点位置 - 起点位置", "路程 = 路径长度"]
+                ),
+                ConcreteTopic(
+                    id: "scalar_vector",
+                    title: "标量与矢量",
+                    subtitle: "物理",
+                    icon: "➡️",
+                    description: "标量的特点、矢量的特点、矢量的合成与分解",
+                    difficulty: "基础",
+                    concepts: ["标量", "矢量", "大小", "方向", "合成", "分解"],
+                    formulas: ["矢量合成", "矢量分解", "平行四边形法则"]
+                ),
+                ConcreteTopic(
+                    id: "velocity_acceleration_basic",
+                    title: "速度与加速度",
+                    subtitle: "物理",
+                    icon: "📈",
+                    description: "平均速度、瞬时速度、加速度的定义与计算",
+                    difficulty: "基础",
+                    concepts: ["平均速度", "瞬时速度", "加速度", "速度变化", "时间"],
+                    formulas: ["v = s/t", "a = Δv/Δt", "v = v₀ + at"]
+                )
+            ]
+        case "pressure_buoyancy":
+            return [
+                ConcreteTopic(
+                    id: "pressure_area_relation",
+                    title: "压强与面积关系",
+                    subtitle: "物理",
+                    icon: "⚖️",
+                    description: "压强的定义、压强与受力面积的关系",
+                    difficulty: "基础",
+                    concepts: ["压强", "压力", "面积", "压强公式", "单位"],
+                    formulas: ["p = F/S", "压强单位: Pa", "1 Pa = 1 N/m²"]
+                ),
+                ConcreteTopic(
+                    id: "liquid_pressure",
+                    title: "液体压强",
+                    subtitle: "物理",
+                    icon: "💧",
+                    description: "液体压强的特点、p=ρgh公式的应用",
+                    difficulty: "基础",
+                    concepts: ["液体压强", "密度", "重力加速度", "深度", "压强分布"],
+                    formulas: ["p = ρgh", "液体压强与深度成正比", "与液体密度成正比"]
+                ),
+                ConcreteTopic(
+                    id: "atmospheric_pressure",
+                    title: "气压与连通器",
+                    subtitle: "物理",
+                    icon: "🌬️",
+                    description: "大气压强的概念、连通器原理、气压计",
+                    difficulty: "基础",
+                    concepts: ["大气压", "连通器", "气压计", "标准大气压", "气压变化"],
+                    formulas: ["标准大气压 = 1.013×10⁵ Pa", "连通器液面等高"]
+                ),
+                ConcreteTopic(
+                    id: "archimedes_principle",
+                    title: "阿基米德原理",
+                    subtitle: "物理",
+                    icon: "🏊",
+                    description: "浮力的概念、阿基米德原理、浮沉条件",
+                    difficulty: "基础",
+                    concepts: ["浮力", "阿基米德原理", "排开液体", "浮沉条件", "密度比较"],
+                    formulas: ["F浮 = ρ液gV排", "浮沉条件: ρ物与ρ液比较"]
+                )
+            ]
+        case "acoustics":
+            return [
+                ConcreteTopic(
+                    id: "sound_production_propagation",
+                    title: "声音的产生与传播",
+                    subtitle: "物理",
+                    icon: "🔊",
+                    description: "声音的产生条件、传播介质、声速",
+                    difficulty: "基础",
+                    concepts: ["声源", "振动", "传播介质", "声速", "传播条件"],
+                    formulas: ["声速 = 距离/时间", "不同介质中声速不同"]
+                ),
+                ConcreteTopic(
+                    id: "sound_characteristics",
+                    title: "声音的特性",
+                    subtitle: "物理",
+                    icon: "🎵",
+                    description: "音调、响度、音色的概念与影响因素",
+                    difficulty: "基础",
+                    concepts: ["音调", "响度", "音色", "频率", "振幅", "波形"],
+                    formulas: ["音调与频率关系", "响度与振幅关系"]
+                ),
+                ConcreteTopic(
+                    id: "echo_applications",
+                    title: "回声与应用",
+                    subtitle: "物理",
+                    icon: "🔄",
+                    description: "回声的形成条件、声纳原理、超声波应用",
+                    difficulty: "基础",
+                    concepts: ["回声", "反射", "时间间隔", "声纳", "超声波"],
+                    formulas: ["回声距离 = 声速×时间/2"]
+                )
+            ]
+        case "geometric_optics_basic":
+            return [
+                ConcreteTopic(
+                    id: "light_rectilinear_propagation",
+                    title: "光的直线传播",
+                    subtitle: "物理",
+                    icon: "💡",
+                    description: "光的直线传播特性、小孔成像原理",
+                    difficulty: "基础",
+                    concepts: ["直线传播", "小孔成像", "倒像", "成像大小", "成像距离"],
+                    formulas: ["成像比例", "小孔成像规律"]
+                ),
+                ConcreteTopic(
+                    id: "reflection_law",
+                    title: "反射定律",
+                    subtitle: "物理",
+                    icon: "🪞",
+                    description: "反射定律、平面镜成像规律、虚像特点",
+                    difficulty: "基础",
+                    concepts: ["入射角", "反射角", "法线", "平面镜", "虚像"],
+                    formulas: ["入射角 = 反射角", "像距 = 物距", "像高 = 物高"]
+                ),
+                ConcreteTopic(
+                    id: "refraction_basic",
+                    title: "折射现象",
+                    subtitle: "物理",
+                    icon: "🔍",
+                    description: "折射现象、折射定律初步认识",
+                    difficulty: "基础",
+                    concepts: ["折射", "折射角", "折射率", "光密介质", "光疏介质"],
+                    formulas: ["折射定律", "临界角"]
+                ),
+                ConcreteTopic(
+                    id: "lens_simulation",
+                    title: "透镜成像",
+                    subtitle: "物理",
+                    icon: "🔍",
+                    description: "凸透镜、凹透镜成像规律",
+                    difficulty: "中等",
+                    concepts: ["凸透镜", "凹透镜", "成像", "焦距"],
+                    formulas: ["1/u + 1/v = 1/f", "放大率"]
+                )
+            ]
+        case "simple_circuit":
+            return [
+                ConcreteTopic(
+                    id: "circuit_components",
+                    title: "电路元件",
+                    subtitle: "物理",
+                    icon: "⚡",
+                    description: "电源、开关、导线、用电器等基本元件",
+                    difficulty: "基础",
+                    concepts: ["电源", "开关", "导线", "用电器", "电路符号"],
+                    formulas: ["电路图绘制", "元件连接"]
+                ),
+                ConcreteTopic(
+                    id: "series_parallel_circuits",
+                    title: "串并联电路",
+                    subtitle: "物理",
+                    icon: "🔗",
+                    description: "串联电路和并联电路的特点",
+                    difficulty: "基础",
+                    concepts: ["串联", "并联", "电流分配", "电压分配"],
+                    formulas: ["串联: I相等, U分配", "并联: U相等, I分配"]
+                ),
+                ConcreteTopic(
+                    id: "current_voltage_resistance",
+                    title: "电流、电压、电阻",
+                    subtitle: "物理",
+                    icon: "📊",
+                    description: "电流、电压、电阻的概念与测量",
+                    difficulty: "基础",
+                    concepts: ["电流", "电压", "电阻", "测量", "单位"],
+                    formulas: ["I = Q/t", "U = W/Q", "R = U/I"]
+                )
+            ]
+        // 初三年级物理知识点
+        case "electricity_deep":
+            return [
+                ConcreteTopic(
+                    id: "ohm_law",
+                    title: "欧姆定律",
+                    subtitle: "物理",
+                    icon: "⚡",
+                    description: "欧姆定律及其应用",
+                    difficulty: "中等",
+                    concepts: ["欧姆定律", "电阻", "电流", "电压"],
+                    formulas: ["I = U/R", "U = IR", "R = U/I"]
+                ),
+                ConcreteTopic(
+                    id: "series_parallel_calculation",
+                    title: "串并联电路计算",
+                    subtitle: "物理",
+                    icon: "🧮",
+                    description: "串并联电路的定量计算",
+                    difficulty: "中等",
+                    concepts: ["串联电阻", "并联电阻", "电路分析"],
+                    formulas: ["R串 = R₁ + R₂", "1/R并 = 1/R₁ + 1/R₂"]
+                ),
+                ConcreteTopic(
+                    id: "electric_power",
+                    title: "电功与电功率",
+                    subtitle: "物理",
+                    icon: "💡",
+                    description: "电功、电功率的计算与应用",
+                    difficulty: "中等",
+                    concepts: ["电功", "电功率", "电能", "用电器额定功率"],
+                    formulas: ["W = UIt", "P = UI", "P = U²/R"]
+                )
+            ]
+        default:
+            return [
+                ConcreteTopic(
+                    id: "coming_soon",
+                    title: "开发中...",
+                    subtitle: "敬请期待",
+                    icon: "🚧",
+                    description: "该单元的知识点正在开发中",
+                    difficulty: "待定",
+                    concepts: ["开发中"],
+                    formulas: ["敬请期待"]
+                )
+            ]
+        }
+    }
+    
+    private func getSimulatorDestination(for topic: ConcreteTopic) -> some View {
+        // 根据知识点ID返回对应的模拟器视图
+        switch topic.id {
+        case "projectile_motion":
+            return AnyView(ProjectileSimView(title: topic.title))
+        case "freefall":
+            return AnyView(FreefallSimView(title: topic.title))
+        case "force_motion":
+            return AnyView(ForceMotionSimView(title: topic.title, forceType: "基础"))
+        case "simple_motion":
+            return AnyView(SimpleMotionSimView(title: topic.title, motionType: "基础"))
+        case "lens_simulation":
+            return AnyView(LensSimView(title: topic.title))
+        default:
+            return AnyView(Text("模拟器开发中..."))
+        }
+    }
+}
+
+// 新增：具体知识点行视图
+struct ConcreteTopicRowView: View {
+    let topic: ConcreteTopic
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            // 左侧图标
+            ZStack {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color(.systemGray5))
+                    .frame(width: 40, height: 40)
+                
+                Text(topic.icon)
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .foregroundColor(.primary)
+            }
+            
+            // 中间内容
+            VStack(alignment: .leading, spacing: 4) {
+                Text(topic.title)
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
+                
+                Text(topic.subtitle)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                
+                if !topic.description.isEmpty {
+                    Text(topic.description)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .lineLimit(2)
+                }
+            }
+            
+            Spacer()
+            
+            // 右侧箭头
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .background(Color(.systemBackground))
+        .cornerRadius(8)
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(Color(.systemGray4), lineWidth: 1)
+        )
     }
 }
 
