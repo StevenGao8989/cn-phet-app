@@ -647,6 +647,9 @@ struct AIChatView: View {
                             TextField("给 AI小高 发送消息", text: $vm.input)
                                 .textFieldStyle(PlainTextFieldStyle())
                                 .padding(.horizontal, 16)
+                                .onSubmit {
+                                    vm.sendMessage()
+                                }
                                 .padding(.vertical, 12)
                         }
                         .background(Color(.systemGray6))
