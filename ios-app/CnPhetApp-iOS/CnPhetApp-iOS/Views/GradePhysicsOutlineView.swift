@@ -141,7 +141,7 @@ struct GradePhysicsOutlineView: View {
         .navigationTitle(grade.title)
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: PhysicsTopic.self) { topic in
-            TopicDetailView(topic: topic)
+            PhysicsTopicDetailView(topic: topic)
         }
         .onAppear {
             loadPhysicsOutline()
@@ -656,6 +656,182 @@ struct ExperimentCard: View {
         case "高级": return .red
         default: return .blue
         }
+    }
+}
+
+// MARK: - 物理主题详情视图
+struct PhysicsTopicDetailView: View {
+    let topic: PhysicsTopic
+    
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                // 标题和年级信息
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(topic.title)
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                    
+                    HStack {
+                        Text("年级: \(topic.grade.title)")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        
+                        Spacer()
+                        
+                        Text("难度: \(topic.difficulty)")
+                            .font(.subheadline)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 4)
+                            .background(Color.blue.opacity(0.2))
+                            .foregroundColor(.blue)
+                            .cornerRadius(8)
+                    }
+                }
+                .padding(.horizontal)
+                
+                // 核心概念
+                if !topic.coreConcepts.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("核心概念")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                        
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 8) {
+                            ForEach(topic.coreConcepts, id: \.self) { concept in
+                                Text(concept)
+                                    .font(.subheadline)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(Color.gray.opacity(0.1))
+                                    .cornerRadius(6)
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                
+                // 公式
+                if !topic.equations.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("核心公式")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                        
+                        ForEach(topic.equations, id: \.self) { equation in
+                            Text(equation)
+                                .font(.title2)
+                                .fontWeight(.medium)
+                                .padding()
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .background(Color.blue.opacity(0.1))
+                                .cornerRadius(8)
+                        }
+                        
+                        if !topic.formulaDescription.isEmpty {
+                            Text(topic.formulaDescription)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .padding(.horizontal)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                
+                // 应用场景
+                if !topic.applicationScenarios.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("应用场景")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                        
+                        ForEach(topic.applicationScenarios, id: \.self) { scenario in
+                            HStack {
+                                Image(systemName: "lightbulb.fill")
+                                    .foregroundColor(.yellow)
+                                Text(scenario)
+                                    .font(.subheadline)
+                                Spacer()
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                
+                // 教学重点
+                if !topic.teachingFocus.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("教学重点")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                        
+                        ForEach(topic.teachingFocus, id: \.self) { focus in
+                            HStack {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.green)
+                                Text(focus)
+                                    .font(.subheadline)
+                                Spacer()
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                
+                // 常见错误
+                if !topic.commonErrors.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("常见错误")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                        
+                        ForEach(topic.commonErrors, id: \.self) { error in
+                            HStack {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundColor(.orange)
+                                Text(error)
+                                    .font(.subheadline)
+                                Spacer()
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                
+                // 实验信息
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("实验信息")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("实验类型:")
+                                .fontWeight(.medium)
+                            Text(topic.experimentType)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        HStack {
+                            Text("实验目标:")
+                                .fontWeight(.medium)
+                            Text(topic.experimentGoal)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                .padding(.horizontal)
+                
+                Spacer(minLength: 100)
+            }
+            .padding(.top)
+        }
+        .navigationTitle(topic.title)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
