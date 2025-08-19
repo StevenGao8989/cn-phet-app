@@ -377,33 +377,7 @@ struct HomeTabView: View {
 // MARK: - AI助手视图
 struct AIAssistantView: View {
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 20) {
-                Image(systemName: "brain.head.profile")
-                    .font(.system(size: 80))
-                    .foregroundColor(.blue)
-                
-                Text("AI助手")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                
-                Text("智能学习伙伴，随时为你解答问题")
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-                
-                Button("开始对话") {
-                    // TODO: 实现AI对话功能
-                }
-                .buttonStyle(.borderedProminent)
-                .padding()
-                
-                Spacer()
-            }
-            .navigationTitle("AI助手")
-            .navigationBarTitleDisplayMode(.inline)
-        }
+        AIChatView()
     }
 }
 
@@ -528,6 +502,286 @@ struct ProfileView: View {
             Button("确认退出", role: .destructive) {
                 auth.signOutFromUI()
             }
+        }
+    }
+}
+
+// MARK: - AI问答相关代码
+
+struct ChatResponse: Codable {
+    let reply: String
+}
+
+class AIViewModel: ObservableObject {
+    @Published var messages: [String] = []
+    @Published var input: String = ""
+    @Published var isLoading = false
+
+    func sendMessage() {
+        guard !input.isEmpty else { return }
+        let userMessage = input
+        messages.append("我: \(userMessage)")
+        input = ""
+        isLoading = true
+
+        // 这里换成你自己 Supabase Function 的地址
+        let url = URL(string: "https://yveexbmtnlnsfwrpumgy.supabase.co/functions/v1/ask-qwen")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // 添加Supabase认证头
+        request.addValue(AppConfig.supabaseAnonKey, forHTTPHeaderField: "apikey")
+        request.addValue("Bearer \(AppConfig.supabaseAnonKey)", forHTTPHeaderField: "Authorization")
+        
+        // 请求体
+        let body: [String: Any] = ["prompt": userMessage]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+        // 发起请求
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            DispatchQueue.main.async {
+                self.isLoading = false
+                
+                if let error = error {
+                    self.messages.append("AI: （网络错误：\(error.localizedDescription)）")
+                    return
+                }
+                
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("HTTP状态码: \(httpResponse.statusCode)")
+                    if httpResponse.statusCode != 200 {
+                        self.messages.append("AI: （服务器错误：状态码 \(httpResponse.statusCode)）")
+                        return
+                    }
+                }
+                
+                guard let data = data else {
+                    self.messages.append("AI: （没有收到数据）")
+                    return
+                }
+                
+                // 打印原始响应数据用于调试
+                if let responseString = String(data: data, encoding: .utf8) {
+                    print("原始响应: \(responseString)")
+                }
+                
+                if let response = try? JSONDecoder().decode(ChatResponse.self, from: data) {
+                    self.messages.append("AI: \(response.reply)")
+                } else {
+                    self.messages.append("AI: （解析失败，请检查响应格式）")
+                }
+            }
+        }.resume()
+    }
+}
+
+struct AIChatView: View {
+    @StateObject var vm = AIViewModel()
+
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 0) {
+                // 主要聊天区域
+                if vm.messages.isEmpty {
+                    // 欢迎界面
+                    VStack(spacing: 24) {
+                        Spacer()
+                        
+                        // DeepSeek 图标
+                        ZStack {
+                            Circle()
+                                .fill(Color.blue)
+                                .frame(width: 80, height: 80)
+                            
+                            Image(systemName: "brain.head.profile")
+                                .font(.system(size: 40))
+                                .foregroundColor(.white)
+                        }
+                        
+                        VStack(spacing: 16) {
+                            Text("嗨！我是 AI理科助手小高")
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.primary)
+                            
+                            Text("我可以帮你搜索、答疑、计算、 制作动画模型，请把你的任务交给我吧～")
+                                .font(.body)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 32)
+                        }
+                        
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color(.systemBackground))
+                } else {
+                    // 消息列表
+                    ScrollView {
+                        LazyVStack(spacing: 16) {
+                            ForEach(vm.messages, id: \.self) { msg in
+                                ChatMessageView(message: msg)
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                    }
+                }
+                
+                // 输入区域
+                VStack(spacing: 12) {
+                    // 快捷功能按钮（仅在空白状态显示）
+                    if vm.messages.isEmpty {
+                        HStack(spacing: 12) {
+                            QuickActionButton(icon: "brain.head.profile", title: "深度思考 (R1)")
+                            QuickActionButton(icon: "globe", title: "联网搜索")
+                            Spacer()
+                        }
+                        .padding(.horizontal, 16)
+                    }
+                    
+                    // 输入框
+                    HStack(spacing: 12) {
+                        HStack(spacing: 8) {
+                            TextField("给 AI小高 发送消息", text: $vm.input)
+                                .textFieldStyle(PlainTextFieldStyle())
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                        }
+                        .background(Color(.systemGray6))
+                        .cornerRadius(20)
+                        
+                        Button(action: {
+                            vm.sendMessage()
+                        }) {
+                            if vm.isLoading {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                    .scaleEffect(0.8)
+                            } else {
+                                Image(systemName: "arrow.up")
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        .frame(width: 32, height: 32)
+                        .background(vm.input.isEmpty || vm.isLoading ? Color.gray : Color.blue)
+                        .clipShape(Circle())
+                        .disabled(vm.input.isEmpty || vm.isLoading)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
+                }
+                .background(Color(.systemBackground))
+            }
+            .navigationTitle("新对话")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        // 侧边栏按钮
+                    }) {
+                        Image(systemName: "line.horizontal.3")
+                            .foregroundColor(.primary)
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        // 新对话按钮
+                        vm.messages = []
+                        vm.input = ""
+                    }) {
+                        Image(systemName: "plus.message")
+                            .foregroundColor(.primary)
+                    }
+                }
+            }
+        }
+        .navigationViewStyle(StackNavigationViewStyle())
+    }
+}
+
+// 聊天消息视图
+struct ChatMessageView: View {
+    let message: String
+    
+    var isUser: Bool {
+        message.hasPrefix("我:")
+    }
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            if !isUser {
+                // AI 头像
+                ZStack {
+                    Circle()
+                        .fill(Color.blue)
+                        .frame(width: 32, height: 32)
+                    
+                    Image(systemName: "brain.head.profile")
+                        .font(.system(size: 16))
+                        .foregroundColor(.white)
+                }
+            }
+            
+            VStack(alignment: isUser ? .trailing : .leading, spacing: 4) {
+                if !isUser {
+                    Text("AI小高")
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .foregroundColor(.secondary)
+                }
+                
+                Text(cleanMessage(message))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(isUser ? Color.blue : Color(.systemGray6))
+                    .foregroundColor(isUser ? .white : .primary)
+                    .cornerRadius(16)
+                    .frame(maxWidth: .infinity * 0.8, alignment: isUser ? .trailing : .leading)
+            }
+            
+            if isUser {
+                Spacer()
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
+    }
+    
+    private func cleanMessage(_ message: String) -> String {
+        if message.hasPrefix("我: ") {
+            return String(message.dropFirst(3))
+        } else if message.hasPrefix("AI: ") {
+            return String(message.dropFirst(4))
+        }
+        return message
+    }
+}
+
+// 快捷操作按钮
+struct QuickActionButton: View {
+    let icon: String
+    let title: String
+    
+    var body: some View {
+        Button(action: {
+            // 快捷操作
+        }) {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 14))
+                    .foregroundColor(.blue)
+                
+                Text(title)
+                    .font(.system(size: 14))
+                    .foregroundColor(.primary)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(Color(.systemGray6))
+            .cornerRadius(16)
         }
     }
 }
