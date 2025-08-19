@@ -512,15 +512,26 @@ struct ChatResponse: Codable {
     let reply: String
 }
 
+struct Conversation: Identifiable {
+    let id = UUID()
+    let userMessage: String
+    var aiMessage: String?
+    let timestamp: Date = Date()
+}
+
 class AIViewModel: ObservableObject {
-    @Published var messages: [String] = []
+    @Published var conversations: [Conversation] = []
     @Published var input: String = ""
     @Published var isLoading = false
 
     func sendMessage() {
         guard !input.isEmpty else { return }
         let userMessage = input
-        messages.append("我: \(userMessage)")
+        
+        // 创建新的对话，先只有用户消息
+        let newConversation = Conversation(userMessage: userMessage, aiMessage: nil)
+        conversations.append(newConversation) // 添加到数组末尾，保持历史顺序
+        
         input = ""
         isLoading = true
 
@@ -543,33 +554,33 @@ class AIViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self.isLoading = false
                 
-                if let error = error {
-                    self.messages.append("AI: （网络错误：\(error.localizedDescription)）")
-                    return
-                }
-                
-                if let httpResponse = response as? HTTPURLResponse {
-                    print("HTTP状态码: \(httpResponse.statusCode)")
-                    if httpResponse.statusCode != 200 {
-                        self.messages.append("AI: （服务器错误：状态码 \(httpResponse.statusCode)）")
-                        return
+                // 找到刚创建的对话并更新AI回答
+                if let index = self.conversations.firstIndex(where: { $0.id == newConversation.id }) {
+                    var updatedConversation = self.conversations[index]
+                    
+                    if let error = error {
+                        updatedConversation.aiMessage = "（网络错误：\(error.localizedDescription)）"
+                    } else if let httpResponse = response as? HTTPURLResponse {
+                        print("HTTP状态码: \(httpResponse.statusCode)")
+                        if httpResponse.statusCode != 200 {
+                            updatedConversation.aiMessage = "（服务器错误：状态码 \(httpResponse.statusCode)）"
+                        } else if let data = data {
+                            // 打印原始响应数据用于调试
+                            if let responseString = String(data: data, encoding: .utf8) {
+                                print("原始响应: \(responseString)")
+                            }
+                            
+                            if let response = try? JSONDecoder().decode(ChatResponse.self, from: data) {
+                                updatedConversation.aiMessage = response.reply
+                            } else {
+                                updatedConversation.aiMessage = "（解析失败，请检查响应格式）"
+                            }
+                        } else {
+                            updatedConversation.aiMessage = "（没有收到数据）"
+                        }
                     }
-                }
-                
-                guard let data = data else {
-                    self.messages.append("AI: （没有收到数据）")
-                    return
-                }
-                
-                // 打印原始响应数据用于调试
-                if let responseString = String(data: data, encoding: .utf8) {
-                    print("原始响应: \(responseString)")
-                }
-                
-                if let response = try? JSONDecoder().decode(ChatResponse.self, from: data) {
-                    self.messages.append("AI: \(response.reply)")
-                } else {
-                    self.messages.append("AI: （解析失败，请检查响应格式）")
+                    
+                    self.conversations[index] = updatedConversation
                 }
             }
         }.resume()
@@ -583,7 +594,7 @@ struct AIChatView: View {
         NavigationView {
             VStack(spacing: 0) {
                 // 主要聊天区域
-                if vm.messages.isEmpty {
+                if vm.conversations.isEmpty {
                     // 欢迎界面
                     VStack(spacing: 24) {
                         Spacer()
@@ -617,30 +628,37 @@ struct AIChatView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(Color(.systemBackground))
                 } else {
-                    // 消息列表
-                    ScrollView {
-                        LazyVStack(spacing: 16) {
-                            ForEach(vm.messages, id: \.self) { msg in
-                                ChatMessageView(message: msg)
+                    // 对话列表
+                    ScrollViewReader { proxy in
+                        ScrollView {
+                            LazyVStack(spacing: 20) {
+                                ForEach(vm.conversations) { conversation in
+                                    ConversationView(conversation: conversation)
+                                        .id(conversation.id)
+                                }
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                        }
+                        .onChange(of: vm.conversations.count) { _ in
+                            // 当有新对话时，自动滚动到底部
+                            if let lastConversation = vm.conversations.last {
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    proxy.scrollTo(lastConversation.id, anchor: .bottom)
+                                }
                             }
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
+                        .onAppear {
+                            // 页面加载时滚动到底部
+                            if let lastConversation = vm.conversations.last {
+                                proxy.scrollTo(lastConversation.id, anchor: .bottom)
+                            }
+                        }
                     }
                 }
                 
                 // 输入区域
                 VStack(spacing: 12) {
-                    // 快捷功能按钮（仅在空白状态显示）
-                    if vm.messages.isEmpty {
-                        HStack(spacing: 12) {
-                            QuickActionButton(icon: "brain.head.profile", title: "深度思考 (R1)")
-                            QuickActionButton(icon: "globe", title: "联网搜索")
-                            Spacer()
-                        }
-                        .padding(.horizontal, 16)
-                    }
-                    
                     // 输入框
                     HStack(spacing: 12) {
                         HStack(spacing: 8) {
@@ -693,7 +711,7 @@ struct AIChatView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
                         // 新对话按钮
-                        vm.messages = []
+                        vm.conversations = []
                         vm.input = ""
                     }) {
                         Image(systemName: "plus.message")
@@ -706,85 +724,93 @@ struct AIChatView: View {
     }
 }
 
-// 聊天消息视图
-struct ChatMessageView: View {
-    let message: String
-    
-    var isUser: Bool {
-        message.hasPrefix("我:")
-    }
+
+// 对话视图
+struct ConversationView: View {
+    let conversation: Conversation
     
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            if !isUser {
-                // AI 头像
-                ZStack {
-                    Circle()
-                        .fill(Color.blue)
-                        .frame(width: 32, height: 32)
-                    
-                    Image(systemName: "brain.head.profile")
-                        .font(.system(size: 16))
-                        .foregroundColor(.white)
-                }
-            }
-            
-            VStack(alignment: isUser ? .trailing : .leading, spacing: 4) {
-                if !isUser {
-                    Text("AI小高")
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .foregroundColor(.secondary)
-                }
-                
-                Text(cleanMessage(message))
+        VStack(spacing: 12) {
+            // 用户消息
+            HStack {
+                Spacer()
+                Text(conversation.userMessage)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
-                    .background(isUser ? Color.blue : Color(.systemGray6))
-                    .foregroundColor(isUser ? .white : .primary)
+                    .background(Color.blue)
+                    .foregroundColor(.white)
                     .cornerRadius(16)
-                    .frame(maxWidth: .infinity * 0.8, alignment: isUser ? .trailing : .leading)
+                    .frame(maxWidth: .infinity * 0.8, alignment: .trailing)
             }
             
-            if isUser {
-                Spacer()
+            // AI回答
+            if let aiMessage = conversation.aiMessage {
+                HStack(alignment: .top, spacing: 12) {
+                    // AI头像
+                    ZStack {
+                        Circle()
+                            .fill(Color.blue)
+                            .frame(width: 32, height: 32)
+                        Image(systemName: "brain.head.profile")
+                            .font(.system(size: 16))
+                            .foregroundColor(.white)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("AI小高")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundColor(.secondary)
+                        
+                        Text(aiMessage)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+                            .background(Color(.systemGray6))
+                            .foregroundColor(.primary)
+                            .cornerRadius(16)
+                            .frame(maxWidth: .infinity * 0.8, alignment: .leading)
+                    }
+                    
+                    Spacer()
+                }
+            } else {
+                // 等待AI回答
+                HStack(alignment: .top, spacing: 12) {
+                    // AI头像
+                    ZStack {
+                        Circle()
+                            .fill(Color.blue)
+                            .frame(width: 32, height: 32)
+                        Image(systemName: "brain.head.profile")
+                            .font(.system(size: 16))
+                            .foregroundColor(.white)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("AI小高")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundColor(.secondary)
+                        
+                        HStack(spacing: 8) {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .secondary))
+                                .scaleEffect(0.8)
+                            Text("正在拼命思考...")
+                                .font(.body)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(16)
+                    }
+                    
+                    Spacer()
+                }
             }
         }
-        .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
-    }
-    
-    private func cleanMessage(_ message: String) -> String {
-        if message.hasPrefix("我: ") {
-            return String(message.dropFirst(3))
-        } else if message.hasPrefix("AI: ") {
-            return String(message.dropFirst(4))
-        }
-        return message
     }
 }
 
-// 快捷操作按钮
-struct QuickActionButton: View {
-    let icon: String
-    let title: String
-    
-    var body: some View {
-        Button(action: {
-            // 快捷操作
-        }) {
-            HStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.system(size: 14))
-                    .foregroundColor(.blue)
-                
-                Text(title)
-                    .font(.system(size: 14))
-                    .foregroundColor(.primary)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .background(Color(.systemGray6))
-            .cornerRadius(16)
-        }
-    }
-}
+
