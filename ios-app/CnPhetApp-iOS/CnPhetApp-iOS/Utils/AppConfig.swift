@@ -32,8 +32,4 @@ enum AppConfig {
         }
         return key
     }
-    
-    static var supabaseServiceKey: String? {
-        return Bundle.main.object(forInfoDictionaryKey: "SUPABASE_SERVICE_KEY") as? String
-    }
 }

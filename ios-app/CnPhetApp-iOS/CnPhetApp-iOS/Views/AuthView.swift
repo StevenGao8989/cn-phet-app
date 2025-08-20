@@ -525,48 +525,131 @@ struct EmailVerificationView: View {
     let onBack: () -> Void
     
     @State private var otpCode = ""
+    @State private var isResending = false
+    @FocusState private var isTextFieldFocused: Bool
     
     var body: some View {
-        VStack(spacing: 24) {
-            // 标题
-            VStack(spacing: 8) {
-                Text("验证邮箱")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.primary)
+        VStack(spacing: 0) {
+            // 顶部装饰区域
+            VStack(spacing: 16) {
+                // 成功图标
+                ZStack {
+                    Circle()
+                        .fill(Color.green.opacity(0.1))
+                        .frame(width: 80, height: 80)
+                    
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 40))
+                        .foregroundColor(.green)
+                }
+                .padding(.top, 20)
                 
-                Text("我们已向您的邮箱发送了验证码")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                // 标题区域
+                VStack(spacing: 8) {
+                    Text("验证邮箱")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                    
+                    Text("我们已向您的邮箱发送了验证码")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
                 
-                // 显示邮箱
-                Text("邮箱: \(email)")
-                    .font(.caption)
-                    .foregroundColor(.blue)
-                    .padding(.horizontal)
-                    .padding(.vertical, 4)
-                    .background(Color.blue.opacity(0.1))
-                    .cornerRadius(8)
+                // 邮箱显示卡片
+                HStack(spacing: 12) {
+                    Image(systemName: "envelope.fill")
+                        .foregroundColor(.blue)
+                        .font(.title3)
+                    
+                    Text(email)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundColor(.primary)
+                    
+                    Spacer()
+                    
+                    // 复制邮箱按钮
+                    Button(action: {
+                        UIPasteboard.general.string = email
+                        auth.showToast("邮箱已复制到剪贴板", seconds: 2)
+                    }) {
+                        Image(systemName: "doc.on.doc")
+                            .foregroundColor(.blue)
+                            .font(.caption)
+                    }
+                }
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.blue.opacity(0.05))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.blue.opacity(0.2), lineWidth: 1)
+                        )
+                )
+                .padding(.horizontal, 24)
             }
             
-            // 验证码输入
-            VStack(spacing: 16) {
+            Spacer()
+            
+            // 验证码输入区域
+            VStack(spacing: 20) {
                 Text("请输入6位验证码")
                     .font(.headline)
                     .foregroundColor(.primary)
                 
-                TextField("输入 6 位验证码", text: $otpCode)
-                    .textFieldStyle(ModernTextFieldStyle())
+                // 验证码输入框
+                HStack(spacing: 12) {
+                    ForEach(0..<6, id: \.self) { index in
+                        VerificationCodeDigit(
+                            digit: index < otpCode.count ? String(otpCode[otpCode.index(otpCode.startIndex, offsetBy: index)]) : "",
+                            isActive: index == otpCode.count
+                        )
+                        .onTapGesture {
+                            // 点击任意输入框时聚焦到隐藏的TextField
+                            isTextFieldFocused = true
+                        }
+                    }
+                }
+                
+                // 输入提示
+                Text("点击任意输入框开始输入，或直接输入数字")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                
+                // 隐藏的文本输入框（用于接收输入）
+                TextField("", text: $otpCode)
                     .keyboardType(.numberPad)
                     .textInputAutocapitalization(.never)
-                    .multilineTextAlignment(.center)
-                    .font(.title2)
-                    .frame(maxWidth: 200)
+                    .opacity(0)
+                    .frame(height: 1)
+                    .focused($isTextFieldFocused)
+                    .onChange(of: otpCode) { newValue in
+                        // 限制只能输入6位数字
+                        if newValue.count > 6 {
+                            otpCode = String(newValue.prefix(6))
+                        }
+                        // 只允许数字
+                        otpCode = newValue.filter { $0.isNumber }
+                    }
+                    .onAppear {
+                        // 自动聚焦到输入框
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            isTextFieldFocused = true
+                        }
+                    }
             }
+            .padding(.horizontal, 24)
             
-            // 按钮
-            VStack(spacing: 12) {
-                Button(auth.isBusy ? "验证中..." : "验证并完成注册") {
+            Spacer()
+            
+            // 按钮区域
+            VStack(spacing: 16) {
+                // 主要验证按钮
+                Button(action: {
                     Task {
                         await auth.verifyEmailOTP(otpCode.trimmingCharacters(in: .whitespaces))
                         // 如果验证成功，用户会自动登录，关闭注册页面
@@ -574,33 +657,170 @@ struct EmailVerificationView: View {
                             dismiss()
                         }
                     }
+                }) {
+                    HStack(spacing: 8) {
+                        if auth.isBusy {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        } else {
+                            Image(systemName: "checkmark.shield.fill")
+                        }
+                        Text(auth.isBusy ? "验证中..." : "验证并完成注册")
+                            .fontWeight(.semibold)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(
+                        isVerificationButtonEnabled ? 
+                        LinearGradient(
+                            colors: [.blue, .blue.opacity(0.8)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ) : 
+                        LinearGradient(
+                            colors: [.gray.opacity(0.3), .gray.opacity(0.2)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .foregroundColor(isVerificationButtonEnabled ? .white : .gray)
+                    .cornerRadius(25)
+                    .shadow(color: isVerificationButtonEnabled ? .blue.opacity(0.3) : .clear, radius: 8, x: 0, y: 4)
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(otpCode.isEmpty || otpCode.count < 6 || auth.isBusy)
+                .disabled(!isVerificationButtonEnabled)
                 
-                Button("重发验证码") {
-                    Task {
-                        await auth.resendSignUpOTP()
+                // 辅助按钮行
+                HStack(spacing: 20) {
+                    // 重发验证码按钮
+                    Button(action: {
+                        isResending = true
+                        Task {
+                            await auth.resendSignUpOTP()
+                            isResending = false
+                        }
+                    }) {
+                        HStack(spacing: 6) {
+                            if isResending {
+                                ProgressView()
+                                    .scaleEffect(0.7)
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .blue))
+                            } else {
+                                Image(systemName: "arrow.clockwise")
+                            }
+                            Text(isResending ? "发送中..." : "重发验证码")
+                        }
+                        .font(.subheadline)
+                        .foregroundColor(.blue)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color.blue.opacity(0.1))
+                        )
+                    }
+                    .disabled(isResending)
+                    
+                    // 返回修改按钮
+                    Button(action: onBack) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "arrow.left")
+                            Text("返回修改")
+                        }
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color.gray.opacity(0.1))
+                        )
                     }
                 }
-                .buttonStyle(.bordered)
-                
-                Button("返回修改") {
-                    onBack()
-                }
-                .buttonStyle(.bordered)
             }
-            
+            .padding(.horizontal, 24)
+            .padding(.bottom, 30)
+        }
+        .background(
+            LinearGradient(
+                colors: [Color(.systemBackground), Color(.systemGray6).opacity(0.3)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
+        .overlay(
             // 错误提示
-            if let error = auth.errorMessage, !error.isEmpty {
-                Text(error)
-                    .foregroundColor(.red)
-                    .font(.caption)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
+            VStack {
+                if let error = auth.errorMessage, !error.isEmpty {
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(.red)
+                        Text(error)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color.red.opacity(0.1))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.red.opacity(0.3), lineWidth: 1)
+                            )
+                    )
+                    .padding(.horizontal, 24)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                }
+                Spacer()
+            }
+            .animation(.easeInOut(duration: 0.3), value: auth.errorMessage)
+        )
+    }
+    
+    private var isVerificationButtonEnabled: Bool {
+        return !otpCode.isEmpty && otpCode.count == 6 && !auth.isBusy
+    }
+}
+
+// 验证码数字显示组件
+struct VerificationCodeDigit: View {
+    let digit: String
+    let isActive: Bool
+    
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(isActive ? Color.blue.opacity(0.1) : Color(.systemGray5))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(isActive ? Color.blue : Color(.systemGray4), lineWidth: isActive ? 2 : 1)
+                )
+                .frame(width: 50, height: 60)
+            
+            if digit.isEmpty {
+                if isActive {
+                    // 闪烁的光标
+                    Rectangle()
+                        .fill(Color.blue)
+                        .frame(width: 2, height: 20)
+                        .opacity(0.8)
+                        .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: isActive)
+                }
+            } else {
+                Text(digit)
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.primary)
             }
         }
-        .padding(.horizontal, 24)
+        .scaleEffect(isActive ? 1.05 : 1.0)
+        .animation(.easeInOut(duration: 0.2), value: isActive)
+        .overlay(
+            // 添加点击提示的视觉反馈
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.blue.opacity(0.3), lineWidth: 1)
+                .opacity(0.3)
+        )
     }
 }
 

@@ -1000,12 +1000,13 @@ final class AuthViewModel: ObservableObject {
                             print("⚠️ 删除当前会话失败: \(signOutError.localizedDescription)")
                         }
                         
-                        // 方法5：尝试通过REST API直接删除用户账号
-                        await self.deleteUserViaRESTAPI(userId: self.user?.id ?? UUID())
+                        // 方法5：尝试通过Edge Function删除用户账号
+                        print("🔄 准备调用Edge Function删除用户账号")
+                        await self.deleteUserViaEdgeFunction(userId: self.user?.id ?? UUID())
                         
                         print("✅ 账号禁用完成")
-                        print("💡 注意：如果未配置SUPABASE_SERVICE_KEY，用户账号可能仍存在于Supabase Authentication中")
-                        print("💡 但用户已无法登录（密码已更改，邮箱已禁用，状态已标记为已注销）")
+                        print("💡 注意：现在使用Edge Function删除用户账号，无需配置SUPABASE_SERVICE_KEY")
+                        print("💡 用户账号将从Supabase Authentication中完全删除")
                     } else {
                         // 其他admin错误，抛出异常
                         throw adminError
@@ -1332,46 +1333,58 @@ final class AuthViewModel: ObservableObject {
         }
     }
     
-    // MARK: - 通过REST API删除用户账号
-    private func deleteUserViaRESTAPI(userId: UUID) async {
-        print("🔄 尝试通过REST API删除用户账号: \(userId)")
+    // MARK: - 通过Edge Function删除用户账号
+    private func deleteUserViaEdgeFunction(userId: UUID) async {
+        print("🔄 尝试通过Edge Function删除用户账号: \(userId)")
+        print("📧 Edge Function URL: https://yveexbmtnlnsfwrpumgy.supabase.co/functions/v1/delete-user")
+        print("🔑 使用的API Key: \(AppConfig.supabaseAnonKey.prefix(20))...")
         
-        // 检查是否有service_key
-        guard let serviceKey = AppConfig.supabaseServiceKey else {
-            print("⚠️ 未配置SUPABASE_SERVICE_KEY，跳过REST API删除用户")
-            print("💡 提示：如需完全删除用户账号，请在Secrets.xcconfig中配置SUPABASE_SERVICE_KEY")
-            return
-        }
-        
-        // 构建删除用户的URL
-        let urlString = "\(AppConfig.supabaseURL)/auth/v1/admin/users/\(userId)"
+        // 构建Edge Function的URL
+        let urlString = "https://yveexbmtnlnsfwrpumgy.supabase.co/functions/v1/delete-user"
         guard let url = URL(string: urlString) else {
-            print("❌ 无效的URL")
+            print("❌ 无效的Edge Function URL")
             return
         }
         
         var request = URLRequest(url: url)
-        request.httpMethod = "DELETE"
-        request.addValue("Bearer \(serviceKey)", forHTTPHeaderField: "Authorization")
+        request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue(AppConfig.supabaseAnonKey, forHTTPHeaderField: "apikey")
+        
+        // 请求体：包含要删除的用户ID
+        let requestBody = ["userId": userId.uuidString]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: requestBody)
+        
+        print("📤 发送请求体: \(requestBody)")
         
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
             
             if let httpResponse = response as? HTTPURLResponse {
-                print("📡 HTTP状态码: \(httpResponse.statusCode)")
+                print("📡 Edge Function HTTP状态码: \(httpResponse.statusCode)")
+                print("📡 HTTP响应头: \(httpResponse.allHeaderFields)")
                 
-                if httpResponse.statusCode == 200 || httpResponse.statusCode == 204 {
-                    print("✅ 通过REST API成功删除用户账号")
+                if let responseData = String(data: data, encoding: .utf8) {
+                    print("📝 响应内容: \(responseData)")
+                }
+                
+                if httpResponse.statusCode == 200 {
+                    print("✅ 通过Edge Function成功删除用户账号")
+                } else if httpResponse.statusCode == 401 {
+                    print("❌ Edge Function认证失败 - 请检查API Key是否正确")
+                } else if httpResponse.statusCode == 403 {
+                    print("❌ Edge Function权限不足 - 请检查Edge Function的权限设置")
+                } else if httpResponse.statusCode == 404 {
+                    print("❌ Edge Function未找到 - 请检查URL是否正确")
+                } else if httpResponse.statusCode == 500 {
+                    print("❌ Edge Function内部错误 - 请检查Edge Function的日志")
                 } else {
-                    print("⚠️ REST API删除用户失败，状态码: \(httpResponse.statusCode)")
-                    if let responseData = String(data: data, encoding: .utf8) {
-                        print("📝 响应内容: \(responseData)")
-                    }
+                    print("⚠️ Edge Function删除用户失败，状态码: \(httpResponse.statusCode)")
                 }
             }
         } catch {
-            print("❌ REST API删除用户失败: \(error.localizedDescription)")
+            print("❌ Edge Function删除用户失败: \(error.localizedDescription)")
+            print("🔍 错误详情: \(error)")
         }
     }
 }
