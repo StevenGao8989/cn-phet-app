@@ -13,6 +13,7 @@ struct GradeTopicsView: View {
     @State private var topics: [GradeTopic] = []
     @State private var isLoading = true
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var favoritesManager: FavoritesManager
     
     var body: some View {
         VStack(spacing: 0) {
@@ -53,7 +54,7 @@ struct GradeTopicsView: View {
                 ScrollView {
                     LazyVStack(spacing: 16) {
                         ForEach(topics) { topic in
-                            TopicSectionView(topic: topic)
+                            TopicSectionView(topic: topic, grade: grade)
                         }
                     }
                     .padding(.horizontal)
@@ -955,6 +956,7 @@ struct GradeTopicsView: View {
 // 新增：知识点单元视图
 struct TopicSectionView: View {
     let topic: GradeTopic
+    let grade: Grade
     @State private var isExpanded = false
     @State private var concreteTopics: [ConcreteTopic] = []
     
@@ -999,7 +1001,7 @@ struct TopicSectionView: View {
                 VStack(spacing: 8) {
                     ForEach(concreteTopics) { concreteTopic in
                         NavigationLink(destination: getSimulatorDestination(for: concreteTopic)) {
-                            ConcreteTopicRowView(topic: concreteTopic)
+                            ConcreteTopicRowView(topic: concreteTopic, grade: grade)
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
@@ -1491,6 +1493,8 @@ struct TopicSectionView: View {
 // 新增：具体知识点行视图
 struct ConcreteTopicRowView: View {
     let topic: ConcreteTopic
+    let grade: Grade
+    @EnvironmentObject var favoritesManager: FavoritesManager
     
     var body: some View {
         HStack(spacing: 16) {
@@ -1526,6 +1530,25 @@ struct ConcreteTopicRowView: View {
             }
             
             Spacer()
+            
+            // 收藏按钮
+            Button(action: {
+                let favoriteItem = FavoriteItem(
+                    title: topic.title,
+                    subject: topic.subtitle,
+                    grade: grade.title,
+                    topicId: topic.id,
+                    description: topic.description
+                )
+                Task {
+                    await favoritesManager.toggleFavorite(favoriteItem)
+                }
+            }) {
+                Image(systemName: favoritesManager.isFavorite(topicId: topic.id) ? "heart.fill" : "heart")
+                    .foregroundColor(favoritesManager.isFavorite(topicId: topic.id) ? .pink : .gray)
+                    .font(.title3)
+            }
+            .buttonStyle(PlainButtonStyle())
             
             // 右侧箭头
             Image(systemName: "chevron.right")

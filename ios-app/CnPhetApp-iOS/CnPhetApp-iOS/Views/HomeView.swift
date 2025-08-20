@@ -14,6 +14,7 @@ import SwiftUI
 struct HomeView: View {
     @EnvironmentObject var store: ContentStore
     @EnvironmentObject var auth: AuthViewModel
+    @StateObject private var favoritesManager = FavoritesManager()
 
     @State private var showProfileSheet = false
     @State private var showChangePwdSheet = false
@@ -41,6 +42,7 @@ struct HomeView: View {
                 showDeleteAlert: $showDeleteAlert,
                 confirmPwdForDelete: $confirmPwdForDelete
             )
+            .environmentObject(favoritesManager)
             .tabItem {
                 Image(systemName: "house.fill")
                 Text("首页")
@@ -60,9 +62,27 @@ struct HomeView: View {
                 showDeleteAlert: $showDeleteAlert,
                 confirmPwdForDelete: $confirmPwdForDelete
             )
+            .environmentObject(favoritesManager)
             .tabItem {
                 Image(systemName: "person.fill")
                 Text("我的")
+            }
+        }
+        .onAppear {
+            // 应用启动时刷新收藏数据
+            Task {
+                await favoritesManager.refreshForUser()
+            }
+        }
+        .onChange(of: auth.user?.id) { oldValue, newValue in
+            if newValue != nil {
+                // 用户登录，刷新收藏数据
+                Task {
+                    await favoritesManager.refreshForUser()
+                }
+            } else {
+                // 用户登出，清空收藏数据
+                favoritesManager.clearForLogout()
             }
         }
         .alert("确认注销？", isPresented: $showDeleteAlert) {
@@ -388,7 +408,10 @@ struct ProfileView: View {
     @Binding var showDeleteAlert: Bool
     @Binding var confirmPwdForDelete: String
     @EnvironmentObject var auth: AuthViewModel
+    @EnvironmentObject var favoritesManager: FavoritesManager
     @State private var showSignOutAlert = false  // 添加退出登录确认状态
+    @State private var showFavoritesSheet = false  // 添加收藏页面状态
+    @State private var showSubscriptionSheet = false  // 添加订阅页面状态
     
     // 先用昵称，其次邮箱，再兜底"我"
     private var displayText: String {
@@ -461,6 +484,40 @@ struct ProfileView: View {
                     Divider()
                         .padding(.leading, 50)
                     
+                    Button(action: { showFavoritesSheet = true }) {
+                        HStack {
+                            Image(systemName: "heart.fill")
+                                .foregroundColor(.pink)
+                            Text("我的收藏")
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.secondary)
+                        }
+                        .padding()
+                        .background(Color(.systemBackground))
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    Divider()
+                        .padding(.leading, 50)
+                    
+                    Button(action: { showSubscriptionSheet = true }) {
+                        HStack {
+                            Image(systemName: "star.fill")
+                                .foregroundColor(.yellow)
+                            Text("订阅管理")
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.secondary)
+                        }
+                        .padding()
+                        .background(Color(.systemBackground))
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    Divider()
+                        .padding(.leading, 50)
+                    
                     Button(action: { showSignOutAlert = true }) {
                         HStack {
                             Image(systemName: "rectangle.portrait.and.arrow.right")
@@ -496,6 +553,13 @@ struct ProfileView: View {
             }
             .navigationTitle("我的")
             .navigationBarTitleDisplayMode(.inline)
+        }
+        .sheet(isPresented: $showFavoritesSheet) {
+            FavoritesView()
+                .environmentObject(favoritesManager)
+        }
+        .sheet(isPresented: $showSubscriptionSheet) {
+            SubscriptionView()
         }
         .alert("确认退出登录？", isPresented: $showSignOutAlert) {
             Button("取消", role: .cancel) { }
@@ -810,6 +874,412 @@ struct ConversationView: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - 收藏视图
+struct FavoritesView: View {
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var favoritesManager: FavoritesManager
+    
+    var body: some View {
+        NavigationStack {
+            Group {
+                if favoritesManager.isLoading {
+                    ProgressView("加载收藏中...")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if favoritesManager.favorites.isEmpty {
+                    VStack {
+                        Image(systemName: "heart")
+                            .font(.system(size: 50))
+                            .foregroundColor(.gray)
+                        Text("还没有收藏的内容")
+                            .font(.title3)
+                            .foregroundColor(.secondary)
+                        Text("在知识点列表中点击心形图标来收藏")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    List {
+                        ForEach(favoritesManager.favorites) { item in
+                            FavoriteRowView(item: item)
+                        }
+                        .onDelete(perform: deleteFavorites)
+                    }
+                }
+            }
+            .navigationTitle("我的收藏")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("关闭") {
+                        dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    EditButton()
+                }
+            }
+        }
+    }
+    
+    private func deleteFavorites(offsets: IndexSet) {
+        let itemsToDelete = offsets.map { favoritesManager.favorites[$0] }
+        for item in itemsToDelete {
+            Task {
+                await favoritesManager.removeFromFavorites(topicId: item.topicId)
+            }
+        }
+    }
+}
+
+// MARK: - 订阅视图
+struct SubscriptionView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var subscriptions: [SubscriptionItem] = [
+        SubscriptionItem(title: "物理学习周刊", status: .active, nextRenewal: Date().addingTimeInterval(7 * 24 * 3600)),
+        SubscriptionItem(title: "化学实验视频", status: .expired, nextRenewal: Date().addingTimeInterval(-1 * 24 * 3600)),
+        SubscriptionItem(title: "数学思维训练", status: .active, nextRenewal: Date().addingTimeInterval(30 * 24 * 3600))
+    ]
+    
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(subscriptions) { item in
+                    SubscriptionRowView(item: item)
+                }
+            }
+            .navigationTitle("订阅管理")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("关闭") {
+                        dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("管理") {
+                        // 这里可以添加订阅管理逻辑
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - 收藏项目模型
+struct FavoriteItem: Identifiable, Codable {
+    let id: UUID
+    let userId: UUID?
+    let title: String
+    let subject: String
+    let grade: String
+    let timestamp: Date
+    let topicId: String
+    let description: String?
+    
+    // 数据库字段映射
+    enum CodingKeys: String, CodingKey {
+        case id
+        case userId = "user_id"
+        case title
+        case subject
+        case grade
+        case timestamp = "created_at"
+        case topicId = "topic_id"
+        case description
+    }
+    
+    // 创建新收藏项目的便利初始化器
+    init(title: String, subject: String, grade: String, topicId: String, description: String? = nil, userId: UUID? = nil) {
+        self.id = UUID()
+        self.userId = userId
+        self.title = title
+        self.subject = subject
+        self.grade = grade
+        self.timestamp = Date()
+        self.topicId = topicId
+        self.description = description
+    }
+    
+    // 从数据库加载的完整初始化器
+    init(id: UUID, userId: UUID?, title: String, subject: String, grade: String, timestamp: Date, topicId: String, description: String?) {
+        self.id = id
+        self.userId = userId
+        self.title = title
+        self.subject = subject
+        self.grade = grade
+        self.timestamp = timestamp
+        self.topicId = topicId
+        self.description = description
+    }
+}
+
+// MARK: - 收藏管理器
+@MainActor
+class FavoritesManager: ObservableObject {
+    @Published var favorites: [FavoriteItem] = []
+    @Published var isLoading = false
+    
+    private let supabaseClient = SupabaseService.shared.client
+    private var currentUserId: UUID? {
+        return supabaseClient.auth.currentUser?.id
+    }
+    
+    init() {
+        Task {
+            await loadFavorites()
+        }
+    }
+    
+    // MARK: - 云端同步方法
+    
+    /// 从云端加载收藏数据
+    func loadFavorites() async {
+        guard currentUserId != nil else {
+            print("用户未登录，无法加载收藏")
+            return
+        }
+        
+        isLoading = true
+        
+        do {
+            let response: [FavoriteItem] = try await supabaseClient
+                .from("user_favorites")
+                .select()
+                .order("created_at", ascending: false)
+                .execute()
+                .value
+            
+            favorites = response
+            print("成功加载 \(response.count) 个收藏项目")
+        } catch {
+            print("加载收藏失败: \(error)")
+        }
+        
+        isLoading = false
+    }
+    
+    /// 添加收藏到云端
+    func addToFavorites(_ item: FavoriteItem) async {
+        guard let userId = currentUserId else {
+            print("用户未登录，无法添加收藏")
+            return
+        }
+        
+        // 检查是否已经收藏
+        if isFavorite(topicId: item.topicId) {
+            return
+        }
+        
+        // 创建带有用户ID的收藏项目
+        let favoriteWithUserId = FavoriteItem(
+            title: item.title,
+            subject: item.subject,
+            grade: item.grade,
+            topicId: item.topicId,
+            description: item.description,
+            userId: userId
+        )
+        
+        do {
+            let response: [FavoriteItem] = try await supabaseClient
+                .from("user_favorites")
+                .insert(favoriteWithUserId)
+                .select()
+                .execute()
+                .value
+            
+            if let newFavorite = response.first {
+                favorites.insert(newFavorite, at: 0) // 添加到列表顶部
+                print("成功添加收藏: \(item.title)")
+            }
+        } catch {
+            print("添加收藏失败: \(error)")
+        }
+    }
+    
+    /// 从云端删除收藏
+    func removeFromFavorites(topicId: String) async {
+        guard currentUserId != nil else {
+            print("用户未登录，无法删除收藏")
+            return
+        }
+        
+        do {
+            try await supabaseClient
+                .from("user_favorites")
+                .delete()
+                .eq("topic_id", value: topicId)
+                .execute()
+            
+            // 从本地列表中移除
+            favorites.removeAll { $0.topicId == topicId }
+            print("成功删除收藏: \(topicId)")
+        } catch {
+            print("删除收藏失败: \(error)")
+        }
+    }
+    
+    /// 切换收藏状态
+    func toggleFavorite(_ item: FavoriteItem) async {
+        if isFavorite(topicId: item.topicId) {
+            await removeFromFavorites(topicId: item.topicId)
+        } else {
+            await addToFavorites(item)
+        }
+    }
+    
+    // MARK: - 本地查询方法
+    
+    func isFavorite(topicId: String) -> Bool {
+        return favorites.contains { $0.topicId == topicId }
+    }
+    
+    /// 用户登录后刷新收藏数据
+    func refreshForUser() async {
+        await loadFavorites()
+    }
+    
+    /// 用户登出后清空收藏数据
+    func clearForLogout() {
+        favorites = []
+    }
+}
+
+// MARK: - 订阅项目模型
+struct SubscriptionItem: Identifiable {
+    let id = UUID()
+    let title: String
+    let status: SubscriptionStatus
+    let nextRenewal: Date
+}
+
+// MARK: - 订阅状态枚举
+enum SubscriptionStatus: String, CaseIterable {
+    case active = "活跃"
+    case expired = "已过期"
+    case pending = "待激活"
+    
+    var color: Color {
+        switch self {
+        case .active:
+            return .green
+        case .expired:
+            return .red
+        case .pending:
+            return .orange
+        }
+    }
+}
+
+// MARK: - 收藏行视图
+struct FavoriteRowView: View {
+    let item: FavoriteItem
+    
+    var body: some View {
+        NavigationLink(destination: getSimulatorDestination(for: item)) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text(item.title)
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    Spacer()
+                    Text(item.subject)
+                        .font(.caption)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.blue.opacity(0.2))
+                        .foregroundColor(.blue)
+                        .cornerRadius(8)
+                }
+                
+                HStack {
+                    Text(item.grade)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                }
+                
+                if let description = item.description {
+                    Text(description)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .lineLimit(2)
+                }
+            }
+            .padding(.vertical, 4)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+    
+    // 根据收藏项目获取模拟器目标
+    @ViewBuilder
+    private func getSimulatorDestination(for favoriteItem: FavoriteItem) -> some View {
+        let topicId = favoriteItem.topicId
+        switch topicId {
+        case "projectile_motion":
+            ProjectileSimView(title: favoriteItem.title)
+        case "geometric_optics":
+            // 这里可以添加几何光学的模拟器
+            Text("几何光学模拟器")
+                .navigationTitle(favoriteItem.title)
+        case "chemical_equations":
+            // 这里可以添加化学方程式的模拟器
+            Text("化学方程式模拟器")
+                .navigationTitle(favoriteItem.title)
+        default:
+            // 默认显示一个通用页面
+            Text("模拟器开发中...")
+                .navigationTitle(favoriteItem.title)
+        }
+    }
+}
+
+// MARK: - 订阅行视图
+struct SubscriptionRowView: View {
+    let item: SubscriptionItem
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(item.title)
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                Spacer()
+                Text(item.status.rawValue)
+                    .font(.caption)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(item.status.color.opacity(0.2))
+                    .foregroundColor(item.status.color)
+                    .cornerRadius(8)
+            }
+            
+            HStack {
+                Text("下次续费: \(item.nextRenewal, style: .date)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Spacer()
+                if item.status == .expired {
+                    Button("续费") {
+                        // 这里可以添加续费逻辑
+                    }
+                    .font(.caption)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 4)
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                }
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
 

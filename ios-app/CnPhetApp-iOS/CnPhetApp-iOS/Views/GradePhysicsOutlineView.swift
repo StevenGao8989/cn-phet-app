@@ -505,6 +505,7 @@ struct AllExperimentsView: View {
 
 struct TopicCard: View {
     let topic: PhysicsTopic
+    @EnvironmentObject var favoritesManager: FavoritesManager
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -521,12 +522,34 @@ struct TopicCard: View {
             }
             
             VStack(alignment: .leading, spacing: 8) {
-                // 标题
-                Text(topic.title)
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                    .lineLimit(2)
+                // 标题和收藏按钮
+                HStack {
+                    Text(topic.title)
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
+                        .lineLimit(2)
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        let favoriteItem = FavoriteItem(
+                            title: topic.title,
+                            subject: "物理",
+                            grade: topic.grade.title,
+                            topicId: topic.id,
+                            description: topic.coreConcepts.joined(separator: "、")
+                        )
+                        Task {
+                            await favoritesManager.toggleFavorite(favoriteItem)
+                        }
+                    }) {
+                        Image(systemName: favoritesManager.isFavorite(topicId: topic.id) ? "heart.fill" : "heart")
+                            .foregroundColor(favoritesManager.isFavorite(topicId: topic.id) ? .pink : .gray)
+                            .font(.title3)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
                 
                 // 难度和年级
                 HStack(spacing: 8) {
