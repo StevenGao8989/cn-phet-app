@@ -368,13 +368,14 @@ struct HomeTabView: View {
                 VStack(spacing: 24) {
                     // 顶部欢迎区域
                     HStack {
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: 6) {
                             Text("欢迎回来")
-                                .font(.subheadline)
+                                .font(.title2)
+                                .fontWeight(.medium)
                                 .foregroundColor(.secondary)
                             
                             Text(displayText)
-                                .font(.title)
+                                .font(.largeTitle)
                                 .fontWeight(.bold)
                         }
                         
@@ -1515,12 +1516,13 @@ struct ModernSubjectCard: View {
                 // 文字内容
                 VStack(spacing: 4) {
                     Text(title)
-                        .font(.headline)
-                        .fontWeight(.semibold)
+                        .font(.title2)
+                        .fontWeight(.bold)
                         .foregroundColor(.primary)
                     
                     Text(subtitle)
-                        .font(.caption)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
                         .foregroundColor(.secondary)
                 }
             }
