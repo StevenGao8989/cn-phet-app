@@ -101,6 +101,12 @@ final class AuthViewModel: ObservableObject {
             self.pendingPassword = password
             self.pendingDisplayName = displayName
             self.awaitingEmailOTP = true
+            
+            // 显示成功提示
+            await MainActor.run {
+                self.showToast("✅ 验证码已发送到 \(email)", seconds: 3)
+            }
+            
             self.errorMessage = "我们已向 \(email) 发送 6 位验证码，请查收。"
         }
     }
@@ -151,6 +157,11 @@ final class AuthViewModel: ObservableObject {
             self.pendingPassword = nil
             self.pendingDisplayName = nil
                 self.errorMessage = nil
+                
+                // 6️⃣ 显示成功提示
+                await MainActor.run {
+                    self.showToast("🎉 注册成功！正在自动登录...", seconds: 3)
+                }
                 
                 print("✅ 注册完成，用户已登录")
                 
@@ -374,6 +385,51 @@ final class AuthViewModel: ObservableObject {
             } catch let error as NSError {
                 print("❌ 重发验证码失败: \(error.localizedDescription)")
                 self.errorMessage = "重发验证码失败，请重试。"
+            }
+        }
+    }
+
+    // 重发注册验证码
+    func resendSignUpOTP() async {
+        await run {
+            guard let email = self.pendingEmail,
+                  let password = self.pendingPassword,
+                  let displayName = self.pendingDisplayName else {
+                self.errorMessage = "注册信息丢失，请重新开始。"
+                return
+            }
+            
+            print("🔄 重新发送注册验证码到: \(email)")
+            
+            do {
+                // 重新发送注册验证码
+                let result = try await self.client.auth.signUp(email: email, password: password, data: [
+                    "display_name": .string(displayName),
+                    "full_name": .string(displayName)
+                ])
+                
+                print("✅ 重新发送验证码成功")
+                let user = result.user
+                print("📧 新验证码已发送，用户ID: \(user.id.uuidString)")
+                
+                // 显示成功提示
+                await MainActor.run {
+                    self.showToast("✅ 新验证码已发送到 \(email)", seconds: 3)
+                }
+                
+                self.errorMessage = "新验证码已发送到 \(email)，请尽快输入。"
+                
+            } catch let error as NSError {
+                print("❌ 重发验证码失败: \(error.localizedDescription)")
+                
+                let errorMsg = error.localizedDescription.lowercased()
+                if errorMsg.contains("rate limit") || errorMsg.contains("too many") {
+                    self.errorMessage = "请求过于频繁，请稍后再试。"
+                } else if errorMsg.contains("already registered") {
+                    self.errorMessage = "该邮箱已注册，请直接登录。"
+                } else {
+                    self.errorMessage = "重发验证码失败，请重试。"
+                }
             }
         }
     }
