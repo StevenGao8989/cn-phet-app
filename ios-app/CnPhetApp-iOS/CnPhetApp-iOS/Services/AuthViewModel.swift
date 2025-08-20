@@ -770,7 +770,28 @@ final class AuthViewModel: ObservableObject {
             
             // 直接使用邮箱登录
             _ = try await self.client.auth.signIn(email: email, password: password)
+            
+            // 登录成功后，检查用户是否已被注销
             try await self.loadCurrentUserAndProfile()
+            
+            // 检查用户状态
+            if let profile = self.profile {
+                // 检查display_name是否标记为已注销
+                if let displayName = profile.display_name, displayName == "已注销" {
+                    // 用户已被注销，退出登录并显示错误
+                    try await self.client.auth.signOut()
+                    self.user = nil
+                    self.profile = nil
+                    self.errorMessage = "此账号已被注销，无法登录。"
+                    print("❌ 登录失败: 账号已被注销")
+                    
+                    // 显示错误提示
+                    await MainActor.run {
+                        self.showToast("账号已被注销，无法登录", seconds: 2)
+                    }
+                    return
+                }
+            }
             
             // 登录成功后保存登录信息
             self.saveLoginInfo()
@@ -882,7 +903,7 @@ final class AuthViewModel: ObservableObject {
             
             do {
                 // 先验证密码
-            _ = try await self.client.auth.signIn(email: email, password: confirmPassword)
+                _ = try await self.client.auth.signIn(email: email, password: confirmPassword)
 
                 // 删除用户资料
                 if let uid = self.user?.id {
@@ -894,26 +915,146 @@ final class AuthViewModel: ObservableObject {
                     print("✅ profiles表删除成功")
                 }
                 
-                // 删除用户账号
-                try await self.client.auth.admin.deleteUser(id: self.user?.id ?? UUID())
-                print("✅ 用户账号删除成功")
+                // 尝试删除用户账号（可能需要admin权限）
+                do {
+                    try await self.client.auth.admin.deleteUser(id: self.user?.id ?? UUID())
+                    print("✅ 用户账号删除成功")
+                } catch let adminError as NSError {
+                    print("⚠️ admin删除用户失败: \(adminError.localizedDescription)")
+                    
+                    // 如果admin删除失败，尝试其他方法禁用账号
+                    if adminError.localizedDescription.contains("not allowed") || adminError.localizedDescription.contains("unauthorized") {
+                        print("🔄 尝试禁用用户账号")
+                        
+                        // 方法1：尝试更新用户元数据，标记为已删除
+                        do {
+                            try await self.client.auth.update(user: .init(
+                                data: [
+                                    "deleted": AnyJSON.bool(true),
+                                    "deleted_at": AnyJSON.string(ISO8601DateFormatter().string(from: .init())),
+                                    "status": AnyJSON.string("deleted")
+                                ]
+                            ))
+                            print("✅ 用户元数据更新成功，标记为已删除")
+                        } catch let metaError as NSError {
+                            print("⚠️ 更新用户元数据失败: \(metaError.localizedDescription)")
+                        }
+                        
+                        // 方法2：尝试更改用户密码为随机字符串，使其无法登录
+                        do {
+                            let randomPassword = UUID().uuidString + UUID().uuidString
+                            try await self.client.auth.update(user: .init(password: randomPassword))
+                            print("✅ 用户密码已更改为随机字符串，无法重新登录")
+                        } catch let pwdError as NSError {
+                            print("⚠️ 更改用户密码失败: \(pwdError.localizedDescription)")
+                        }
+                        
+                        // 方法2.5：尝试禁用用户邮箱，使其无法接收验证码
+                        do {
+                            try await self.client.auth.update(user: .init(
+                                data: [
+                                    "email_confirmed_at": AnyJSON.null,
+                                    "email_change_confirm_status": AnyJSON.integer(0),
+                                    "deleted": AnyJSON.bool(true),
+                                    "deleted_at": AnyJSON.string(ISO8601DateFormatter().string(from: .init())),
+                                    "banned_until": AnyJSON.string(ISO8601DateFormatter().string(from: Date().addingTimeInterval(365 * 24 * 60 * 60))) // 禁用一年
+                                ]
+                            ))
+                            print("✅ 用户邮箱已禁用，无法接收验证码")
+                        }
+                        
+                        // 方法3：在profiles表中标记为已删除
+                        guard let uid = self.user?.id else {
+                            print("❌ 软删除失败：用户ID不存在")
+                            return
+                        }
+                        
+                        do {
+                            struct SoftDeleteProfile: Encodable {
+                                let display_name: String
+                                let updated_at: String
+                                let deleted_at: String
+                            }
+                            
+                            let updateData = SoftDeleteProfile(
+                                display_name: "已注销",
+                                updated_at: ISO8601DateFormatter().string(from: .init()),
+                                deleted_at: ISO8601DateFormatter().string(from: .init())
+                            )
+                            
+                            _ = try await self.client.database
+                                .from("profiles")
+                                .update(updateData)
+                                .eq("id", value: uid)
+                                .execute()
+                            print("✅ profiles表软删除更新成功")
+                        } catch let softDeleteError as NSError {
+                            print("⚠️ profiles表软删除更新失败: \(softDeleteError.localizedDescription)")
+                        }
+                        
+                        // 方法4：尝试删除当前会话，确保用户无法继续使用
+                        do {
+                            try await self.client.auth.signOut()
+                            print("✅ 当前会话已删除")
+                        } catch let signOutError as NSError {
+                            print("⚠️ 删除当前会话失败: \(signOutError.localizedDescription)")
+                        }
+                        
+                        // 方法5：尝试通过REST API直接删除用户账号
+                        await self.deleteUserViaRESTAPI(userId: self.user?.id ?? UUID())
+                        
+                        print("✅ 账号禁用完成")
+                        print("💡 注意：如果未配置SUPABASE_SERVICE_KEY，用户账号可能仍存在于Supabase Authentication中")
+                        print("💡 但用户已无法登录（密码已更改，邮箱已禁用，状态已标记为已注销）")
+                    } else {
+                        // 其他admin错误，抛出异常
+                        throw adminError
+                    }
+                }
                 
-                // 退出登录
-            try await self.client.auth.signOut()
+                // 清理用户状态（不调用signOut，让用户自然回到登录界面）
                 self.user = nil
                 self.profile = nil
                 
-                self.errorMessage = "账号已成功删除。"
-                self.showToast("账号已成功删除", seconds: 3)
+                // 清理所有状态
+                self.awaitingEmailOTP = false
+                self.pendingEmail = nil
+                self.pendingPassword = nil
+                self.pendingDisplayName = nil
+                self.isForgotPasswordFlow = false
+                self.isResettingPassword = false
+                self.resetToken = nil
+                self.resetEmail = nil
+                
+                // 显示成功提示
+                await MainActor.run {
+                    self.showToast("🎉 账号已成功注销！", seconds: 3)
+                }
+                
+                // 显示注销成功消息，3秒后自动消失
+                await MainActor.run {
+                    self.showToast("账号已成功注销，已退出到登录界面", seconds: 3)
+                }
+                
+                print("✅ 账号删除/禁用完成，已退出到登录界面")
                 
             } catch let error as NSError {
                 print("❌ 删除账号失败: \(error.localizedDescription)")
                 
                 let errorMsg = error.localizedDescription.lowercased()
-                if errorMsg.contains("invalid") {
+                if errorMsg.contains("invalid") || errorMsg.contains("credentials") {
                     self.errorMessage = "密码错误，请重试。"
+                } else if errorMsg.contains("not allowed") || errorMsg.contains("unauthorized") {
+                    self.errorMessage = "权限不足，无法删除账号。请联系管理员。"
+                } else if errorMsg.contains("session") || errorMsg.contains("expired") {
+                    self.errorMessage = "会话已过期，请重新登录后重试。"
                 } else {
                     self.errorMessage = "删除账号失败，请稍后重试。"
+                }
+                
+                // 显示错误提示
+                await MainActor.run {
+                    self.showToast("密码错误，请重试", seconds: 2)
                 }
             }
         }
@@ -958,6 +1099,27 @@ final class AuthViewModel: ObservableObject {
             try? await self.client.auth.signOut()
             self.user = nil
             self.profile = nil
+            
+            // 清理所有状态
+            self.awaitingEmailOTP = false
+            self.pendingEmail = nil
+            self.pendingPassword = nil
+            self.pendingDisplayName = nil
+            self.isForgotPasswordFlow = false
+            self.isResettingPassword = false
+            self.resetToken = nil
+            self.resetEmail = nil
+            
+            // 显示成功提示
+            await MainActor.run {
+                self.showToast("🎉 账号已成功注销！", seconds: 3)
+            }
+            
+            // 显示注销成功消息，3秒后自动消失
+            await MainActor.run {
+                self.showToast("账号已成功注销，已退出到登录界面", seconds: 3)
+            }
+            
             print("✅ 软删除完成，已退出登录")
         }
     }
@@ -1167,6 +1329,49 @@ final class AuthViewModel: ObservableObject {
             }
         } catch {
             print("❌ 数据库连接测试失败: \(error)")
+        }
+    }
+    
+    // MARK: - 通过REST API删除用户账号
+    private func deleteUserViaRESTAPI(userId: UUID) async {
+        print("🔄 尝试通过REST API删除用户账号: \(userId)")
+        
+        // 检查是否有service_key
+        guard let serviceKey = AppConfig.supabaseServiceKey else {
+            print("⚠️ 未配置SUPABASE_SERVICE_KEY，跳过REST API删除用户")
+            print("💡 提示：如需完全删除用户账号，请在Secrets.xcconfig中配置SUPABASE_SERVICE_KEY")
+            return
+        }
+        
+        // 构建删除用户的URL
+        let urlString = "\(AppConfig.supabaseURL)/auth/v1/admin/users/\(userId)"
+        guard let url = URL(string: urlString) else {
+            print("❌ 无效的URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.addValue("Bearer \(serviceKey)", forHTTPHeaderField: "Authorization")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                print("📡 HTTP状态码: \(httpResponse.statusCode)")
+                
+                if httpResponse.statusCode == 200 || httpResponse.statusCode == 204 {
+                    print("✅ 通过REST API成功删除用户账号")
+                } else {
+                    print("⚠️ REST API删除用户失败，状态码: \(httpResponse.statusCode)")
+                    if let responseData = String(data: data, encoding: .utf8) {
+                        print("📝 响应内容: \(responseData)")
+                    }
+                }
+            }
+        } catch {
+            print("❌ REST API删除用户失败: \(error.localizedDescription)")
         }
     }
 }

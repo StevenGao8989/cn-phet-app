@@ -19,6 +19,7 @@ struct UserProfile: Codable, Identifiable {
     var avatar_url: String?
     var created_at: Date?
     var updated_at: Date?
+    var status: String?
 }
 
 
