@@ -86,7 +86,7 @@ struct ConcreteTopicsListView: View {
         print("📚 主知识点标题: \(mainTopic.title)")
         print("📚 主知识点描述: \(mainTopic.description)")
         
-        concreteTopics = getConcreteTopicsForMainTopic(mainTopic)
+        concreteTopics = ConcreteTopicsListView.getConcreteTopicsForMainTopic(mainTopic)
         
         print("📊 找到 \(concreteTopics.count) 个具体知识点")
         for (index, topic) in concreteTopics.enumerated() {
@@ -101,7 +101,7 @@ struct ConcreteTopicsListView: View {
         }
     }
     
-    private func getConcreteTopicsForMainTopic(_ mainTopic: GradeTopic) -> [ConcreteTopic] {
+    static func getConcreteTopicsForMainTopic(_ mainTopic: GradeTopic) -> [ConcreteTopic] {
         switch mainTopic.id {
         // 初二年级物理知识点
         case "motion_force":
