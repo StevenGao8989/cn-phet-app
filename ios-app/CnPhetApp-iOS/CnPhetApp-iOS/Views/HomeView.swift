@@ -413,30 +413,18 @@ struct HomeTabView: View {
                     .cornerRadius(12)
                     .padding(.horizontal)
                     
-                    // 学科选择标题
-                    HStack {
-                        Text("选择学科")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                        
-                        Spacer()
-                        
-                        Button(action: {}) {
-                            HStack(spacing: 4) {
-                                Text("查看详细学程")
-                                    .font(.caption)
-                                    .foregroundColor(.blue)
-                                Image(systemName: "chevron.right")
-                                    .font(.caption2)
-                                    .foregroundColor(.blue)
-                            }
+                    // 学科选择区域
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack {
+                            Text("选择学科")
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                            Spacer()
                         }
-                        .buttonStyle(PlainButtonStyle())
-                    }
-                    .padding(.horizontal)
-                    
-                    // 美化的学科卡片
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: 2), spacing: 16) {
+                        .padding(.horizontal)
+                        
+                        // 美化的学科卡片
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: 2), spacing: 16) {
                         ModernSubjectCard(
                             title: "物理",
                             subtitle: "Physics", 
@@ -480,8 +468,9 @@ struct HomeTabView: View {
                                 showGradeSelection = true
                             }
                         )
+                        }
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
                     
                     // 快速操作区域
                     VStack(alignment: .leading, spacing: 16) {
