@@ -14,32 +14,32 @@ struct GradeSelectionView: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        VStack(spacing: 0) {
-            
-            
-            // 学科标题 - 居中
-            HStack {
-                Spacer()
-                Text(subject.title)
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                Spacer()
-            }
-            .padding()
-            
-            // 年级选择网格
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: 2), spacing: 16) {
-                ForEach(Grade.allCases) { grade in
-                    GradeCard(grade: grade, subject: subject) {
-                        selectedGrade = grade
-                        showGradeTopics = true
+        ScrollView {
+            VStack(spacing: 24) {
+                // 顶部学科标题区域
+                VStack(spacing: 8) {
+                    Text(subject.title)
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                }
+                .padding(.top, 20)
+                
+                // 年级选择网格
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20), count: 2), spacing: 20) {
+                    ForEach(Grade.allCases) { grade in
+                        GradeCard(grade: grade, subject: subject) {
+                            selectedGrade = grade
+                            showGradeTopics = true
+                        }
                     }
                 }
+                .padding(.horizontal, 20)
+                
+                Spacer(minLength: 40)
             }
-            .padding(.horizontal)
-            
-            Spacer()
         }
+        .background(Color(.systemGroupedBackground))
         .navigationTitle("年级选择")
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $showGradeTopics) {
@@ -63,7 +63,7 @@ struct GradeCard: View {
         case .chemistry:
             return .green
         case .math:
-            return .yellow
+            return .orange
         case .biology:
             return .purple
         }
@@ -71,38 +71,47 @@ struct GradeCard: View {
     
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 16) {
+            VStack(spacing: 20) {
                 // 顶部图标
                 ZStack {
                     Circle()
-                        .fill(subjectColor.opacity(0.2))
-                        .frame(width: 60, height: 60)
+                        .fill(subjectColor.opacity(0.15))
+                        .frame(width: 70, height: 70)
                     
                     Text(grade.title.prefix(1))
-                        .font(.title)
-                        .fontWeight(.bold)
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
                         .foregroundColor(subjectColor)
                 }
                 
                 // 年级名称
-                VStack(spacing: 4) {
+                VStack(spacing: 6) {
                     Text(grade.title)
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
                     
                     Text(grade.englishTitle)
-                        .font(.caption)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
                         .foregroundColor(.secondary)
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(16)
-            .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+            .padding(.vertical, 24)
+            .padding(.horizontal, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color(.systemBackground))
+                    .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(subjectColor.opacity(0.1), lineWidth: 1)
+            )
         }
         .buttonStyle(PlainButtonStyle())
+        .scaleEffect(0.98)
+        .animation(.easeInOut(duration: 0.1), value: true)
     }
 }
 
