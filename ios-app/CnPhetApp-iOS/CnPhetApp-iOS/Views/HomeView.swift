@@ -338,47 +338,184 @@ struct HomeTabView: View {
     @Binding var showDeleteAlert: Bool
     @Binding var confirmPwdForDelete: String
     @EnvironmentObject var auth: AuthViewModel
-    @State private var showSignOutAlert = false  // 添加退出登录确认状态
+    @EnvironmentObject var favoritesManager: FavoritesManager
+    @State private var showSignOutAlert = false
+    @State private var searchText = ""
+    @State private var showFavoritesSheet = false  // 添加收藏页面状态
+    
+    // 用户显示信息
+    private var displayText: String {
+        if let n = auth.profile?.display_name, !n.isEmpty { return n }
+        if let e = auth.user?.email, !e.isEmpty { 
+            // 从邮箱提取用户名（@符号前的部分）
+            let components = e.components(separatedBy: "@")
+            return components.first?.capitalized ?? e
+        }
+        return "StevenKo"
+    }
+    
+    private var avatarInitials: String { 
+        let name = displayText
+        if name.count > 0 {
+            return String(name.prefix(1)).uppercased()
+        }
+        return "S"
+    }
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                // 顶部标题
-                HStack {
-                    Spacer()
-                    Text("理科实验室")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                    Spacer()
+            ScrollView {
+                VStack(spacing: 24) {
+                    // 顶部欢迎区域
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("欢迎回来")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            
+                            Text(displayText)
+                                .font(.title)
+                                .fontWeight(.bold)
+                        }
+                        
+                        Spacer()
+                        
+                        // 用户头像
+                        Button(action: { showProfileSheet = true }) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color.blue)
+                                    .frame(width: 50, height: 50)
+                                
+                                Text(avatarInitials)
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                    .padding(.horizontal)
+                    .padding(.top, 10)
+                    
+                    // 全局搜索框
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.secondary)
+                        
+                        TextField("搜索课程、实验、概念...", text: $searchText)
+                            .textFieldStyle(PlainTextFieldStyle())
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
+                    .padding(.horizontal)
+                    
+                    // 学科选择标题
+                    HStack {
+                        Text("选择学科")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                        
+                        Spacer()
+                        
+                        Button(action: {}) {
+                            HStack(spacing: 4) {
+                                Text("查看详细学程")
+                                    .font(.caption)
+                                    .foregroundColor(.blue)
+                                Image(systemName: "chevron.right")
+                                    .font(.caption2)
+                                    .foregroundColor(.blue)
+                            }
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                    .padding(.horizontal)
+                    
+                    // 美化的学科卡片
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: 2), spacing: 16) {
+                        ModernSubjectCard(
+                            title: "物理",
+                            subtitle: "Physics", 
+                            icon: "物",
+                            color: .blue,
+                            action: {
+                                selectedSubject = .physics
+                                showGradeSelection = true
+                            }
+                        )
+                        
+                        ModernSubjectCard(
+                            title: "数学", 
+                            subtitle: "Mathematics",
+                            icon: "数",
+                            color: .orange,
+                            action: {
+                                selectedSubject = .math
+                                showGradeSelection = true
+                            }
+                        )
+                        
+                        ModernSubjectCard(
+                            title: "化学",
+                            subtitle: "Chemistry", 
+                            icon: "化",
+                            color: .green,
+                            action: {
+                                selectedSubject = .chemistry
+                                showGradeSelection = true
+                            }
+                        )
+                        
+                        ModernSubjectCard(
+                            title: "生物",
+                            subtitle: "Biology", 
+                            icon: "生",
+                            color: .purple,
+                            action: {
+                                selectedSubject = .biology
+                                showGradeSelection = true
+                            }
+                        )
+                    }
+                    .padding(.horizontal)
+                    
+                    // 快速操作区域
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack {
+                            Text("快速操作")
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                        
+                        HStack(spacing: 20) {
+                            QuickActionButton(
+                                icon: "star.fill",
+                                title: "收藏",
+                                color: .orange,
+                                action: { showFavoritesSheet = true }
+                            )
+                            
+                            QuickActionButton(
+                                icon: "info.circle.fill", 
+                                title: "帮助",
+                                color: .blue,
+                                action: {}
+                            )
+                            
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                    }
+                    
+                    Spacer(minLength: 100)
                 }
-                .padding()
-                
-                // 学科选择按钮
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: 2), spacing: 16) {
-                    SubjectCard(subject: .physics) {
-                        selectedSubject = .physics
-                        showGradeSelection = true
-                    }
-                    
-                    SubjectCard(subject: .chemistry) {
-                        selectedSubject = .chemistry
-                        showGradeSelection = true
-                    }
-                    
-                    SubjectCard(subject: .math) {
-                        selectedSubject = .math
-                        showGradeSelection = true
-                    }
-                    
-                    SubjectCard(subject: .biology) {
-                        selectedSubject = .biology
-                        showGradeSelection = true
-                    }
-                }
-                .padding(.horizontal)
-                
-                Spacer()
             }
+            .navigationBarHidden(true)
             .navigationDestination(isPresented: $showGradeSelection) {
                 if let subject = selectedSubject {
                     GradeSelectionView(subject: subject)
@@ -390,6 +527,10 @@ struct HomeTabView: View {
             Button("确认退出", role: .destructive) {
                 auth.signOutFromUI()
             }
+        }
+        .sheet(isPresented: $showFavoritesSheet) {
+            FavoritesView()
+                .environmentObject(favoritesManager)
         }
     }
 }
@@ -704,7 +845,7 @@ struct AIChatView: View {
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
                         }
-                        .onChange(of: vm.conversations.count) { _ in
+                        .onChange(of: vm.conversations.count) { oldValue, newValue in
                             // 当有新对话时，自动滚动到底部
                             if let lastConversation = vm.conversations.last {
                                 withAnimation(.easeInOut(duration: 0.3)) {
@@ -995,6 +1136,64 @@ struct FavoriteItem: Identifiable, Codable {
         case description
     }
     
+    // 自定义日期解码器
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        id = try container.decode(UUID.self, forKey: .id)
+        userId = try container.decodeIfPresent(UUID.self, forKey: .userId)
+        title = try container.decode(String.self, forKey: .title)
+        subject = try container.decode(String.self, forKey: .subject)
+        grade = try container.decode(String.self, forKey: .grade)
+        topicId = try container.decode(String.self, forKey: .topicId)
+        description = try container.decodeIfPresent(String.self, forKey: .description)
+        
+        // 自定义日期解析
+        let dateString = try container.decode(String.self, forKey: .timestamp)
+        
+        // 尝试多种日期格式
+        let formatters: [DateFormatter] = [
+            {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+                formatter.timeZone = TimeZone.current
+                return formatter
+            }(),
+            {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+                formatter.timeZone = TimeZone.current
+                return formatter
+            }(),
+            {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+                return formatter
+            }(),
+            {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ"
+                return formatter
+            }()
+        ]
+        
+        var parsedDate: Date?
+        for formatter in formatters {
+            if let date = formatter.date(from: dateString) {
+                parsedDate = date
+                break
+            }
+        }
+        
+        if let date = parsedDate {
+            timestamp = date
+        } else {
+            // 如果所有格式都失败，使用当前时间作为兜底
+            print("无法解析日期格式: \(dateString), 使用当前时间")
+            timestamp = Date()
+        }
+    }
+    
     // 创建新收藏项目的便利初始化器
     init(title: String, subject: String, grade: String, topicId: String, description: String? = nil, userId: UUID? = nil) {
         self.id = UUID()
@@ -1027,8 +1226,15 @@ class FavoritesManager: ObservableObject {
     @Published var isLoading = false
     
     private let supabaseClient = SupabaseService.shared.client
-    private var currentUserId: UUID? {
-        return supabaseClient.auth.currentUser?.id
+    private func getCurrentUserId() async -> UUID? {
+        // 使用SupabaseService来获取当前用户ID
+        do {
+            let session = try await SupabaseService.shared.client.auth.session
+            return session.user.id
+        } catch {
+            print("获取当前用户失败: \(error)")
+            return nil
+        }
     }
     
     init() {
@@ -1041,7 +1247,7 @@ class FavoritesManager: ObservableObject {
     
     /// 从云端加载收藏数据
     func loadFavorites() async {
-        guard currentUserId != nil else {
+        guard await getCurrentUserId() != nil else {
             print("用户未登录，无法加载收藏")
             return
         }
@@ -1049,7 +1255,7 @@ class FavoritesManager: ObservableObject {
         isLoading = true
         
         do {
-            let response: [FavoriteItem] = try await supabaseClient
+            let response: [FavoriteItem] = try await supabaseClient.database
                 .from("user_favorites")
                 .select()
                 .order("created_at", ascending: false)
@@ -1067,7 +1273,7 @@ class FavoritesManager: ObservableObject {
     
     /// 添加收藏到云端
     func addToFavorites(_ item: FavoriteItem) async {
-        guard let userId = currentUserId else {
+        guard let userId = await getCurrentUserId() else {
             print("用户未登录，无法添加收藏")
             return
         }
@@ -1088,7 +1294,7 @@ class FavoritesManager: ObservableObject {
         )
         
         do {
-            let response: [FavoriteItem] = try await supabaseClient
+            let response: [FavoriteItem] = try await supabaseClient.database
                 .from("user_favorites")
                 .insert(favoriteWithUserId)
                 .select()
@@ -1106,13 +1312,13 @@ class FavoritesManager: ObservableObject {
     
     /// 从云端删除收藏
     func removeFromFavorites(topicId: String) async {
-        guard currentUserId != nil else {
+        guard await getCurrentUserId() != nil else {
             print("用户未登录，无法删除收藏")
             return
         }
         
         do {
-            try await supabaseClient
+            try await supabaseClient.database
                 .from("user_favorites")
                 .delete()
                 .eq("topic_id", value: topicId)
@@ -1283,4 +1489,77 @@ struct SubscriptionRowView: View {
     }
 }
 
+// MARK: - 现代化学科卡片
+struct ModernSubjectCard: View {
+    let title: String
+    let subtitle: String
+    let icon: String
+    let color: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 12) {
+                // 图标背景
+                ZStack {
+                    Circle()
+                        .fill(color.opacity(0.2))
+                        .frame(width: 60, height: 60)
+                    
+                    Text(icon)
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(color)
+                }
+                
+                // 文字内容
+                VStack(spacing: 4) {
+                    Text(title)
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
+                    
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 20)
+            .background(Color(.systemBackground))
+            .cornerRadius(16)
+            .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
+// MARK: - 快速操作按钮
+struct QuickActionButton: View {
+    let icon: String
+    let title: String
+    let color: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 8) {
+                ZStack {
+                    Circle()
+                        .fill(color.opacity(0.2))
+                        .frame(width: 50, height: 50)
+                    
+                    Image(systemName: icon)
+                        .font(.title2)
+                        .foregroundColor(color)
+                }
+                
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(.primary)
+            }
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
 

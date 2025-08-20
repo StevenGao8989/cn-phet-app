@@ -58,7 +58,7 @@ final class AuthViewModel: ObservableObject {
 
     init() {
         authWatcher = Task {
-            for await state in self.client.auth.authStateChanges {
+            for await state in await self.client.auth.authStateChanges {
                 switch state.event {
                 case .initialSession, .signedIn, .tokenRefreshed:
                     try? await self.loadCurrentUserAndProfile()
@@ -917,8 +917,12 @@ final class AuthViewModel: ObservableObject {
                 
                 // 尝试删除用户账号（可能需要admin权限）
                 do {
-                    try await self.client.auth.admin.deleteUser(id: self.user?.id ?? UUID())
-                    print("✅ 用户账号删除成功")
+                    if let userId = self.user?.id {
+                        try await self.client.auth.admin.deleteUser(id: userId.uuidString)
+                        print("✅ 用户账号删除成功")
+                    } else {
+                        print("⚠️ 无法删除用户账号：用户ID不存在")
+                    }
                 } catch let adminError as NSError {
                     print("⚠️ admin删除用户失败: \(adminError.localizedDescription)")
                     
@@ -1002,7 +1006,11 @@ final class AuthViewModel: ObservableObject {
                         
                         // 方法5：尝试通过Edge Function删除用户账号
                         print("🔄 准备调用Edge Function删除用户账号")
-                        await self.deleteUserViaEdgeFunction(userId: self.user?.id ?? UUID())
+                        if let userId = self.user?.id {
+                            await self.deleteUserViaEdgeFunction(userId: userId)
+                        } else {
+                            print("⚠️ 无法调用Edge Function：用户ID不存在")
+                        }
                         
                         print("✅ 账号禁用完成")
                         print("💡 注意：现在使用Edge Function删除用户账号，无需配置SUPABASE_SERVICE_KEY")
