@@ -11,7 +11,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "qwen-turbo",   // 推荐测试用 turbo，便宜又快
+        model: "deepseek-v3",   // 推荐测试用 turbo，便宜又快
         messages: [{ role: "user", content: prompt }]
       }),
     })
