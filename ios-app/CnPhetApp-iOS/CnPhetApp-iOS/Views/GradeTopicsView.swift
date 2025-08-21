@@ -1024,16 +1024,27 @@ struct TopicSectionView: View {
         switch topic.id {
         case "projectile_motion":
             return AnyView(ProjectileSimView(title: topic.title))
-        case "freefall":
-            return AnyView(FreefallSimView(title: topic.title))
-        case "force_motion":
-            return AnyView(ForceMotionSimView(title: topic.title, forceType: "基础"))
-        case "simple_motion":
-            return AnyView(SimpleMotionSimView(title: topic.title, motionType: "基础"))
-        case "lens_simulation":
-            return AnyView(LensSimView(title: topic.title))
         default:
-            return AnyView(Text("模拟器开发中..."))
+            return AnyView(
+                VStack(spacing: 20) {
+                    Image(systemName: "flask.fill")
+                        .font(.system(size: 60))
+                        .foregroundColor(.blue)
+                    
+                    Text(topic.title)
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                    
+                    Text("该知识点的模拟器正在开发中...")
+                        .font(.title3)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                    
+                    Spacer()
+                }
+                .padding()
+                .navigationTitle(topic.title)
+            )
         }
     }
 }

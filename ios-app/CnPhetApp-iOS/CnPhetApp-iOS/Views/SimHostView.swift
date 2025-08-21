@@ -14,16 +14,24 @@ struct SimHostView: View {
         switch topic.sim {
         case .projectile:
             ProjectileSimView(title: topic.title)
-        case .freefall:
-            FreefallSimView(title: topic.title)
-        case .lens:
-            LensSimView(title: topic.title)
-
         default:
-            VStack(spacing: 12) {
-                Text(topic.title).font(.title3.bold())
-                Text("这个模拟正在开发中…").foregroundStyle(.secondary)
+            VStack(spacing: 20) {
+                Image(systemName: "flask.fill")
+                    .font(.system(size: 60))
+                    .foregroundColor(.blue)
+                
+                Text(topic.title)
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                
+                Text("该知识点的模拟器正在开发中...")
+                    .font(.title3)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                
+                Spacer()
             }
+            .padding()
             .navigationTitle(topic.title)
         }
     }

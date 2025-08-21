@@ -2664,14 +2664,6 @@ struct ConcreteTopicsListView: View {
         switch topic.id {
         case "projectile_motion":
             return AnyView(ProjectileSimView(title: topic.title))
-        case "free_fall":
-            return AnyView(FreefallSimView(title: topic.title))
-        case "uniform_motion", "uniformly_accelerated_motion":
-            return AnyView(SimpleMotionSimView(title: topic.title, motionType: topic.id))
-        case "force_analysis", "newton_third_law", "friction_constraint":
-            return AnyView(ForceMotionSimView(title: topic.title, forceType: topic.id))
-        case "lens_imaging", "refraction_reflection", "reflection_law":
-            return AnyView(LensSimView(title: topic.title))
         default:
             // 如果没有对应的模拟器，显示一个默认的详情页面
             return AnyView(

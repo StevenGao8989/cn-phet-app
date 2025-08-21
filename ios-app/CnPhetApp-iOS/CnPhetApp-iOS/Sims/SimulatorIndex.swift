@@ -27,16 +27,11 @@ struct PhysicsSimulators {
     struct Kinematics {
         // 使用字符串路径引用，避免编译时依赖
         static let projectileMotion = "ProjectileSimView"
-        static let freeFall = "FreefallSimView"
-        static let uniformMotion = "SimpleMotionSimView"
-        static let uniformlyAcceleratedMotion = "SimpleMotionSimView"
     }
     
     // MARK: - 力与运动模拟器
     struct ForceMotion {
-        static let forceAnalysis = "ForceMotionSimView"
-        static let newtonThirdLaw = "ForceMotionSimView"
-        static let frictionConstraint = "ForceMotionSimView"
+        // 待实现
     }
     
     // MARK: - 功与能模拟器
@@ -51,7 +46,7 @@ struct PhysicsSimulators {
     
     // MARK: - 光学模拟器
     struct Optics {
-        static let lensImaging = "LensSimView"
+        // 待实现
     }
     
     // MARK: - 热学模拟器
@@ -91,19 +86,6 @@ struct SimulatorFactory {
         // 运动学相关
         case "projectile_motion":
             return PhysicsSimulators.Kinematics.projectileMotion
-        case "free_fall":
-            return PhysicsSimulators.Kinematics.freeFall
-        case "uniform_motion", "uniformly_accelerated_motion":
-            return PhysicsSimulators.Kinematics.uniformMotion
-            
-        // 力与运动相关
-        case "force_analysis", "newton_third_law", "friction_constraint":
-            return PhysicsSimulators.ForceMotion.forceAnalysis
-            
-        // 光学相关
-        case "lens_imaging", "refraction_reflection":
-            return PhysicsSimulators.Optics.lensImaging
-            
         default:
             return nil
         }
@@ -123,14 +105,6 @@ struct SimulatorFactory {
         switch simulatorType {
         case "ProjectileSimView":
             return AnyView(ProjectileSimView(title: title))
-        case "FreefallSimView":
-            return AnyView(FreefallSimView(title: title))
-        case "SimpleMotionSimView":
-            return AnyView(SimpleMotionSimView(title: title, motionType: topicId))
-        case "ForceMotionSimView":
-            return AnyView(ForceMotionSimView(title: title, forceType: topicId))
-        case "LensSimView":
-            return AnyView(LensSimView(title: title))
         default:
             return nil
         }
@@ -160,7 +134,7 @@ extension SimulatorFactory {
         var stats: [String: Int] = [:]
         
         // 物理模拟器统计
-        stats["Physics"] = 5 // 当前实现的物理模拟器数量
+        stats["Physics"] = 1 // 当前实现的物理模拟器数量
         stats["Chemistry"] = 0
         stats["Mathematics"] = 0
         stats["Biology"] = 0
@@ -173,11 +147,7 @@ extension SimulatorFactory {
         switch subject.lowercased() {
         case "physics":
             return [
-                "ProjectileSimView - 抛体运动",
-                "FreefallSimView - 自由落体",
-                "SimpleMotionSimView - 直线运动",
-                "ForceMotionSimView - 力与运动",
-                "LensSimView - 透镜成像"
+                "ProjectileSimView - 抛体运动"
             ]
         case "chemistry":
             return []
