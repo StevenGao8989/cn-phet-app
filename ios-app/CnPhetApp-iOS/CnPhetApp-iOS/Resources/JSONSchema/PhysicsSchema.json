@@ -1,8 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Physics DSL JSON Schema",
-  "description": "Schema for validating Physics DSL to JSON conversion",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/PhysicsDSL.schema.json",
+  "title": "Physics DSL Schema",
+  "description": "Schema for validating Physics DSL v4 (K12 coverage ~90%)",
   "type": "object",
+  "required": ["subject", "scene", "objects", "motions", "outputs"],
   "properties": {
     "subject": {
       "type": "string",
@@ -10,136 +12,216 @@
     },
     "scene": {
       "type": "object",
+      "required": ["coordinate_system", "time"],
       "properties": {
-        "coordinate_system": { "type": "string", "enum": ["cartesian", "polar", "spherical"] },
+        "coordinate_system": {
+          "type": "string",
+          "enum": ["cartesian", "polar", "spherical"]
+        },
         "time": {
           "type": "object",
+          "required": ["start", "end", "step"],
           "properties": {
-            "start": { "type": "number" },
-            "end": { "type": "number" },
-            "step": { "type": "number" }
-          },
-          "required": ["start", "end", "step"]
+            "start": {"type": "number"},
+            "end": {"type": "number"},
+            "step": {"type": "number"}
+          }
         },
         "ignore": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": {"type": "string"}
         }
-      },
-      "required": ["coordinate_system", "time"]
+      }
     },
     "objects": {
       "type": "array",
       "items": {
         "type": "object",
+        "required": ["id", "type"],
         "properties": {
-          "id": { "type": "string" },
-          "type": { "type": "string" },
-          "mass": { "type": "number" },
-          "radius": { "type": "number" },
-          "size": {
-            "type": "object",
-            "properties": {
-              "width": { "type": "number" },
-              "height": { "type": "number" }
-            }
+          "id": {"type": "string"},
+          "type": {
+            "type": "string",
+            "enum": [
+              "particle", "block", "pendulum", "spring", "pulley",
+              "tuning_fork", "wave_source", "ideal_gas", "heater", "calorimeter",
+              "charge", "current", "resistor", "capacitor", "inductor", "solenoid",
+              "light", "lens", "mirror", "double_slit",
+              "photon", "nucleus"
+            ]
           },
-          "constraint": { "type": "string" },
+          "mass": {"type": "number"},
+          "radius": {"type": "number"},
+          "constraint": {"type": "string"},
           "initial": {
             "type": "object",
             "properties": {
               "position": {
                 "type": "object",
                 "properties": {
-                  "x": { "type": "number" },
-                  "y": { "type": "number" }
+                  "x": {"type": "number"},
+                  "y": {"type": "number"}
                 },
                 "required": ["x", "y"]
               },
               "velocity": {
                 "type": "object",
                 "properties": {
-                  "x": { "type": "number" },
-                  "y": { "type": "number" }
+                  "x": {"type": "number"},
+                  "y": {"type": "number"}
                 },
                 "required": ["x", "y"]
               }
             }
-          }
-        },
-        "required": ["id", "type"]
+          },
+          "size": {
+            "type": "object",
+            "properties": {
+              "width": {"type": "number"},
+              "height": {"type": "number"}
+            }
+          },
+          "length": {"type": "number"},
+          "angle": {"type": "string"},
+          "pivot": {
+            "type": "object",
+            "properties": {
+              "x": {"type": "number"},
+              "y": {"type": "number"}
+            }
+          },
+          "k": {"type": "number"},
+          "rest_length": {"type": "number"},
+          "attach": {"type": "array", "items": {"type": "string"}},
+          "frequency": {"type": "number"},
+          "amplitude": {"type": "number"},
+          "wave_type": {"type": "string", "enum": ["longitudinal", "transverse"]},
+          "wavelength": {"type": "number"},
+          "n": {"type": "number"},
+          "V": {"type": "number"},
+          "T": {"type": "number"},
+          "power": {"type": "number"},
+          "capacity": {"type": "number"},
+          "q": {"type": "number"},
+          "I": {"type": "number"},
+          "direction": {
+            "type": "object",
+            "properties": {
+              "x": {"type": "number"},
+              "y": {"type": "number"}
+            }
+          },
+          "R": {"type": "number"},
+          "C": {"type": "number"},
+          "L": {"type": "number"},
+          "turns": {"type": "number"},
+          "current": {"type": "number"},
+          "focal_length": {"type": "number"},
+          "position": {
+            "type": "object",
+            "properties": {
+              "x": {"type": "number"},
+              "y": {"type": "number"}
+            }
+          },
+          "shape": {"type": "string", "enum": ["concave", "convex"]},
+          "d": {"type": "number"},
+          "screen_distance": {"type": "number"},
+          "energy": {"type": "number"},
+          "protons": {"type": "integer"},
+          "neutrons": {"type": "integer"}
+        }
       }
     },
     "motions": {
       "type": "array",
       "items": {
         "type": "object",
+        "required": ["target", "type"],
         "properties": {
-          "target": { "type": "string" },
-          "type": { "type": "string" },
-          "params": { "type": "object" }
-        },
-        "required": ["target", "type"]
+          "target": {"type": "string"},
+          "type": {
+            "type": "string",
+            "enum": [
+              "free_fall", "projectile", "oscillation",
+              "circular", "wave_propagation",
+              "isothermal_process", "adiabatic_process"
+            ]
+          },
+          "params": {"type": "object"}
+        }
       }
     },
     "connectors": {
       "type": "array",
       "items": {
         "type": "object",
+        "required": ["type"],
         "properties": {
-          "type": { "type": "string" },
-          "between": {
-            "type": "array",
-            "items": { "type": "string" }
-          },
-          "length": { "type": "number" },
-          "k": { "type": "number" },
-          "rest_length": { "type": "number" }
-        },
-        "required": ["type", "between"]
+          "type": {"type": "string", "enum": ["rope", "spring", "circuit", "rigid_rod"]},
+          "between": {"type": "array", "items": {"type": "string"}},
+          "elements": {"type": "array", "items": {"type": "string"}},
+          "source": {"type": "string"},
+          "k": {"type": "number"},
+          "rest_length": {"type": "number"}
+        }
       }
     },
     "forces": {
       "type": "array",
       "items": {
         "type": "object",
+        "required": ["type"],
         "properties": {
-          "type": { "type": "string" },
-          "target": {
-            "type": "array",
-            "items": { "type": "string" }
+          "type": {
+            "type": "string",
+            "enum": ["gravity", "friction", "buoyancy", "electric_field", "magnetic_field", "normal_force"]
           },
-          "g": { "type": "number" },
-          "mu": { "type": "number" },
-          "E": { "type": "object" },
-          "B": { "type": "object" }
-        },
-        "required": ["type"]
+          "g": {"type": "number"},
+          "target": {"type": "array", "items": {"type": "string"}},
+          "mu": {"type": "number"},
+          "fluid_density": {"type": "number"},
+          "E": {
+            "type": "object",
+            "properties": {
+              "x": {"type": "number"},
+              "y": {"type": "number"}
+            }
+          },
+          "B": {
+            "type": "object",
+            "properties": {
+              "x": {"type": "number"},
+              "y": {"type": "number"},
+              "z": {"type": "number"}
+            }
+          }
+        }
       }
     },
     "initial": {
       "type": "object",
       "properties": {
-        "relative_angle": {
+        "temperature": {
           "type": "object",
           "properties": {
-            "between": { "type": "array", "items": { "type": "string" } },
-            "value": { "type": "number" }
+            "object": {"type": "string"},
+            "T": {"type": "number"}
           }
         },
         "displacement": {
           "type": "object",
           "properties": {
-            "object": { "type": "string" },
-            "dx": { "type": "number" }
+            "object": {"type": "string"},
+            "dx": {"type": "number"}
           }
         },
         "release_condition": {
           "type": "object",
           "properties": {
-            "object": { "type": "string" },
-            "velocity": { "type": "number" },
-            "from_rest": { "type": "boolean" }
+            "object": {"type": "string"},
+            "velocity": {"type": "number"},
+            "from_rest": {"type": "boolean"}
           }
         }
       }
@@ -148,22 +230,24 @@
       "type": "array",
       "items": {
         "type": "object",
+        "required": ["type"],
         "properties": {
-          "type": { "type": "string" },
-          "objects": { "type": "array", "items": { "type": "string" } },
-          "components": { "type": "array", "items": { "type": "string" } },
-          "show": { "type": "array", "items": { "type": "string" } }
-        },
-        "required": ["type"]
+          "type": {
+            "type": "string",
+            "enum": ["trajectory", "velocity", "acceleration", "energy", "visualization", "spectrum"]
+          },
+          "objects": {"type": "array", "items": {"type": "string"}},
+          "components": {"type": "array", "items": {"type": "string"}},
+          "show": {"type": "array", "items": {"type": "string"}}
+        }
       }
     },
     "extra": {
       "type": "object",
       "properties": {
-        "description": { "type": "string" },
-        "notes": { "type": "string" }
+        "description": {"type": "string"},
+        "notes": {"type": "string"}
       }
     }
-  },
-  "required": ["subject", "scene", "objects"]
+  }
 }
