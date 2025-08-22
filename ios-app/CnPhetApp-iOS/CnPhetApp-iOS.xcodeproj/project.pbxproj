@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8242321B2E58290900A64204 /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = 8242321A2E58290900A64204 /* Yams */; };
 		828767062E4C7759003D6767 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 828767052E4C7759003D6767 /* Secrets.xcconfig */; };
 		8287671E2E4C7DEF003D6767 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 8287671D2E4C7DEF003D6767 /* Supabase */; };
 /* End PBXBuildFile section */
@@ -40,16 +41,30 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				Models/DSL/PhysicsDSL.yaml,
+				Models/JSONSchema/PhysicsSchema.json,
 			);
 			target = 828766BE2E4B9467003D6767 /* CnPhetApp-iOS */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		824232102E58268E00A64204 /* Exceptions for "CnPhetApp-iOS" folder in "Compile Sources" phase from "CnPhetApp-iOS" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 828766BB2E4B9467003D6767 /* Sources */;
+			membershipExceptions = (
+				Models/DSL/PhysicsDSL.yaml,
+				Models/JSONSchema/PhysicsSchema.json,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		828766C12E4B9467003D6767 /* CnPhetApp-iOS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				828767082E4C783C003D6767 /* Exceptions for "CnPhetApp-iOS" folder in "CnPhetApp-iOS" target */,
+				824232102E58268E00A64204 /* Exceptions for "CnPhetApp-iOS" folder in "Compile Sources" phase from "CnPhetApp-iOS" target */,
 			);
 			path = "CnPhetApp-iOS";
 			sourceTree = "<group>";
@@ -71,6 +86,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8242321B2E58290900A64204 /* Yams in Frameworks */,
 				8287671E2E4C7DEF003D6767 /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -142,6 +158,7 @@
 			name = "CnPhetApp-iOS";
 			packageProductDependencies = (
 				8287671D2E4C7DEF003D6767 /* Supabase */,
+				8242321A2E58290900A64204 /* Yams */,
 			);
 			productName = "CnPhetApp-iOS";
 			productReference = 828766BF2E4B9467003D6767 /* CnPhetApp-iOS.app */;
@@ -227,6 +244,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				828767092E4C78ED003D6767 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				824232192E5827EB00A64204 /* XCRemoteSwiftPackageReference "Yams" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 828766C02E4B9467003D6767 /* Products */;
@@ -596,6 +614,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		824232192E5827EB00A64204 /* XCRemoteSwiftPackageReference "Yams" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jpsim/Yams";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.1.0;
+			};
+		};
 		828767092E4C78ED003D6767 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/supabase-community/supabase-swift";
@@ -607,6 +633,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8242321A2E58290900A64204 /* Yams */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 824232192E5827EB00A64204 /* XCRemoteSwiftPackageReference "Yams" */;
+			productName = Yams;
+		};
 		8287671D2E4C7DEF003D6767 /* Supabase */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 828767092E4C78ED003D6767 /* XCRemoteSwiftPackageReference "supabase-swift" */;

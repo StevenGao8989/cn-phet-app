@@ -1,0 +1,196 @@
+
+# ===============================================
+# Physics DSL v3 (K12 coverage ~90%)
+# 带中文注释版本，便于增删
+# ===============================================
+
+subject: physics   # 学科：物理
+
+scene:
+  coordinate_system: cartesian   # 坐标系：cartesian / polar / spherical
+  time:
+    start: 0       # 仿真起始时间
+    end: 10        # 仿真结束时间
+    step: 0.01     # 时间步长（越小越精确，计算量越大）
+  ignore: ["air_resistance", "energy_loss"]  # 忽略空气阻力和能量损失
+
+# ===============================
+# 1. Objects (物体定义)
+# ===============================
+objects:
+  # ---- 力学常见物体 ----
+  - id: particle1
+    type: particle        # 质点/小球
+    mass: 1.0             # 质量
+    radius: 0.05          # 半径（可选，做动画渲染用）
+    constraint: free      # 运动约束：free / vertical_rod / horizontal_rod / inclined_plane(angle)
+    initial:
+      position: {x: 0, y: 1}   # 初始位置
+      velocity: {x: 0, y: 0}   # 初始速度
+
+  - id: cart1
+    type: block           # 小车/滑块
+    mass: 2.0
+    size: {width: 0.5, height: 0.2}   # 尺寸（可选）
+    constraint: inclined_plane(angle: 30)  # 约束在30°斜面上
+
+  - id: pendulum1
+    type: pendulum        # 单摆
+    length: 1.0           # 摆长
+    mass: 0.5             # 摆球质量
+    angle: 30deg          # 初始偏角
+    pivot: {x: 0, y: 0}   # 支点位置
+
+  - id: spring1
+    type: spring          # 弹簧
+    k: 100                # 劲度系数
+    rest_length: 0.5      # 原长
+    attach: [cart1, wall] # 两端连接对象
+
+  - id: pulley1
+    type: pulley
+    ideal: true           # 理想滑轮（无摩擦无质量）
+    attach: [ceiling]
+
+  # ---- 电磁学常见物体 ----
+  - id: charge1
+    type: charge
+    q: 1e-6               # 电荷量（库仑）
+    position: {x: 0.5, y: 0}
+
+  - id: current1
+    type: current
+    I: 2.0                # 电流大小（安培）
+    direction: {x: 1, y: 0} # 电流方向
+
+  - id: resistor1
+    type: resistor
+    R: 100                # 电阻值（欧姆）
+    connect: [node1, node2]  # 电路节点
+
+  - id: capacitor1
+    type: capacitor
+    C: 1e-6               # 电容值（法拉）
+    connect: [node2, node3]
+
+  # ---- 光学常见物体 ----
+  - id: light1
+    type: light
+    wavelength: 600e-9     # 波长（米）
+    direction: right       # 入射方向
+
+  - id: lens1
+    type: lens
+    focal_length: 0.2      # 焦距
+    position: {x: 1, y: 0}
+
+# ===============================
+# 2. Motions (运动模型)
+# ===============================
+motions:
+  - target: particle1
+    type: free_fall        # 自由落体
+    params:
+      g: 9.8
+
+  - target: particle1
+    type: projectile       # 抛体运动
+    params:
+      g: 9.8
+      angle: 45
+      speed: 10
+
+  - target: particle1
+    type: circular         # 圆周运动
+    params:
+      radius: 1.0
+      angular_velocity: 2.0
+      center: {x: 0, y: 0}
+
+  - target: pendulum1
+    type: oscillation      # 简谐/振动运动
+    params:
+      amplitude: 0.2
+      frequency: 1.5
+
+# ===============================
+# 3. Connectors (约束/连接)
+# ===============================
+connectors:
+  - type: rigid_rod
+    length: 0.5
+    between: [particle1, cart1]   # 两物体用刚性杆连接
+
+  - type: rope
+    between: [cart1, pulley1]     # 绳子连接小车和滑轮
+    massless: true
+
+  - type: spring
+    k: 200
+    rest_length: 0.3
+    between: [particle1, wall]    # 弹簧一端接小球，一端接墙壁
+
+# ===============================
+# 4. Forces & Fields (力与场)
+# ===============================
+forces:
+  - type: gravity
+    g: 9.8
+    target: [particle1, cart1]    # 重力作用对象
+
+  - type: friction
+    target: cart1
+    mu: 0.2                       # 摩擦系数
+
+  - type: normal_force
+    target: cart1                 # 支持力
+
+  - type: electric_field
+    E: {x: 100, y: 0}             # 电场强度
+
+  - type: magnetic_field
+    B: {x: 0, y: 0, z: 1}         # 磁场分布
+
+# ===============================
+# 5. Initial Conditions (初始条件)
+# ===============================
+initial:
+  relative_angle:
+    between: [particle1, cart1]   # 两物体的夹角
+    value: 30
+
+  displacement:
+    object: spring1
+    dx: 0.1                       # 弹簧初始形变量
+
+  release_condition:
+    object: particle1
+    velocity: 0                   # 静止释放
+    from_rest: true
+
+# ===============================
+# 6. Outputs (输出结果)
+# ===============================
+outputs:
+  - type: trajectory
+    objects: [particle1, cart1, pendulum1]   # 输出运动轨迹
+
+  - type: velocity
+    objects: [particle1, cart1]
+
+  - type: acceleration
+    objects: [particle1]
+
+  - type: energy
+    objects: [particle1, cart1, pendulum1]
+    components: [kinetic, potential, spring]  # 输出动能/势能/弹簧能
+
+  - type: visualization
+    show: [forces, velocity_vectors, acceleration_vectors, field_lines] # 动画可视化内容
+
+# ===============================
+# 7. Extra (兜底扩展)
+# ===============================
+extra:
+  description: "DSL 未涵盖的特殊场景（如流体力学、相对论、量子效应）"
+  notes: "遇到未知模块时，fallback 到文本讲解或简化模型"
