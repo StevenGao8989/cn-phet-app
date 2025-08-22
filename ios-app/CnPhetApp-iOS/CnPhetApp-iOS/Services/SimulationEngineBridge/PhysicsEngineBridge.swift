@@ -69,6 +69,64 @@ class PhysicsEngineBridge {
         scene.rootNode.addChildNode(node)
     }
     
+    // ====== 示例: 创建单摆 ======
+    private func createPendulum(_ obj: [String: Any]) {
+        let length = obj["length"] as? Double ?? 1.0
+        let mass = obj["mass"] as? Double ?? 1.0
+        
+        // 创建摆球
+        let sphere = SCNSphere(radius: CGFloat(mass * 0.1))
+        let ballNode = SCNNode(geometry: sphere)
+        ballNode.position = SCNVector3(0, Float(-length), 0)
+        ballNode.physicsBody = SCNPhysicsBody.dynamic()
+        ballNode.physicsBody?.mass = CGFloat(mass)
+        
+        // 创建摆线（约束）- 使用固定点作为锚点
+        let anchorNode = SCNNode()
+        anchorNode.position = SCNVector3(0, 0, 0)
+        anchorNode.physicsBody = SCNPhysicsBody.static()
+        
+        let constraint = SCNPhysicsBallSocketJoint(
+            bodyA: ballNode.physicsBody!,
+            anchorA: SCNVector3(0, 0, 0),
+            bodyB: anchorNode.physicsBody!,
+            anchorB: SCNVector3(0, 0, 0)
+        )
+        
+        scene.rootNode.addChildNode(anchorNode)
+        scene.rootNode.addChildNode(ballNode)
+        scene.physicsWorld.addBehavior(constraint)
+    }
+    
+    // ====== 示例: 创建弹簧 ======
+    private func createSpring(_ obj: [String: Any]) {
+        let stiffness = obj["stiffness"] as? Double ?? 100.0
+        let damping = obj["damping"] as? Double ?? 10.0
+        let restLength = obj["restLength"] as? Double ?? 1.0
+        
+        // 创建弹簧端点
+        let endPoint1 = SCNNode()
+        endPoint1.position = SCNVector3(0, 0, 0)
+        endPoint1.physicsBody = SCNPhysicsBody.static()
+        
+        let endPoint2 = SCNNode()
+        endPoint2.position = SCNVector3(0, Float(-restLength), 0)
+        endPoint2.physicsBody = SCNPhysicsBody.dynamic()
+        endPoint2.physicsBody?.mass = 1.0
+        
+        // 创建弹簧约束 - 使用 SCNPhysicsBallSocketJoint 模拟弹簧效果
+        let springConstraint = SCNPhysicsBallSocketJoint(
+            bodyA: endPoint1.physicsBody!,
+            anchorA: SCNVector3(0, 0, 0),
+            bodyB: endPoint2.physicsBody!,
+            anchorB: SCNVector3(0, 0, 0)
+        )
+        
+        scene.rootNode.addChildNode(endPoint1)
+        scene.rootNode.addChildNode(endPoint2)
+        scene.physicsWorld.addBehavior(springConstraint)
+    }
+    
     // ====== 示例: 简单施加重力 ======
     private func applyForce(_ force: [String: Any]) {
         if let type = force["type"] as? String, type == "gravity" {

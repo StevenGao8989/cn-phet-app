@@ -1,0 +1,169 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Physics DSL JSON Schema",
+  "description": "Schema for validating Physics DSL to JSON conversion",
+  "type": "object",
+  "properties": {
+    "subject": {
+      "type": "string",
+      "enum": ["physics"]
+    },
+    "scene": {
+      "type": "object",
+      "properties": {
+        "coordinate_system": { "type": "string", "enum": ["cartesian", "polar", "spherical"] },
+        "time": {
+          "type": "object",
+          "properties": {
+            "start": { "type": "number" },
+            "end": { "type": "number" },
+            "step": { "type": "number" }
+          },
+          "required": ["start", "end", "step"]
+        },
+        "ignore": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["coordinate_system", "time"]
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string" },
+          "mass": { "type": "number" },
+          "radius": { "type": "number" },
+          "size": {
+            "type": "object",
+            "properties": {
+              "width": { "type": "number" },
+              "height": { "type": "number" }
+            }
+          },
+          "constraint": { "type": "string" },
+          "initial": {
+            "type": "object",
+            "properties": {
+              "position": {
+                "type": "object",
+                "properties": {
+                  "x": { "type": "number" },
+                  "y": { "type": "number" }
+                },
+                "required": ["x", "y"]
+              },
+              "velocity": {
+                "type": "object",
+                "properties": {
+                  "x": { "type": "number" },
+                  "y": { "type": "number" }
+                },
+                "required": ["x", "y"]
+              }
+            }
+          }
+        },
+        "required": ["id", "type"]
+      }
+    },
+    "motions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "target": { "type": "string" },
+          "type": { "type": "string" },
+          "params": { "type": "object" }
+        },
+        "required": ["target", "type"]
+      }
+    },
+    "connectors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string" },
+          "between": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "length": { "type": "number" },
+          "k": { "type": "number" },
+          "rest_length": { "type": "number" }
+        },
+        "required": ["type", "between"]
+      }
+    },
+    "forces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string" },
+          "target": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "g": { "type": "number" },
+          "mu": { "type": "number" },
+          "E": { "type": "object" },
+          "B": { "type": "object" }
+        },
+        "required": ["type"]
+      }
+    },
+    "initial": {
+      "type": "object",
+      "properties": {
+        "relative_angle": {
+          "type": "object",
+          "properties": {
+            "between": { "type": "array", "items": { "type": "string" } },
+            "value": { "type": "number" }
+          }
+        },
+        "displacement": {
+          "type": "object",
+          "properties": {
+            "object": { "type": "string" },
+            "dx": { "type": "number" }
+          }
+        },
+        "release_condition": {
+          "type": "object",
+          "properties": {
+            "object": { "type": "string" },
+            "velocity": { "type": "number" },
+            "from_rest": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string" },
+          "objects": { "type": "array", "items": { "type": "string" } },
+          "components": { "type": "array", "items": { "type": "string" } },
+          "show": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["type"]
+      }
+    },
+    "extra": {
+      "type": "object",
+      "properties": {
+        "description": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    }
+  },
+  "required": ["subject", "scene", "objects"]
+}
